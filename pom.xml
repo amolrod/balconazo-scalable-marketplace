@@ -21,6 +21,8 @@
     <modules>
     <!-- <module>microservice-Eureka</module>-->
          <module>catalog_microservice</module>
+         <module>booking_microservice</module>
+         <module>search_microservice</module>
      </modules>
 
      <properties>
