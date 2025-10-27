@@ -1,252 +1,184 @@
-# 🚀 Guía de Inicio Rápido - Catalog Service
+# 🚀 QUICKSTART - Balconazo
 
-## ⚡ Inicio en 3 Pasos (5 minutos)
+> Guía rápida para levantar el proyecto en **menos de 10 minutos**
 
-### Paso 1️⃣: Levantar PostgreSQL
+---
+
+## ✅ Pre-requisitos
 
 ```bash
-cd /Users/angel/Desktop/BalconazoApp
-docker-compose up -d postgres-catalog
-```
-
-**Verificar:**
-```bash
-docker ps | grep postgres
-```
-
-Deberías ver:
-```
-postgres-catalog   Up   0.0.0.0:5433->5432/tcp
+# Verificar versiones
+java -version          # Java 21+
+mvn -version          # Maven 3.9+
+docker --version      # Docker 24+
 ```
 
 ---
 
-### Paso 2️⃣: Ejecutar el Servicio
+## 🎯 Instalación Rápida (3 pasos)
+
+### 1️⃣ Levantar PostgreSQL
+
+```bash
+docker run -d \
+  --name balconazo-pg-catalog \
+  -p 5433:5432 \
+  -e POSTGRES_DB=catalog_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  postgres:16-alpine
+
+# Esperar 10 segundos
+sleep 10
+
+# Crear schema
+docker exec balconazo-pg-catalog psql -U postgres -d catalog_db \
+  -c "CREATE SCHEMA IF NOT EXISTS catalog;"
+```
+
+### 2️⃣ Compilar y Arrancar catalog-service
 
 ```bash
 cd catalog_microservice
+mvn clean install -DskipTests
 mvn spring-boot:run
 ```
 
-**Esperarás ver:**
+**Espera a ver:**
 ```
-Started CatalogMicroserviceApplication in 4.2 seconds
-Tomcat started on port 8081
+Started CatalogMicroserviceApplication in X.XXX seconds
+```
+
+### 3️⃣ Verificar que Funciona
+
+```bash
+# Health check
+curl http://localhost:8085/actuator/health
+
+# Debería responder:
+# {"status":"UP"}
 ```
 
 ---
 
-### Paso 3️⃣: Probar
+## 🧪 Prueba Rápida
+
+### Crear un Usuario
 
 ```bash
-curl http://localhost:8081/actuator/health
-```
-
-**Respuesta esperada:**
-```json
-{"status":"UP"}
-```
-
----
-
-## 🧪 Pruebas Rápidas
-
-### 1. Crear un Usuario Host
-
-```bash
-curl -X POST http://localhost:8081/api/catalog/users \
+curl -X POST http://localhost:8085/api/catalog/users \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "maria@balconazo.com",
-    "password": "securepass123",
+    "email": "host@test.com",
+    "password": "test123",
     "role": "host"
   }'
 ```
 
-**Respuesta esperada:**
+**Respuesta:**
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "email": "maria@balconazo.com",
+  "id": "uuid-generado",
+  "email": "host@test.com",
   "role": "host",
-  "trustScore": 0,
-  "status": "active",
-  "createdAt": "2025-10-27T12:30:00",
-  "updatedAt": "2025-10-27T12:30:00"
+  "status": "ACTIVE"
 }
 ```
 
-**Guarda el `id` del usuario para el siguiente paso.**
-
----
-
-### 2. Crear un Espacio
+### Crear un Espacio
 
 ```bash
-# Reemplaza USER_ID con el id del paso anterior
-USER_ID="550e8400-e29b-41d4-a716-446655440000"
-
-curl -X POST http://localhost:8081/api/catalog/spaces \
+# Reemplaza USUARIO_UUID con el id del usuario anterior
+curl -X POST http://localhost:8085/api/catalog/spaces \
   -H "Content-Type: application/json" \
-  -d "{
-    \"ownerId\": \"$USER_ID\",
-    \"title\": \"Balcón con vistas al mar\",
-    \"description\": \"Hermoso balcón de 25m² con vistas panorámicas\",
-    \"capacity\": 20,
-    \"areaSqm\": 25.5,
-    \"address\": \"Paseo Marítimo 15, Valencia\",
-    \"lat\": 39.4699,
-    \"lon\": -0.3763,
-    \"basePriceCents\": 12000
-  }"
+  -d '{
+    "ownerId": "USUARIO_UUID",
+    "title": "Terraza Madrid Centro",
+    "description": "Bonita terraza en el centro",
+    "address": "Calle Mayor 1, Madrid",
+    "lat": 40.4168,
+    "lon": -3.7038,
+    "capacity": 15,
+    "areaSqm": 30.0,
+    "basePriceCents": 10000,
+    "amenities": ["wifi"],
+    "rules": {"no_smoking": true}
+  }'
 ```
 
-**Respuesta esperada:**
-```json
-{
-  "id": "660e8400-e29b-41d4-a716-446655440001",
-  "ownerId": "550e8400-e29b-41d4-a716-446655440000",
-  "ownerEmail": "maria@balconazo.com",
-  "title": "Balcón con vistas al mar",
-  "description": "Hermoso balcón de 25m² con vistas panorámicas",
-  "capacity": 20,
-  "areaSqm": 25.5,
-  "address": "Paseo Marítimo 15, Valencia",
-  "lat": 39.4699,
-  "lon": -0.3763,
-  "basePriceCents": 12000,
-  "status": "draft",
-  "createdAt": "2025-10-27T12:35:00",
-  "updatedAt": "2025-10-27T12:35:00"
-}
-```
-
-**Guarda el `id` del espacio.**
-
----
-
-### 3. Activar el Espacio (Publicarlo)
+### Listar Espacios
 
 ```bash
-SPACE_ID="660e8400-e29b-41d4-a716-446655440001"
-
-curl -X POST http://localhost:8081/api/catalog/spaces/$SPACE_ID/activate
+curl http://localhost:8085/api/catalog/spaces
 ```
 
 ---
 
-### 4. Añadir Disponibilidad
+## 🛑 Detener Todo
 
 ```bash
-curl -X POST http://localhost:8081/api/catalog/availability \
-  -H "Content-Type: application/json" \
-  -d "{
-    \"spaceId\": \"$SPACE_ID\",
-    \"startTs\": \"2025-12-31T18:00:00\",
-    \"endTs\": \"2026-01-01T06:00:00\",
-    \"maxGuests\": 20
-  }"
+# Detener Spring Boot (Ctrl+C en la terminal)
+
+# Detener PostgreSQL
+docker stop balconazo-pg-catalog
+docker rm balconazo-pg-catalog
 ```
 
 ---
 
-### 5. Listar Espacios Activos
+## 🔧 Troubleshooting
 
+### Error: "Port 8085 already in use"
 ```bash
-curl http://localhost:8081/api/catalog/spaces
+# Buscar proceso usando el puerto
+lsof -i :8085
+
+# Matar proceso
+kill -9 <PID>
 ```
 
----
-
-## 📋 Comandos Útiles
-
-### Ver Logs
-
-```bash
-# En la terminal donde ejecutaste mvn spring-boot:run
-# Los logs aparecen automáticamente
-```
-
-### Detener el Servicio
-
-```bash
-# Presiona Ctrl+C en la terminal del servicio
-```
-
-### Detener PostgreSQL
-
-```bash
-docker-compose down postgres-catalog
-```
-
-### Ver Base de Datos
-
-```bash
-docker exec -it postgres-catalog psql -U catalog_user -d catalog_db
-
-# Dentro de psql:
-\dt catalog.*           # Listar tablas
-SELECT * FROM catalog.users;
-SELECT * FROM catalog.spaces;
-\q                      # Salir
-```
-
----
-
-## 🐛 Solución de Problemas
-
-### PostgreSQL no inicia
-
-```bash
-# Ver logs
-docker logs postgres-catalog
-
-# Reiniciar
-docker-compose restart postgres-catalog
-```
-
-### Puerto 8081 ya está en uso
-
-```bash
-# Cambiar puerto en application.yml
-# O detener el proceso que usa el puerto:
-lsof -ti:8081 | xargs kill -9
-```
-
-### Error de conexión a base de datos
-
+### Error: "Cannot connect to PostgreSQL"
 ```bash
 # Verificar que PostgreSQL está corriendo
-docker ps | grep postgres
+docker ps | grep balconazo-pg-catalog
 
-# Verificar configuración en application.yml
-# url: jdbc:postgresql://localhost:5433/catalog_db
+# Ver logs
+docker logs balconazo-pg-catalog
+
+# Reiniciar contenedor
+docker restart balconazo-pg-catalog
+```
+
+### Error: "password authentication failed"
+```bash
+# Eliminar y recrear PostgreSQL
+docker rm -f balconazo-pg-catalog
+docker volume rm -f pg-catalog-data
+
+# Volver a ejecutar el comando del paso 1
 ```
 
 ---
 
 ## 📚 Próximos Pasos
 
-1. ✅ Servicio funcionando
-2. ➡️ Prueba todos los endpoints con Postman
-3. ➡️ Implementa el microservicio de booking
-4. ➡️ Implementa el microservicio de search
-5. ➡️ Conecta con Kafka para eventos
+1. ✅ catalog-service funcionando
+2. ⏭️ Levantar Kafka (ver [documentacion.md](./documentacion.md))
+3. ⏭️ Implementar booking-service
+4. ⏭️ Implementar search-pricing-service
+5. ⏭️ Frontend Angular
 
 ---
 
-## 🎯 Endpoints Disponibles
+## 🆘 ¿Necesitas Ayuda?
 
-| Recurso | Endpoint Base |
-|---------|---------------|
-| Users | `/api/catalog/users` |
-| Spaces | `/api/catalog/spaces` |
-| Availability | `/api/catalog/availability` |
-| Health | `/actuator/health` |
-
-Ver documentación completa en `README.md`
+- **Documentación completa:** [`documentacion.md`](./documentacion.md)
+- **Guía de pruebas:** [`TESTING.md`](./TESTING.md)
+- **README principal:** [`README.md`](./README.md)
 
 ---
 
-**¡Listo! 🎉 El servicio está corriendo y funcional.**
+**¡Listo para comenzar!** 🚀
+
+**Última actualización:** 27 de octubre de 2025
 

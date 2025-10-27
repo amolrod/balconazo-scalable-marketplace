@@ -1,390 +1,321 @@
-# 🎉 Balconazo - Catalog Microservice
+# 🏠 BALCONAZO - Marketplace de Espacios
 
-**Marketplace de alquiler de espacios tipo balcones/terrazas**
+> Plataforma de alquiler de balcones y terrazas para eventos privados
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
-[![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
+[![Kafka](https://img.shields.io/badge/Kafka-3.7-black)](https://kafka.apache.org/)
+[![Docker](https://img.shields.io/badge/Docker-latest-blue)](https://www.docker.com/)
 
 ---
 
-## 📋 Descripción
+## 📋 Tabla de Contenidos
 
-Microservicio de catálogo para la plataforma Balconazo. Gestiona:
-- 👥 **Usuarios** (hosts, guests, admins)
-- 🏠 **Espacios** (balcones, terrazas)
-- 📅 **Disponibilidad** de espacios
+- [Sobre el Proyecto](#sobre-el-proyecto)
+- [Estado Actual](#estado-actual)
+- [Arquitectura](#arquitectura)
+- [Tecnologías](#tecnologías)
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Documentación](#documentación)
+- [Roadmap](#roadmap)
+
+---
+
+## 📖 Sobre el Proyecto
+
+**Balconazo** es un marketplace que conecta propietarios de balcones y terrazas con personas que buscan espacios únicos para eventos privados (fiestas, reuniones, cenas, etc.).
+
+### Características Principales
+
+- ✅ Gestión de usuarios (hosts y guests)
+- ✅ Catálogo de espacios con geolocalización
+- ✅ Sistema de disponibilidad temporal
+- ⏳ Reservas con pago integrado
+- ⏳ Búsqueda geoespacial avanzada
+- ⏳ Pricing dinámico basado en demanda
+- ⏳ Sistema de reviews y reputación
+- ⏳ Notificaciones en tiempo real
+
+---
+
+## ✅ Estado Actual
+
+### Completado (27 Oct 2025)
+
+- ✅ **catalog-service** - Microservicio funcionando al 100%
+  - Puerto: 8085
+  - Endpoints REST: Users, Spaces, Availability
+  - PostgreSQL: Conectado y tablas creadas
+  - Kafka Producers: Implementados
+  - Health Check: ✅ UP
+
+### En Progreso
+
+- ⏳ Kafka + Zookeeper (próximo paso)
+- ⏳ booking-service (siguiente microservicio)
+- ⏳ search-pricing-service
+
+### Pendiente
+
+- ⏸️ API Gateway (Spring Cloud Gateway)
+- ⏸️ Frontend Angular 20
+- ⏸️ Redis (cache y locks)
+- ⏸️ Deployment AWS
 
 ---
 
 ## 🏗️ Arquitectura
 
-### Stack Tecnológico
-
-- **Framework:** Spring Boot 3.3.5
-- **Lenguaje:** Java 21
-- **Base de Datos:** PostgreSQL 16
-- **Caché:** Redis
-- **Mensajería:** Apache Kafka
-- **Validación:** Bean Validation
-- **Mapeo:** MapStruct
-- **Seguridad:** BCrypt (Spring Security)
-- **Build:** Maven 3.9+
-
-### Capas de la Aplicación
-
 ```
-catalog-service/
-├── 📦 Domain Layer
-│   ├── Entities (JPA)
-│   ├── Constants
-│   └── Exceptions
-├── 🔧 Application Layer
-│   ├── Services (Business Logic)
-│   ├── DTOs
-│   └── Mappers (MapStruct)
-├── 🗄️ Infrastructure Layer
-│   ├── Repositories (Spring Data JPA)
-│   └── Config (JPA, Security, Exception Handling)
-└── 🌐 Presentation Layer
-    └── Controllers (REST API)
+┌──────────────────────────────────────────────────────┐
+│            Angular Frontend :4200                    │
+└──────────────────┬───────────────────────────────────┘
+                   │ HTTPS/JWT
+                   ▼
+┌──────────────────────────────────────────────────────┐
+│       Spring Cloud Gateway :8080 (⏸️ TODO)          │
+└──────────────────┬───────────────────────────────────┘
+                   │
+        ┌──────────┼──────────┐
+        │          │          │
+        ▼          ▼          ▼
+   ┌────────┐ ┌────────┐ ┌────────┐
+   │Catalog │ │Booking │ │ Search │
+   │:8081   │ │:8082   │ │:8083   │
+   │✅ UP   │ │⏳ TODO │ │⏳ TODO │
+   └───┬────┘ └───┬────┘ └───┬────┘
+       │          │          │
+       ▼          ▼          ▼
+   ┌────────┐ ┌────────┐ ┌────────┐
+   │PG:5433 │ │PG:5434 │ │PG:5435 │
+   │✅ UP   │ │⏸️ TODO │ │⏸️ TODO │
+   └────────┘ └────────┘ └────────┘
+
+       │          │          │
+       └──────────┼──────────┘
+                  │
+         ┌────────▼────────┐
+         │  Kafka :9092    │
+         │  ⏳ TODO        │
+         └─────────────────┘
 ```
+
+### Microservicios
+
+1. **catalog-service** ✅ - Usuarios, Espacios, Disponibilidad
+2. **booking-service** ⏳ - Reservas, Pagos, Reviews
+3. **search-pricing-service** ⏳ - Búsqueda geoespacial, Pricing dinámico
 
 ---
 
-## 🚀 Inicio Rápido
+## 🛠️ Tecnologías
 
-### Prerrequisitos
+### Backend
+- **Spring Boot** 3.5.7
+- **Java** 21
+- **PostgreSQL** 16
+- **Apache Kafka** 3.7
+- **Redis** 7
+- **Maven** 3.9+
 
-- Java 21+
+### Frontend (Pendiente)
+- **Angular** 20
+- **Tailwind CSS**
+- **TypeScript**
+
+### DevOps
+- **Docker** & Docker Compose
+- **AWS** ECS/EKS (producción)
+- **GitHub Actions** (CI/CD)
+
+---
+
+## 🚀 Instalación
+
+### Requisitos Previos
+
+- Java 21
 - Maven 3.9+
-- Docker & Docker Compose
-- PostgreSQL 16 (via Docker)
+- Docker Desktop
+- PostgreSQL client (opcional)
 
-### 1. Clonar el Proyecto
-
-```bash
-git clone https://github.com/tuusuario/BalconazoApp.git
-cd BalconazoApp
-```
-
-### 2. Levantar Infraestructura
+### Paso 1: Clonar el Repositorio
 
 ```bash
-# Levantar PostgreSQL, Kafka y Redis
-docker-compose up -d
+git clone https://github.com/tu-usuario/balconazo-app.git
+cd balconazo-app
 ```
 
-### 3. Compilar el Proyecto
+### Paso 2: Levantar PostgreSQL
+
+```bash
+docker run -d \
+  --name balconazo-pg-catalog \
+  -p 5433:5432 \
+  -e POSTGRES_DB=catalog_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  postgres:16-alpine
+
+# Crear schema
+docker exec balconazo-pg-catalog psql -U postgres -d catalog_db -c "CREATE SCHEMA IF NOT EXISTS catalog;"
+```
+
+### Paso 3: Compilar el Proyecto
 
 ```bash
 cd catalog_microservice
-mvn clean install
+mvn clean install -DskipTests
 ```
 
-**Resultado esperado:**
-```
-[INFO] BUILD SUCCESS
-[INFO] Total time: 3.411 s
-```
-
-### 4. Ejecutar el Servicio
+### Paso 4: Arrancar catalog-service
 
 ```bash
 mvn spring-boot:run
 ```
 
-El servicio estará disponible en: **http://localhost:8081**
+El servicio estará disponible en: `http://localhost:8085`
 
-### 5. Verificar que Funciona
+### Paso 5: Verificar Health Check
 
 ```bash
-# Health check
-curl http://localhost:8081/actuator/health
+curl http://localhost:8085/actuator/health
+```
 
-# Respuesta esperada:
-# {"status":"UP"}
+Respuesta esperada:
+```json
+{
+  "status": "UP"
+}
 ```
 
 ---
 
-## 📡 API REST
+## 📝 Uso
 
-### Endpoints Principales
-
-#### 👥 Users API
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/catalog/users` | Crear usuario |
-| GET | `/api/catalog/users/{id}` | Obtener usuario por ID |
-| GET | `/api/catalog/users/email/{email}` | Buscar por email |
-| GET | `/api/catalog/users?role=host` | Listar por rol |
-| PATCH | `/api/catalog/users/{id}/trust-score` | Actualizar confianza |
-| POST | `/api/catalog/users/{id}/suspend` | Suspender usuario |
-| POST | `/api/catalog/users/{id}/activate` | Activar usuario |
-
-#### 🏠 Spaces API
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/catalog/spaces` | Crear espacio |
-| GET | `/api/catalog/spaces/{id}` | Obtener espacio |
-| GET | `/api/catalog/spaces/owner/{ownerId}` | Listar por propietario |
-| GET | `/api/catalog/spaces` | Listar espacios activos |
-| PUT | `/api/catalog/spaces/{id}` | Actualizar espacio |
-| POST | `/api/catalog/spaces/{id}/activate` | Publicar espacio |
-| POST | `/api/catalog/spaces/{id}/snooze` | Pausar espacio |
-| DELETE | `/api/catalog/spaces/{id}` | Eliminar (soft delete) |
-
-#### 📅 Availability API
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| POST | `/api/catalog/availability` | Añadir disponibilidad |
-| GET | `/api/catalog/availability/space/{spaceId}` | Listar slots de un espacio |
-| GET | `/api/catalog/availability/space/{spaceId}/future` | Slots futuros |
-| GET | `/api/catalog/availability/space/{spaceId}/range` | Por rango de fechas |
-| DELETE | `/api/catalog/availability/{slotId}` | Eliminar slot |
-
----
-
-## 🧪 Ejemplos de Uso
-
-### Crear Usuario
+### Crear un Usuario
 
 ```bash
-curl -X POST http://localhost:8081/api/catalog/users \
+curl -X POST http://localhost:8085/api/catalog/users \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "host@example.com",
+    "email": "host@balconazo.com",
     "password": "password123",
     "role": "host"
   }'
 ```
 
-### Crear Espacio
+### Crear un Espacio
 
 ```bash
-curl -X POST http://localhost:8081/api/catalog/spaces \
+curl -X POST http://localhost:8085/api/catalog/spaces \
   -H "Content-Type: application/json" \
   -d '{
     "ownerId": "uuid-del-usuario",
-    "title": "Balcón con vistas al mar",
-    "description": "Hermoso balcón de 20m²",
-    "capacity": 15,
-    "areaSqm": 20.5,
-    "address": "Calle Principal 123, Barcelona",
-    "lat": 41.3851,
-    "lon": 2.1734,
-    "basePriceCents": 8000
+    "title": "Terraza con vistas al Retiro",
+    "description": "Amplia terraza de 50m²",
+    "address": "Calle Alcalá 123, Madrid",
+    "lat": 40.4168,
+    "lon": -3.7038,
+    "capacity": 20,
+    "areaSqm": 50.0,
+    "basePriceCents": 15000,
+    "amenities": ["wifi", "barbecue"],
+    "rules": {"no_smoking": true}
   }'
 ```
 
-### Añadir Disponibilidad
+### Listar Espacios
 
 ```bash
-curl -X POST http://localhost:8081/api/catalog/availability \
-  -H "Content-Type: application/json" \
-  -d '{
-    "spaceId": "uuid-del-espacio",
-    "startTs": "2025-12-31T18:00:00",
-    "endTs": "2026-01-01T06:00:00",
-    "maxGuests": 15
-  }'
+curl http://localhost:8085/api/catalog/spaces
 ```
+
+Ver más ejemplos en [`TESTING.md`](./TESTING.md)
 
 ---
 
-## 🗂️ Estructura del Proyecto
+## 📚 Documentación
 
-```
-catalog_microservice/
-├── src/main/java/com/balconazo/catalog_microservice/
-│   ├── CatalogMicroserviceApplication.java    # Main
-│   ├── constants/
-│   │   └── CatalogConstants.java               # Constantes
-│   ├── exception/
-│   │   ├── CatalogException.java               # Base exception
-│   │   ├── ResourceNotFoundException.java
-│   │   ├── DuplicateResourceException.java
-│   │   └── BusinessValidationException.java
-│   ├── entity/
-│   │   ├── UserEntity.java                     # Usuarios
-│   │   ├── SpaceEntity.java                    # Espacios
-│   │   ├── AvailabilitySlotEntity.java         # Disponibilidad
-│   │   └── ProcessedEventEntity.java           # Idempotencia
-│   ├── repository/
-│   │   ├── UserRepository.java
-│   │   ├── SpaceRepository.java
-│   │   ├── AvailabilitySlotRepository.java
-│   │   └── ProcessedEventRepository.java
-│   ├── dto/
-│   │   ├── CreateUserDTO.java
-│   │   ├── UserDTO.java
-│   │   ├── CreateSpaceDTO.java
-│   │   ├── SpaceDTO.java
-│   │   ├── CreateAvailabilityDTO.java
-│   │   └── AvailabilitySlotDTO.java
-│   ├── mapper/
-│   │   ├── UserMapper.java                     # MapStruct
-│   │   ├── SpaceMapper.java
-│   │   └── AvailabilityMapper.java
-│   ├── service/
-│   │   ├── UserService.java
-│   │   ├── SpaceService.java
-│   │   ├── AvailabilityService.java
-│   │   └── impl/
-│   │       ├── UserServiceImpl.java
-│   │       ├── SpaceServiceImpl.java
-│   │       └── AvailabilityServiceImpl.java
-│   ├── controller/
-│   │   ├── UserController.java                 # REST API
-│   │   ├── SpaceController.java
-│   │   └── AvailabilityController.java
-│   └── config/
-│       ├── JpaConfig.java
-│       ├── SecurityConfig.java
-│       └── GlobalExceptionHandler.java
-├── src/main/resources/
-│   └── application.yml                          # Configuración
-├── pom.xml                                      # Maven
-└── README.md
-```
-
-**Total:** 35 archivos Java
+- **[documentacion.md](./documentacion.md)** - Documentación técnica completa
+- **[TESTING.md](./TESTING.md)** - Guía de pruebas y ejemplos
+- **[QUICKSTART.md](./QUICKSTART.md)** - Guía rápida de inicio
+- **[README.md](./README.md)** - Este archivo
 
 ---
 
-## ⚙️ Configuración
+## 🗺️ Roadmap
 
-### application.yml
+### Fase 1: Backend Core (EN PROGRESO)
+- [x] Setup inicial del proyecto
+- [x] catalog-service funcional
+- [ ] Levantar Kafka
+- [ ] Implementar booking-service
+- [ ] Implementar search-pricing-service
+- [ ] API Gateway
 
-```yaml
-server:
-  port: 8081
+### Fase 2: Integración
+- [ ] Redis para cache
+- [ ] Saga de booking
+- [ ] Motor de pricing dinámico
+- [ ] Integración con Stripe
 
-spring:
-  application:
-    name: catalog-service
-  datasource:
-    url: jdbc:postgresql://localhost:5433/catalog_db
-    username: catalog_user
-    password: catalog_pass
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-```
+### Fase 3: Frontend
+- [ ] Setup Angular 20
+- [ ] Páginas principales
+- [ ] Autenticación JWT
+- [ ] Integración con API
 
-### Variables de Entorno
-
-```bash
-# Base de datos
-DB_HOST=localhost
-DB_PORT=5433
-DB_NAME=catalog_db
-DB_USER=catalog_user
-DB_PASSWORD=catalog_pass
-
-# Servidor
-SERVER_PORT=8081
-```
-
----
-
-## 🧪 Testing
-
-```bash
-# Ejecutar tests
-mvn test
-
-# Ejecutar con cobertura
-mvn clean test jacoco:report
-```
-
----
-
-## 🐳 Docker
-
-### Levantar Infraestructura
-
-```bash
-docker-compose up -d
-```
-
-Servicios levantados:
-- **PostgreSQL** (catalog_db) - Puerto 5433
-- **Kafka + ZooKeeper** - Puerto 29092
-- **Redis** - Puerto 6379
-
----
-
-## 📊 Estado del Proyecto
-
-✅ **BUILD SUCCESS** - Proyecto completamente funcional
-
-| Componente | Archivos | Estado |
-|-----------|----------|--------|
-| Main | 1 | ✅ |
-| Constants | 1 | ✅ |
-| Exceptions | 4 | ✅ |
-| Entities | 4 | ✅ |
-| Repositories | 4 | ✅ |
-| DTOs | 6 | ✅ |
-| Mappers | 3 | ✅ |
-| Services | 6 | ✅ |
-| Controllers | 3 | ✅ |
-| Config | 3 | ✅ |
-| **TOTAL** | **35** | **100%** |
-
----
-
-## 🎯 Roadmap
-
-- [x] CRUD de Usuarios
-- [x] CRUD de Espacios
-- [x] Gestión de Disponibilidad
-- [ ] Integración con Kafka (eventos)
-- [ ] Cache con Redis
-- [ ] Documentación Swagger/OpenAPI
-- [ ] Tests de integración
-- [ ] Métricas con Prometheus
+### Fase 4: Producción
+- [ ] Docker Compose completo
+- [ ] CI/CD
+- [ ] Deployment AWS
+- [ ] Monitoring
 
 ---
 
 ## 🤝 Contribuir
 
-1. Fork el proyecto
-2. Crea tu rama (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+Este es un proyecto educacional. Si encuentras bugs o tienes sugerencias:
+
+1. Abre un issue
+2. Haz un fork del proyecto
+3. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
+4. Commit tus cambios (`git commit -m 'Añade nueva funcionalidad'`)
+5. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+6. Abre un Pull Request
 
 ---
 
-## 📝 Licencia
+## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT.
+Este proyecto es de código abierto bajo la licencia MIT.
 
 ---
 
-## 👥 Autores
+## 👨‍💻 Autor
 
-- **Angel** - *Desarrollo inicial*
+**Angel Rodriguez**
+
+- GitHub: [@amolrod](https://github.com/amolrod)
+- Email: angel@balconazo.com
 
 ---
 
 ## 🙏 Agradecimientos
 
-- Spring Boot Team
-- MapStruct
-- Lombok
+- Spring Framework Team
+- Apache Kafka Community
+- PostgreSQL Team
 
 ---
 
-**🚀 ¡El servicio está listo para usar!**
+**¡Gracias por tu interés en Balconazo!** 🚀🎉
 
-Para más información, consulta la documentación en `/docs`
+---
+
+**Última actualización:** 27 de octubre de 2025  
+**Estado:** catalog-service ✅ Funcional
 

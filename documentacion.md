@@ -1,944 +1,732 @@
-0) Visión general (stack solicitado)
+# 🏗️ BALCONAZO - Documentación Técnica Completa
 
-Backend
+> **Marketplace de Alquiler de Espacios (Balcones/Terrazas para Eventos)**  
+> Arquitectura de Microservicios con Spring Boot 3.5, Java 21, Kafka, PostgreSQL, Redis y Angular 20
 
-3 microservicios Spring Boot 3.x (Java 21), empaquetados con spring-boot-maven-plugin.
+---
 
-Spring Cloud Gateway como API Gateway (JWT + rate limit en Redis + CORS).
+## 📋 ÍNDICE
 
-Kafka (AWS MSK en prod; Confluent/Bitnami en dev) para eventos asíncronos.
+1. [Estado Actual del Proyecto](#estado-actual)
+2. [Stack Tecnológico](#stack-tecnológico)
+3. [Arquitectura de Microservicios](#arquitectura)
+4. [Bounded Contexts y Distribución](#bounded-contexts)
+5. [Catalog Microservice (IMPLEMENTADO)](#catalog-service)
+6. [Base de Datos](#base-de-datos)
+7. [Eventos Kafka](#eventos-kafka)
+8. [Configuración Docker](#docker)
+9. [Roadmap](#roadmap)
 
-PostgreSQL (RDS en prod) — database per service; en dev: 3 DBs en el mismo contenedor para simplificar, cada una con su schema propio.
+---
 
-Redis (ElastiCache en prod) para caché y locks.
+<a name="estado-actual"></a>
+## ✅ ESTADO ACTUAL DEL PROYECTO (27 Oct 2025)
 
-Patrones: SOLID, Repository, Service Layer, DTO, Outbox + Kafka.
+### Completado
+- ✅ **catalog-service** - 100% funcional
+  - Puerto: 8085
+  - PostgreSQL: Conectado (puerto 5433)
+  - Tablas: users, spaces, availability_slots, processed_events
+  - Endpoints REST: Implementados
+  - Kafka Producers: Preparados
+  - Health Check: ✅ UP
 
-Frontend
+### En Progreso
+- ⏳ Kafka + Zookeeper (próximo paso)
+- ⏳ booking-service (siguiente microservicio)
+- ⏳ search-pricing-service
 
-Angular 20 (standalone components) + Tailwind CSS.
+### Pendiente
+- ⏸️ API Gateway (Spring Cloud Gateway)
+- ⏸️ Frontend Angular 20
+- ⏸️ Docker Compose completo
+- ⏸️ Deployment AWS
 
-HttpClient contra el API Gateway (JWT vía interceptor).
+---
 
-Infra
+<a name="stack-tecnológico"></a>
+## 🛠️ STACK TECNOLÓGICO
 
-Docker Compose para dev local (Gateway + 3 servicios + Kafka + ZK + 3 Postgres + Redis).
+### Backend
+- **Framework:** Spring Boot 3.5.7
+- **Lenguaje:** Java 21 (OpenJDK 21.0.6)
+- **Build:** Maven 3.9+
+- **API Gateway:** Spring Cloud Gateway (pendiente)
+- **Messaging:** Apache Kafka 3.7 (Bitnami)
+- **Base de Datos:** PostgreSQL 16 (Alpine)
+- **Cache:** Redis 7 (Alpine)
+- **ORM:** Hibernate 6.6.33 (JPA)
+- **Pool Conexiones:** HikariCP
 
-AWS ECS/EKS para despliegue (imágenes Docker), AWS MSK y AWS RDS para datos.
+### Frontend
+- **Framework:** Angular 20 (standalone components)
+- **CSS:** Tailwind CSS
+- **HTTP:** HttpClient + JWT Interceptor
 
-TAREA 1) Redistribuye 8 bounded contexts en EXACTAMENTE 3 microservicios (con justificación)
-Bounded contexts originales
+### Infraestructura
+- **Desarrollo:** Docker + Docker Compose
+- **Producción:** AWS ECS/EKS, MSK, RDS, ElastiCache
 
-Identidad & Confianza
+### Patrones Implementados
+- ✅ SOLID principles
+- ✅ Repository Pattern
+- ✅ Service Layer
+- ✅ DTO Pattern
+- ✅ Outbox Pattern (preparado)
+- ✅ Event-Driven Architecture
+- ⏳ Saga Pattern (para booking)
+- ⏳ CQRS (read-model en search-pricing)
 
-Catálogo (Listings)
+---
 
-Búsqueda
+<a name="arquitectura"></a>
+## 🏗️ ARQUITECTURA DE MICROSERVICIOS
 
-Precios
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Angular Frontend :4200                      │
+│                    (Tailwind CSS + HttpClient)                  │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │ HTTPS/JWT
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              Spring Cloud Gateway :8080 (Pendiente)             │
+│         (JWT Validation, Rate Limiting, CORS, Routing)          │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+                 ┌─────────────┼─────────────┐
+                 │             │             │
+                 ▼             ▼             ▼
+       ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+       │  Catalog    │ │  Booking    │ │Search-Pricing│
+       │  Service    │ │  Service    │ │   Service    │
+       │   :8081     │ │   :8082     │ │   :8083      │
+       │             │ │             │ │              │
+       │ ✅ RUNNING │ │ ⏳ TODO     │ │ ⏳ TODO      │
+       └──────┬──────┘ └──────┬──────┘ └──────┬───────┘
+              │                │                │
+              ▼                ▼                ▼
+       ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+       │PostgreSQL   │ │PostgreSQL   │ │PostgreSQL   │
+       │ catalog_db  │ │ booking_db  │ │ search_db   │
+       │   :5433     │ │   :5434     │ │   :5435     │
+       │ ✅ RUNNING │ │ ⏸️ TODO     │ │ ⏸️ TODO     │
+       └─────────────┘ └─────────────┘ └─────────────┘
 
-Reservas (Bookings)
+              ▲                ▲                ▲
+              └────────────────┼────────────────┘
+                               │
+                ┌──────────────▼──────────────┐
+                │      Apache Kafka :9092     │
+                │    (+ Zookeeper :2181)      │
+                │        ⏳ TODO              │
+                └─────────────────────────────┘
 
-Pagos
+                ┌─────────────────────────────┐
+                │       Redis :6379           │
+                │    (Cache + Locks)          │
+                │        ⏸️ TODO              │
+                └─────────────────────────────┘
+```
 
-Reputación (Reviews & Disputes)
+---
 
-Notificaciones
+<a name="bounded-contexts"></a>
+## 🎯 BOUNDED CONTEXTS Y DISTRIBUCIÓN
 
-Nueva distribución (3 microservicios)
+### Contextos Originales (8)
+1. Identidad & Confianza
+2. Catálogo (Listings)
+3. Búsqueda
+4. Precios
+5. Reservas (Bookings)
+6. Pagos
+7. Reputación (Reviews & Disputes)
+8. Notificaciones
 
-MS‑Catalog (catalog-service)
+### Redistribución en 3 Microservicios
 
-Agrupa: Identidad & Confianza + Catálogo (Spaces, Availability)
+#### 1️⃣ MS-Catalog (catalog-service) ✅ IMPLEMENTADO
+**Agrupa:** Identidad & Confianza + Catálogo (Spaces, Availability)
 
-Responsabilidad: gestión de usuarios/roles/trust (a nivel mínimo, verificación simulada), alta/edición de espacios, reglas, disponibilidad base.
+**Responsabilidades:**
+- Gestión de usuarios (hosts/guests) con roles y trust score
+- CRUD de espacios (balcones/terrazas)
+- Gestión de disponibilidad temporal
+- Validación de propiedad y reglas de negocio
 
-Por qué junto: el host y su inventario son acoplados; compartir transacciones simplifica invariantes de “propiedad del espacio” y publicación de eventos consistentes (SpaceCreated, AvailabilityChanged).
+**Por qué junto:**
+- El host y su inventario están acoplados lógicamente
+- Compartir transacciones simplifica invariantes de propiedad
+- Emisión consistente de eventos (SpaceCreated, AvailabilityChanged)
 
-Publica (Kafka): space.events.v1 (created/updated), availability.events.v1.
+**Publica a Kafka:**
+- `space.events.v1` → SpaceCreated, SpaceUpdated, SpaceDeactivated
+- `availability.events.v1` → AvailabilityAdded, AvailabilityRemoved
 
-MS‑Booking (booking-service)
+**Base de Datos:** `catalog_db` (PostgreSQL 16)
+**Puerto:** 8081 (configurado actualmente en 8085 para desarrollo)
 
-Agrupa: Reservas + Pagos + Reputación (Reviews/Disputes) + Notificaciones (como módulo interno que emite NotificationRequested)
+#### 2️⃣ MS-Booking (booking-service) ⏳ TODO
+**Agrupa:** Reservas + Pagos + Reputación + Notificaciones
 
-Responsabilidad: orquestar la saga de reserva (hold → preauth → confirm/cancel), integrarse con pasarela de pago (stub en dev), emitir reviews y disputas post‑estancia.
+**Responsabilidades:**
+- Orquestar saga de reserva (hold → preauth → confirm/cancel)
+- Integración con pasarela de pago (Stripe stub en dev)
+- Gestión de reviews post-estancia
+- Disputas y resoluciones
+- Emisión de notificaciones (email/SMS)
 
-Por qué junto: la consistencia entre reserva, cobro y review es crítica; tenerlas juntas evita coreografías excesivas en el camino crítico.
+**Por qué junto:**
+- Consistencia crítica entre reserva, cobro y review
+- Evita coreografías complejas en el camino crítico
+- Transacciones ACID para operaciones de pago
 
-Publica: booking.events.v1, payment.events.v1, review.events.v1, notification.events.v1.
+**Publica a Kafka:**
+- `booking.events.v1` → BookingRequested, BookingConfirmed, BookingCancelled
+- `payment.events.v1` → PaymentAuthorized, PaymentCaptured, RefundIssued
+- `review.events.v1` → ReviewCreated, ReviewUpdated
+- `notification.events.v1` → NotificationRequested
 
-MS‑SearchPricing (search-pricing-service)
+**Base de Datos:** `booking_db` (PostgreSQL 16)
+**Puerto:** 8082
 
-Agrupa: Búsqueda + Precios
+#### 3️⃣ MS-SearchPricing (search-pricing-service) ⏳ TODO
+**Agrupa:** Búsqueda + Precios
 
-Responsabilidad: mantener proyección de búsqueda geoespacial (PostGIS) y motor de pricing dinámico (Kafka Streams o scheduler + Kafka), precalcular price_surface y calentar Redis.
+**Responsabilidades:**
+- Proyección de búsqueda geoespacial (PostGIS)
+- Motor de pricing dinámico (Kafka Streams)
+- Precálculo de precios efectivos
+- Cache en Redis para baja latencia (<200ms P95)
+- Índices de búsqueda optimizados
 
-Por qué junto: el precio efectivo forma parte del read‑model de búsqueda; precalcular y servir desde el mismo servicio reduce latencia (<100–200 ms P95).
+**Por qué junto:**
+- El precio efectivo es parte del read-model de búsqueda
+- Precalcular y servir desde el mismo servicio reduce latencia
+- Escalado horizontal independiente
 
-Consume: space.events.v1, availability.events.v1, booking.events.v1, analytics.search.v1; Publica: pricing.events.v1.
+**Consume de Kafka:**
+- `space.events.v1`
+- `availability.events.v1`
+- `booking.events.v1`
 
-Ventajas: 3 servicios con fronteras estables, coherencia transaccional donde importa (Booking/Payment), y read model separado (SearchPricing) que escala horizontalmente. Permite añadir verticales (“Pool‑nazo”) reutilizando Catalog + Booking; SearchPricing solo indexa nuevo tipo.
+**Publica a Kafka:**
+- `pricing.events.v1` → PriceUpdated, DemandSurgeDetected
 
-TAREA 2) Sustituye EventBridge/SQS por Kafka (tópicos y eventos)
-Tópicos (nombres y claves)
+**Base de Datos:** `search_db` (PostgreSQL 16 + PostGIS)
+**Puerto:** 8083
 
-space.events.v1 — key: space_id
+---
 
-SpaceCreated, SpaceUpdated, SpaceDeactivated
+<a name="catalog-service"></a>
+## ✅ CATALOG MICROSERVICE (IMPLEMENTADO)
 
-availability.events.v1 — key: space_id
+### Estado
+- ✅ **FUNCIONANDO** en puerto **8085**
+- ✅ Conectado a PostgreSQL (localhost:5433)
+- ✅ Tablas creadas automáticamente por Hibernate
+- ✅ Health check: UP
+- ✅ Endpoints REST operativos
 
-AvailabilityAdded, AvailabilityRemoved, AvailabilityChanged
+### Arquitectura Interna
 
-booking.events.v1 — key: booking_id
+```
+catalog-service/
+├── controller/          # REST Controllers
+│   ├── UserController.java
+│   ├── SpaceController.java
+│   └── AvailabilityController.java
+├── service/             # Business Logic
+│   ├── UserService.java (interface)
+│   ├── UserServiceImpl.java
+│   ├── SpaceService.java (interface)
+│   ├── SpaceServiceImpl.java
+│   ├── AvailabilityService.java (interface)
+│   └── AvailabilityServiceImpl.java
+├── repository/          # JPA Repositories
+│   ├── UserRepository.java
+│   ├── SpaceRepository.java
+│   ├── AvailabilitySlotRepository.java
+│   └── ProcessedEventRepository.java
+├── entity/              # JPA Entities
+│   ├── UserEntity.java
+│   ├── SpaceEntity.java
+│   ├── AvailabilitySlotEntity.java
+│   └── ProcessedEventEntity.java
+├── dto/                 # Data Transfer Objects
+│   ├── CreateUserDTO.java
+│   ├── UserDTO.java
+│   ├── CreateSpaceDTO.java
+│   ├── SpaceDTO.java
+│   ├── CreateAvailabilityDTO.java
+│   └── AvailabilitySlotDTO.java
+├── mapper/              # MapStruct Mappers
+│   ├── UserMapper.java
+│   └── SpaceMapper.java
+├── kafka/               # Kafka Producers
+│   ├── producer/
+│   │   ├── SpaceEventProducer.java
+│   │   └── AvailabilityEventProducer.java
+│   └── event/
+│       ├── SpaceCreatedEvent.java
+│       ├── SpaceUpdatedEvent.java
+│       ├── SpaceDeactivatedEvent.java
+│       ├── AvailabilityAddedEvent.java
+│       └── AvailabilityRemovedEvent.java
+├── config/              # Configuration
+│   ├── KafkaConfig.java
+│   ├── SwaggerConfig.java
+│   └── GlobalExceptionHandler.java
+├── exception/           # Custom Exceptions
+│   ├── ResourceNotFoundException.java
+│   └── BusinessValidationException.java
+└── constants/           # Constants
+    └── CatalogConstants.java
+```
 
-BookingRequested, BookingHeld, BookingConfirmed, BookingCancelled, BookingExpired
+### Endpoints REST
 
-payment.events.v1 — key: booking_id
+#### Usuarios
+```
+POST   /api/catalog/users          - Crear usuario
+GET    /api/catalog/users/{id}     - Obtener usuario
+GET    /api/catalog/users          - Listar usuarios
+PUT    /api/catalog/users/{id}     - Actualizar usuario
+```
 
-PaymentIntentCreated, PaymentAuthorized, PaymentCaptured, PaymentFailed, RefundIssued
+#### Espacios
+```
+POST   /api/catalog/spaces         - Crear espacio
+GET    /api/catalog/spaces         - Listar espacios activos
+GET    /api/catalog/spaces/{id}    - Obtener espacio
+PUT    /api/catalog/spaces/{id}    - Actualizar espacio
+DELETE /api/catalog/spaces/{id}    - Desactivar espacio
+GET    /api/catalog/spaces/owner/{ownerId} - Espacios por propietario
+```
 
-review.events.v1 — key: booking_id
+#### Disponibilidad
+```
+POST   /api/catalog/availability                   - Crear slot disponibilidad
+GET    /api/catalog/availability/space/{spaceId}   - Listar disponibilidad
+DELETE /api/catalog/availability/{id}              - Eliminar slot
+GET    /api/catalog/availability/{id}              - Obtener slot
+```
 
-ReviewSubmitted, DisputeOpened, DisputeResolved
+#### Actuator
+```
+GET    /actuator/health            - Estado del servicio
+GET    /actuator/info              - Información del servicio
+GET    /actuator/metrics           - Métricas
+```
 
-pricing.events.v1 — key: space_id
+### Modelo de Datos
 
-PriceRecomputeRequested, PriceUpdated
+#### users
+```sql
+CREATE TABLE catalog.users (
+    id UUID PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,  -- 'host' | 'guest' | 'admin'
+    status VARCHAR(255) NOT NULL, -- 'ACTIVE' | 'SUSPENDED' | 'DELETED'
+    trust_score INTEGER,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
+);
+```
 
-analytics.search.v1 — key: tile_id (o bboxKey)
+#### spaces
+```sql
+CREATE TABLE catalog.spaces (
+    id UUID PRIMARY KEY,
+    owner_id UUID NOT NULL REFERENCES users(id),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    address VARCHAR(255) NOT NULL,
+    lat DOUBLE PRECISION NOT NULL,
+    lon DOUBLE PRECISION NOT NULL,
+    capacity INTEGER NOT NULL,
+    area_sqm NUMERIC(6,2),
+    base_price_cents INTEGER NOT NULL,
+    amenities TEXT[],
+    rules JSONB,
+    status VARCHAR(255) NOT NULL, -- 'ACTIVE' | 'INACTIVE' | 'DELETED'
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
+);
+```
 
-SearchQueryLogged (lat, lon, fecha, filtros)
+#### availability_slots
+```sql
+CREATE TABLE catalog.availability_slots (
+    id UUID PRIMARY KEY,
+    space_id UUID NOT NULL REFERENCES spaces(id),
+    start_ts TIMESTAMP NOT NULL,
+    end_ts TIMESTAMP NOT NULL,
+    max_guests INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);
+```
 
-Política por tópico
+#### processed_events
+```sql
+CREATE TABLE catalog.processed_events (
+    event_id UUID PRIMARY KEY,
+    aggregate_id UUID NOT NULL,
+    event_type VARCHAR(255) NOT NULL,
+    processed_at TIMESTAMP NOT NULL
+);
+-- Para idempotencia de eventos Kafka
+```
 
-Particiones: 12 en dev (fácil de escalar a 48/96 en prod).
+---
 
-Retención: 7–14 días para eventos de sistema; 24–48 h para analytics.search.v1 (alto volumen).
+<a name="base-de-datos"></a>
+## 💾 BASE DE DATOS
 
-DLT por tópico: *.DLT.
+### Estrategia: Database per Service
 
-Formato: JSON + encabezados (traceId, correlationId, eventType, version, occurredAt). Avro/Schema Registry opcional en prod.
+Cada microservicio tiene su propia base de datos PostgreSQL para garantizar:
+- ✅ Aislamiento de datos
+- ✅ Escalado independiente
+- ✅ Schema evolution sin coordinación
+- ✅ Resiliencia (un DB down no afecta otros servicios)
 
-Ejemplo evento JSON (PriceUpdated)
+### Configuración Docker (Desarrollo)
 
+#### catalog_db (✅ FUNCIONANDO)
+```bash
+docker run -d \
+  --name balconazo-pg-catalog \
+  -p 5433:5432 \
+  -e POSTGRES_DB=catalog_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  postgres:16-alpine
+```
+
+#### booking_db (⏳ TODO)
+```bash
+docker run -d \
+  --name balconazo-pg-booking \
+  -p 5434:5432 \
+  -e POSTGRES_DB=booking_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  postgres:16-alpine
+```
+
+#### search_db (⏳ TODO)
+```bash
+docker run -d \
+  --name balconazo-pg-search \
+  -p 5435:5432 \
+  -e POSTGRES_DB=search_db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  postgis/postgis:16-3.4-alpine  # PostGIS para búsqueda geoespacial
+```
+
+### Configuración Producción (AWS RDS)
+- PostgreSQL 16.x
+- Multi-AZ para alta disponibilidad
+- Backups automáticos diarios
+- Encryption at rest (KMS)
+- Connection pooling con RDS Proxy
+
+---
+
+<a name="eventos-kafka"></a>
+## 📨 EVENTOS KAFKA
+
+### Tópicos Definidos
+
+#### space.events.v1
+**Key:** `space_id` (UUID)  
+**Particiones:** 12  
+**Replication Factor:** 3 (prod) / 1 (dev)
+
+**Eventos:**
+1. **SpaceCreated**
+```json
 {
-"eventType": "PriceUpdated",
-"version": 1,
-"spaceId": "f3f2d5e0-...",
-"timeslotStart": "2025-12-31T22:00:00Z",
-"priceCents": 4200,
-"source": "search-pricing",
-"occurredAt": "2025-10-23T09:12:00Z",
-"metadata": { "multiplier": 1.68, "demandScore": 0.82 }
+  "eventType": "SpaceCreated",
+  "version": 1,
+  "spaceId": "uuid",
+  "ownerId": "uuid",
+  "title": "string",
+  "description": "string",
+  "capacity": 20,
+  "areaSqm": 50.0,
+  "basePriceCents": 15000,
+  "amenities": ["wifi", "barbecue"],
+  "rules": {"no_smoking": true},
+  "address": "string",
+  "lat": 40.4168,
+  "lon": -3.7038,
+  "status": "ACTIVE",
+  "occurredAt": "2025-10-27T14:00:00Z",
+  "metadata": {
+    "source": "catalog-service",
+    "traceId": "uuid",
+    "correlationId": "uuid"
+  }
 }
-
-
-Idempotencia
-
-record key = aggregate_id + eventId en payload; consumidores mantienen tabla processed_events(event_id) por servicio.
-
-Productores con enable.idempotence=true y transacciones Kafka cuando se use Outbox.
-
-TAREA 3) DDL Postgres por microservicio (cada uno con su schema)
-
-En dev puedes tener un contenedor Postgres con 3 bases: catalog_db, booking_db, search_db. En cada base, un schema homónimo: catalog, booking, search.
-En prod (RDS), database per service (aislamiento), con el mismo schema lógico interno.
-
-MS‑Catalog (DB: catalog_db, schema: catalog)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE SCHEMA IF NOT EXISTS catalog;
-
-CREATE TABLE IF NOT EXISTS catalog.users(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-email CITEXT UNIQUE NOT NULL,
-role TEXT NOT NULL CHECK (role IN ('host','guest','admin')),
-trust_score INT DEFAULT 0,
-status TEXT DEFAULT 'active',
-created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS catalog.spaces(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-owner_id UUID NOT NULL REFERENCES catalog.users(id),
-title TEXT NOT NULL,
-capacity INT NOT NULL,
-rules JSONB DEFAULT '{}'::jsonb,
-address TEXT,
-lat DOUBLE PRECISION NOT NULL,
-lon DOUBLE PRECISION NOT NULL,
-base_price_cents INT NOT NULL,
-status TEXT CHECK (status IN ('draft','active','snoozed')) DEFAULT 'active',
-created_at TIMESTAMPTZ DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_spaces_owner ON catalog.spaces(owner_id);
-CREATE INDEX IF NOT EXISTS idx_spaces_geo ON catalog.spaces(lat, lon);
-
-CREATE TABLE IF NOT EXISTS catalog.availability_slots(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-space_id UUID NOT NULL REFERENCES catalog.spaces(id),
-start_ts TIMESTAMPTZ NOT NULL,
-end_ts TIMESTAMPTZ NOT NULL,
-max_guests INT NOT NULL,
-UNIQUE(space_id, start_ts, end_ts)
-);
-
-MS‑Booking (DB: booking_db, schema: booking)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "btree_gist";
-
-CREATE SCHEMA IF NOT EXISTS booking;
-
-CREATE TABLE IF NOT EXISTS booking.bookings(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-space_id UUID NOT NULL, -- referencia lógica (no FK cross-DB)
-guest_id UUID NOT NULL,
-start_ts TIMESTAMPTZ NOT NULL,
-end_ts TIMESTAMPTZ NOT NULL,
-status TEXT NOT NULL CHECK (status IN ('held','confirmed','cancelled','expired')),
-price_cents INT NOT NULL,
-deposit_cents INT DEFAULT 0,
-payment_intent_id TEXT,
-created_at TIMESTAMPTZ DEFAULT now()
-);
--- Exclusion para evitar solapes en 'held'/'confirmed'
-ALTER TABLE booking.bookings ADD CONSTRAINT IF NOT EXISTS no_overlap
-EXCLUDE USING GIST (space_id WITH =, tstzrange(start_ts,end_ts) WITH &&)
-WHERE (status IN ('held','confirmed'));
-
-CREATE INDEX IF NOT EXISTS idx_bookings_space_time
-ON booking.bookings(space_id, start_ts, end_ts, status);
-
-CREATE TABLE IF NOT EXISTS booking.reviews(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-booking_id UUID UNIQUE REFERENCES booking.bookings(id),
-author_id UUID NOT NULL,
-target_user_id UUID NOT NULL,
-rating INT CHECK (rating BETWEEN 1 AND 5),
-text TEXT,
-created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Outbox para eventos de dominio
-CREATE TABLE IF NOT EXISTS booking.outbox(
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-aggregate_id UUID NOT NULL,
-event_type TEXT NOT NULL,
-payload JSONB NOT NULL,
-occurred_at TIMESTAMPTZ DEFAULT now(),
-published BOOLEAN DEFAULT FALSE
-);
-CREATE INDEX IF NOT EXISTS idx_outbox_published ON booking.outbox(published, occurred_at);
-
-MS‑SearchPricing (DB: search_db, schema: search)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS postgis; -- para geoespacial
-
-CREATE SCHEMA IF NOT EXISTS search;
-
--- Proyección de spaces (read model)
-CREATE TABLE IF NOT EXISTS search.spaces_projection(
-space_id UUID PRIMARY KEY,
-title TEXT NOT NULL,
-capacity INT NOT NULL,
-rating NUMERIC(3,2),
-geo GEOGRAPHY(POINT,4326) NOT NULL,
-base_price_cents INT NOT NULL,
-status TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_spaces_geo ON search.spaces_projection USING GIST (geo);
-
--- Superficie de precio por timeslot (precalculada)
-CREATE TABLE IF NOT EXISTS search.price_surface(
-space_id UUID NOT NULL,
-timeslot_start TIMESTAMPTZ NOT NULL,
-price_cents INT NOT NULL,
-multiplier NUMERIC(4,2) NOT NULL,
-demand_score NUMERIC(4,2) NOT NULL,
-PRIMARY KEY (space_id, timeslot_start)
-);
-
--- Métricas/demanda agregada por celda/ventana
-CREATE TABLE IF NOT EXISTS search.demand_agg(
-tile_id TEXT NOT NULL,
-window_start TIMESTAMPTZ NOT NULL,
-searches INT NOT NULL DEFAULT 0,
-holds INT NOT NULL DEFAULT 0,
-bookings INT NOT NULL DEFAULT 0,
-PRIMARY KEY (tile_id, window_start)
-);
-
-TAREA 4) Saga de Booking en Spring + Kafka
-
-Estilo: Orquestación centrada en booking-service.
-
-Pasos (happy path)
-
-API POST /bookings (Gateway → booking-service)
-
-Lock Redis: SET lock:booking:{spaceId}:{start}-{end} NX PX=<TTL>
-
-Create booking status='held' con precio de Redis (price:{space}:{slot}) o fallback base_price.
-
-Outbox: insertar evento BookingHeld (transacción DB).
-
-Outbox Publisher (scheduler @fixedDelay=500ms)
-
-Lee outbox no publicados → Kafka produce a booking.events.v1 en una transacción Kafka (opcional) y marca published=true.
-
-Payment (módulo interno del booking-service o subcomponente)
-
-Produce PaymentIntentCreated (y opcionalmente llama a pasarela stub).
-
-Cuando la pasarela responde, emite PaymentAuthorized → Kafka.
-
-booking-service (consumer de payment.events.v1)
-
-PaymentAuthorized → mantiene held; PaymentFailed → cancelled + DEL lock + BookingCancelled.
-
-POST /bookings/{id}/confirm (cliente)
-
-Orquestador captura pago → PaymentCaptured → BookingConfirmed + DEL lock.
-
-expiry worker (scheduler)
-
-Expira held sin confirmación en TTL → expired + DEL lock + BookingExpired.
-
-Compensaciones
-
-Fallo al capturar pago → BookingCancelled + refund si aplica.
-
-Idempotencia
-
-Idempotency-Key en POST /bookings.
-
-Tabla processed_events (consume side) para ignorar duplicados.
-
-TAREA 5) Dependencias Maven (por microservicio)
-
-Usa Spring Boot 3.3.x y Spring Cloud 2024.x.
-
-BOM común (padre)
-<dependencyManagement>
-<dependencies>
-<dependency>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-dependencies</artifactId>
-<version>3.3.3</version>
-<type>pom</type>
-<scope>import</scope>
-</dependency>
-<dependency>
-<groupId>org.springframework.cloud</groupId>
-<artifactId>spring-cloud-dependencies</artifactId>
-<version>2024.0.3</version>
-<type>pom</type>
-<scope>import</scope>
-</dependency>
-</dependencies>
-</dependencyManagement>
-
-catalog-service (JPA + Kafka + Redis)
-<dependencies>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-validation</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>
-<dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
-<dependency><groupId>org.springframework.kafka</groupId><artifactId>spring-kafka</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-redis</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
-<dependency><groupId>org.springdoc</groupId><artifactId>springdoc-openapi-starter-webmvc-ui</artifactId><version>2.6.0</version></dependency>
-<dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jsr310</artifactId></dependency>
-<dependency><groupId>org.mapstruct</groupId><artifactId>mapstruct</artifactId><version>1.5.5.Final</version></dependency>
-</dependencies>
-
-booking-service (JPA + Kafka + Redis)
-<dependencies>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-validation</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>
-<dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
-<dependency><groupId>org.springframework.kafka</groupId><artifactId>spring-kafka</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-redis</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
-<dependency><groupId>org.springdoc</groupId><artifactId>springdoc-openapi-starter-webmvc-ui</artifactId><version>2.6.0</version></dependency>
-<dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jsr310</artifactId></dependency>
-<dependency><groupId>org.mapstruct</groupId><artifactId>mapstruct</artifactId><version>1.5.5.Final</version></dependency>
-</dependencies>
-
-search-pricing-service (JPA + PostGIS + Kafka Streams + Redis)
-<dependencies>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-validation</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-jpa</artifactId></dependency>
-<dependency><groupId>org.hibernate</groupId><artifactId>hibernate-spatial</artifactId></dependency>
-<dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId></dependency>
-<dependency><groupId>org.springframework.kafka</groupId><artifactId>spring-kafka</artifactId></dependency>
-<dependency><groupId>org.springframework.kafka</groupId><artifactId>spring-kafka-streams</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-redis</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
-<dependency><groupId>org.springdoc</groupId><artifactId>springdoc-openapi-starter-webmvc-ui</artifactId><version>2.6.0</version></dependency>
-<dependency><groupId>com.fasterxml.jackson.datatype</groupId><artifactId>jackson-datatype-jsr310</artifactId></dependency>
-<dependency><groupId>org.mapstruct</groupId><artifactId>mapstruct</artifactId><version>1.5.5.Final</version></dependency>
-</dependencies>
-
-api-gateway (Spring Cloud Gateway + Security/JWT)
-<dependencies>
-<dependency><groupId>org.springframework.cloud</groupId><artifactId>spring-cloud-starter-gateway</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-oauth2-resource-server</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-security</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
-<dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-data-redis-reactive</artifactId></dependency>
-</dependencies>
-
-TAREA 6) Configuración del API Gateway (JWT + enrutamiento)
-
-Supuesto: en dev usamos Keycloak (contenedor) para emitir JWT HS256/RS256. En prod puedes apuntar a Cognito o un IdP corporativo (JWKs).
-
-application.yml (extracto)
-
-server:
-port: 8080
-
-spring:
-cloud:
-gateway:
-default-filters:
-- AddResponseHeader=X-Request-Id, #{T(java.util.UUID).randomUUID()}
-routes:
-- id: catalog
-uri: http://catalog-service:8081
-predicates:
-- Path=/api/catalog/**
-filters:
-- StripPrefix=2
-- RequestRateLimiter=#{@redisRateLimiter}
-- id: booking
-uri: http://booking-service:8082
-predicates:
-- Path=/api/bookings/**, /api/reviews/**
-filters:
-- StripPrefix=2
-- RequestRateLimiter=#{@redisRateLimiter}
-- id: search
-uri: http://search-pricing-service:8083
-predicates:
-- Path=/api/search/**, /api/pricing/**
-filters:
-- StripPrefix=2
-- RequestRateLimiter=#{@redisRateLimiter}
-
-security:
-oauth2:
-resourceserver:
-jwt:
-jwk-set-uri: http://keycloak:8080/realms/balconazo/protocol/openid-connect/certs
-
-# Rate limiter (Redis)
-spring:
-data:
-redis:
-host: redis
-port: 6379
-
-# CORS (si usas config global)
-balconazo:
-cors:
-allowed-origins: "http://localhost:4200"
-allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-allowed-headers: "*"
-allow-credentials: true
-
-
-Notas
-
-Path base para el frontend: /api/*.
-
-JWT: roles host, guest en scope/realm_access.
-
-Rate limiting: RedisRateLimiter por principal (resolver custom que lee sub del JWT).
-
-TAREA 7) Arquitectura Angular 20 + Tailwind
-
-Estructura propuesta
-
-/frontend
-/src
-/app
-/core
-auth.service.ts
-jwt.interceptor.ts
-api.config.ts
-/features
-/search
-search.page.ts (standalone)
-search.service.ts
-/space-detail
-space-detail.page.ts
-/host
-host-dashboard.page.ts
-host.service.ts
-/booking
-booking.page.ts
-booking.service.ts
-app.routes.ts
-app.component.ts
-/environments
-environment.ts
-environment.development.ts
-tailwind.config.js
-postcss.config.js
-
-
-Instalación rápida
-
-npm create @angular@latest balconazo-frontend -- --standalone
-cd balconazo-frontend
-npm i -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-
-
-tailwind.config.js
-
-module.exports = {
-content: ["./src/**/*.{html,ts}"],
-theme: { extend: {} },
-plugins: []
-};
-
-
-styles.css
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
-api.config.ts
-
-export const API_BASE = 'http://localhost:8080/api'; // Gateway
-
-
-auth.service.ts (esqueleto)
-
-import { Injectable } from '@angular/core';
-
-@Injectable({ providedIn: 'root' })
-export class AuthService {
-private token?: string;
-setToken(t: string) { this.token = t; }
-getToken() { return this.token; } // En prod, integra Keycloak JS adapter
-isLoggedIn() { return !!this.token; }
+```
+
+2. **SpaceUpdated**
+```json
+{
+  "eventType": "SpaceUpdated",
+  "version": 1,
+  "spaceId": "uuid",
+  "ownerId": "uuid",
+  "title": "string",
+  "capacity": 25,
+  "basePriceCents": 18000,
+  "status": "ACTIVE",
+  "occurredAt": "2025-10-27T15:00:00Z",
+  "metadata": {...}
 }
+```
 
-
-jwt.interceptor.ts
-
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from './auth.service';
-
-export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-const auth = inject(AuthService);
-const token = auth.getToken();
-const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
-return next(authReq);
-};
-
-
-search.service.ts
-
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { API_BASE } from '../../core/api.config';
-
-export interface SearchResult { spaceId: string; title: string; capacity: number; priceCents: number; lat: number; lon: number; rating?: number; }
-
-@Injectable({ providedIn: 'root' })
-export class SearchService {
-private http = inject(HttpClient);
-search(params: { lat: number; lon: number; radius_m: number; capacity: number }) {
-return this.http.get<SearchResult[]>(`${API_BASE}/search`, { params: <any>params });
+3. **SpaceDeactivated**
+```json
+{
+  "eventType": "SpaceDeactivated",
+  "version": 1,
+  "spaceId": "uuid",
+  "ownerId": "uuid",
+  "status": "INACTIVE",
+  "occurredAt": "2025-10-27T16:00:00Z",
+  "metadata": {...}
 }
+```
+
+#### availability.events.v1
+**Key:** `space_id` (UUID)  
+**Particiones:** 12
+
+**Eventos:**
+1. **AvailabilityAdded**
+```json
+{
+  "eventType": "AvailabilityAdded",
+  "version": 1,
+  "slotId": "uuid",
+  "spaceId": "uuid",
+  "startTs": "2025-12-31T18:00:00Z",
+  "endTs": "2025-12-31T23:59:59Z",
+  "maxGuests": 20,
+  "occurredAt": "2025-10-27T14:00:00Z",
+  "metadata": {...}
 }
+```
 
+2. **AvailabilityRemoved**
+```json
+{
+  "eventType": "AvailabilityRemoved",
+  "version": 1,
+  "slotId": "uuid",
+  "spaceId": "uuid",
+  "startTs": "2025-12-31T18:00:00Z",
+  "endTs": "2025-12-31T23:59:59Z",
+  "occurredAt": "2025-10-27T15:00:00Z",
+  "metadata": {...}
+}
+```
 
-Rutas (standalone)
+#### booking.events.v1 (⏳ TODO)
+**Key:** `booking_id` (UUID)
 
-import { Routes } from '@angular/router';
-import { SearchPage } from './features/search/search.page';
-import { SpaceDetailPage } from './features/space-detail/space-detail.page';
-import { BookingPage } from './features/booking/booking.page';
-import { HostDashboardPage } from './features/host/host-dashboard.page';
+**Eventos:** BookingRequested, BookingHeld, BookingConfirmed, BookingCancelled, BookingExpired
 
-export const routes: Routes = [
-{ path: '', component: SearchPage },
-{ path: 'space/:id', component: SpaceDetailPage },
-{ path: 'booking/:id', component: BookingPage },
-{ path: 'host', component: HostDashboardPage }
-];
+#### payment.events.v1 (⏳ TODO)
+**Key:** `booking_id` (UUID)
 
+**Eventos:** PaymentIntentCreated, PaymentAuthorized, PaymentCaptured, PaymentFailed, RefundIssued
 
-Usa HttpClient directo al Gateway; Tailwind para UI rápida; añade un Guard si el endpoint requiere autenticación.
+#### review.events.v1 (⏳ TODO)
+**Key:** `booking_id` (UUID)
 
-TAREA 8) docker-compose.yml (dev local)
+**Eventos:** ReviewCreated, ReviewUpdated
 
-Incluye: Gateway, 3 microservicios, Kafka+ZK, Redis, 3 Postgres (una por servicio), Keycloak opcional para JWT.
+#### pricing.events.v1 (⏳ TODO)
+**Key:** `space_id` (UUID)
 
-version: "3.9"
-services:
-zookeeper:
-image: bitnami/zookeeper:3.9
-environment: [ ALLOW_ANONYMOUS_LOGIN=yes ]
-ports: ["2181:2181"]
+**Eventos:** PriceUpdated, DemandSurgeDetected
 
-kafka:
-image: bitnami/kafka:3.7
-depends_on: [ zookeeper ]
-environment:
-- KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-- KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
-- KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-- ALLOW_PLAINTEXT_LISTENER=yes
-ports: ["29092:29092"]
+---
 
-redis:
-image: redis:7
-ports: ["6379:6379"]
+<a name="docker"></a>
+## 🐳 CONFIGURACIÓN DOCKER
 
-# Bases de datos por servicio
+### Servicios Actuales
+
+#### PostgreSQL Catalog (✅ FUNCIONANDO)
+```yaml
 pg-catalog:
-image: postgres:16
-environment: [ POSTGRES_PASSWORD=postgres, POSTGRES_DB=catalog_db ]
-ports: ["5433:5432"]
-volumes:
-- ./ddl/catalog.sql:/docker-entrypoint-initdb.d/01_catalog.sql:ro
-pg-booking:
-image: postgres:16
-environment: [ POSTGRES_PASSWORD=postgres, POSTGRES_DB=booking_db ]
-ports: ["5434:5432"]
-volumes:
-- ./ddl/booking.sql:/docker-entrypoint-initdb.d/01_booking.sql:ro
-pg-search:
-image: postgis/postgis:16-3.4
-environment: [ POSTGRES_PASSWORD=postgres, POSTGRES_DB=search_db ]
-ports: ["5435:5432"]
-volumes:
-- ./ddl/search.sql:/docker-entrypoint-initdb.d/01_search.sql:ro
-
-# Opcional: Keycloak para JWT
-keycloak:
-image: quay.io/keycloak/keycloak:25.0
-command: start-dev
-environment:
-- KEYCLOAK_ADMIN=admin
-- KEYCLOAK_ADMIN_PASSWORD=admin
-ports: ["8081:8080"]
-
-# API Gateway
-api-gateway:
-build: ./backend/api-gateway
-environment:
-- SPRING_PROFILES_ACTIVE=dev
-ports: ["8080:8080"]
-depends_on: [ kafka, redis, keycloak, catalog-service, booking-service, search-pricing-service ]
-
-catalog-service:
-build: ./backend/catalog-service
-environment:
-- SPRING_DATASOURCE_URL=jdbc:postgresql://pg-catalog:5432/catalog_db
-- SPRING_DATASOURCE_USERNAME=postgres
-- SPRING_DATASOURCE_PASSWORD=postgres
-- SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-- SPRING_REDIS_HOST=redis
-ports: ["8081:8081"]
-depends_on: [ pg-catalog, kafka, redis ]
-
-booking-service:
-build: ./backend/booking-service
-environment:
-- SPRING_DATASOURCE_URL=jdbc:postgresql://pg-booking:5432/booking_db
-- SPRING_DATASOURCE_USERNAME=postgres
-- SPRING_DATASOURCE_PASSWORD=postgres
-- SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-- SPRING_REDIS_HOST=redis
-ports: ["8082:8082"]
-depends_on: [ pg-booking, kafka, redis ]
-
-search-pricing-service:
-build: ./backend/search-pricing-service
-environment:
-- SPRING_DATASOURCE_URL=jdbc:postgresql://pg-search:5432/search_db
-- SPRING_DATASOURCE_USERNAME=postgres
-- SPRING_DATASOURCE_PASSWORD=postgres
-- SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-- SPRING_REDIS_HOST=redis
-ports: ["8083:8083"]
-depends_on: [ pg-search, kafka, redis ]
-
-# Opcional: Angular (dev) — puedes ejecutar local fuera de compose
-frontend:
-build: ./frontend
-ports: ["4200:4200"]
-environment:
-- API_BASE=http://localhost:8080/api
-command: ["npm","run","start","--","--host","0.0.0.0","--poll"]
-depends_on: [ api-gateway ]
-
-
-Dockerfiles (patrón multi‑stage, Spring Boot)
-
-# backend/*/Dockerfile
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN mvn -q -DskipTests package
-
-FROM eclipse-temurin:21-jre
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-ENV JAVA_OPTS="-XX:+UseG1GC -XX:MaxRAMPercentage=75"
-EXPOSE 8081
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
-
-TAREA 9) Motor de Pricing Dinámico con Kafka Streams (o scheduler + Kafka)
-Opción A (recomendada): Kafka Streams en search-pricing-service
-
-Input streams:
-
-analytics.search.v1 (KStream) → (tileId, timestamp)
-
-booking.events.v1 (KStream) → filtrar Held/Confirmed
-
-space.events.v1 (KTable) → base_price por spaceId (tabla compactada)
-
-Topología (ventanas)
-
-Ventana tumbling 5 minutos por tileId
-
-Agrega searches, holds, bookings → demandScore = f(...)
-
-Join con space + availability (si se proyecta) para slots cercanos
-
-Calcula multiplier [1.0–2.5] con topes
-
-Emite PriceUpdated a pricing.events.v1 y setea Redis price:{space}:{ts} (through‑processor)
-
-State stores: RocksDB (default) replicado, changelog topics *-store-changelog.
-
-Config Streams (Java, bean)
-
-@Configuration
-@EnableKafkaStreams
-class PricingTopology {
-@Bean
-public KStream<String, SearchEvent> kstream(StreamsBuilder b) {
-var search = b.stream("analytics.search.v1", Consumed.with(Serdes.String(), Serdes.serdeFrom(...)));
-var holds  = b.stream("booking.events.v1", Consumed.with(Serdes.String(), ...))
-.filter((k,v) -> v.type().equals("BookingHeld"));
-var confs  = b.stream("booking.events.v1", Consumed.with(Serdes.String(), ...))
-.filter((k,v) -> v.type().equals("BookingConfirmed"));
-
-    var agg = search.map((k,v) -> KeyValue.pair(v.tileId(), 1))
-      .groupByKey()
-      .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(5)))
-      .count(Materialized.as("search-count"));
-
-    // Combina con holds/confs de forma similar y calcula demandScore...
-    // Luego calcula multipliers y produce PriceUpdated
-    return search; // placeholder
-}
-}
-
-Opción B: Scheduler + Kafka
-
-@Scheduled(fixedRate=300000) (cada 5 min): consulta métricas y disponibilidad, recalcula precios, produce PriceUpdated y actualiza Redis.
-
-Útil si aún no quieres Streams; más simple, menos reactivo.
-
-TAREA 10) Cómo aplicar SOLID en código Spring Boot
-
-S (Single Responsibility)
-
-SpaceController solo maneja HTTP → delega en SpaceApplicationService.
-
-SpaceApplicationService orquesta casos de uso (crear/editar/listar) → delega en dominio y SpaceRepository.
-
-Space (entidad de dominio) encapsula invariantes (capacidad > 0, status válido).
-
-O (Open/Closed)
-
-Estrategias de pricing: PricingStrategy (interfaz) con implementaciones (EventBasedPricing, WeatherBasedPricing). Abres con nuevas estrategias sin modificar el servicio.
-
-L (Liskov Substitution)
-
-PaymentGateway interface → StripeGateway, MockGateway se pueden inyectar sin romper contratos.
-
-I (Interface Segregation)
-
-Repos separados: SpaceReadRepository y SpaceWriteRepository si necesitas CQRS.
-
-NotificationPort con métodos específicos (email, push) en interfaces pequeñas.
-
-D (Dependency Inversion)
-
-Controladores y servicios dependen de puertos (interfaces) en el dominio, no de adaptadores concretos (infra).
-
-Config de Spring (@Configuration) hace el wiring: @Bean PaymentGateway stripe(...).
-
-Capas recomendadas
-
-/domain     -> entidades (AggregateRoot), value objects, domain services, ports (interfaces)
-/application-> casos de uso, orquestación (sagas), DTOs de comando/resultado
-/infrastructure -> repos JPA, eventos Kafka, mapeadores, config
-/interfaces -> REST controllers (DTOs de entrada/salida), mappers (MapStruct)
-
-
-Patrón Repository + Service Layer + DTO
-
-// Dominio
-public record SpaceId(UUID value) {}
-public class Space { /* invariantes, métodos de negocio */ }
-
-// Puerto
-public interface SpaceRepository {
-Optional<Space> findById(SpaceId id);
-Space save(Space s);
-}
-
-// Aplicación
-@Service
-public class SpaceApplicationService {
-private final SpaceRepository repo;
-public SpaceApplicationService(SpaceRepository repo) { this.repo = repo; }
-@Transactional
-public SpaceDto create(CreateSpaceCommand cmd) { /* validar, mapear, repo.save */ }
-}
-
-// Infra (JPA)
-@Entity @Table(name="spaces", schema="catalog")
-class SpaceJpa { /* ... */ }
-@Repository
-class JpaSpaceRepository implements SpaceRepository { /* ... usa Spring Data JPA */ }
-
-// Interfaces (REST)
-@RestController @RequestMapping("/spaces")
-class SpaceController {
-private final SpaceApplicationService service;
-@PostMapping public ResponseEntity<SpaceDto> create(@Valid @RequestBody CreateSpaceRequest req) { /* ... */ }
-}
-
-APIs por servicio (resumen)
-
-catalog-service
-
-POST /spaces
-
-GET /spaces/{id}
-
-GET /spaces?ownerId=...
-
-POST /availability (crear slots)
-
-Publica eventos space.events.v1, availability.events.v1
-
-booking-service
-
-POST /bookings (crea hold)
-
-GET /bookings/{id}
-
-POST /bookings/{id}/confirm
-
-POST /reviews (1 por booking)
-
-Publica booking.events.v1, payment.events.v1, review.events.v1
-
-search-pricing-service
-
-GET /search?lat&lon&radius_m&capacity (usa PostGIS + Redis para price)
-
-POST /pricing/recompute (admin/debug) — si usas scheduler, este endpoint dispara manual
-
-Publica pricing.events.v1; consume space.*, availability.*, booking.*, analytics.search.*
-
-Configuración application.yml (por servicio, extracto)
-
-catalog-service
-
-server.port: 8081
-spring:
-datasource:
-url: jdbc:postgresql://pg-catalog:5432/catalog_db
-username: postgres
-password: postgres
-jpa:
-hibernate.ddl-auto: validate
-properties.hibernate.jdbc.time_zone: UTC
-kafka.bootstrap-servers: kafka:9092
-redis.host: redis
-
-
-booking-service
-
-server.port: 8082
-spring:
-datasource:
-url: jdbc:postgresql://pg-booking:5432/booking_db
-username: postgres
-password: postgres
-jpa.hibernate.ddl-auto: validate
-kafka.bootstrap-servers: kafka:9092
-redis.host: redis
-
-balconazo:
-booking:
-hold-ttl-ms: 600000
-
-
-search-pricing-service
-
-server.port: 8083
-spring:
-datasource:
-url: jdbc:postgresql://pg-search:5432/search_db
-username: postgres
-password: postgres
-jpa.hibernate.ddl-auto: validate
+  image: postgres:16-alpine
+  container_name: balconazo-pg-catalog
+  ports:
+    - "5433:5432"
+  environment:
+    POSTGRES_DB: catalog_db
+    POSTGRES_USER: postgres
+    POSTGRES_HOST_AUTH_METHOD: trust
+  volumes:
+    - pg-catalog-data:/var/lib/postgresql/data
+```
+
+### Próximos Servicios a Levantar
+
+#### Zookeeper (⏳ PRÓXIMO)
+```yaml
+zookeeper:
+  image: bitnami/zookeeper:3.9
+  container_name: balconazo-zookeeper
+  ports:
+    - "2181:2181"
+  environment:
+    - ALLOW_ANONYMOUS_LOGIN=yes
+```
+
+#### Kafka (⏳ PRÓXIMO)
+```yaml
 kafka:
-bootstrap-servers: kafka:9092
-streams:
-application-id: balconazo-pricing
-properties:
-processing.guarantee: at_least_once
-redis.host: redis
+  image: bitnami/kafka:3.7
+  container_name: balconazo-kafka
+  ports:
+    - "9092:9092"
+    - "29092:29092"
+  environment:
+    - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+    - ALLOW_PLAINTEXT_LISTENER=yes
+    - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+    - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+  depends_on:
+    - zookeeper
+```
 
-Redis (claves y TTL)
+#### Redis (⏳ PRÓXIMO)
+```yaml
+redis:
+  image: redis:7-alpine
+  container_name: balconazo-redis
+  ports:
+    - "6379:6379"
+  command: redis-server --appendonly yes
+```
 
-Locks de reserva: lock:booking:{spaceId}:{start}-{end} (TTL = hold).
+---
 
-Precio precalculado: price:{spaceId}:{timeslotStart} (TTL 15 min; warming por Streams).
+<a name="roadmap"></a>
+## 🗺️ ROADMAP
 
-Resultados de búsqueda: search:hot:{bboxKey}:{date}:{cap} (TTL 60–180 s).
+### Fase 1: Backend Core (EN PROGRESO)
+- [x] Configuración inicial del proyecto
+- [x] catalog-service implementado y funcional
+- [ ] Levantar Kafka + Zookeeper
+- [ ] Crear tópicos de Kafka
+- [ ] Probar publicación de eventos desde catalog
+- [ ] Implementar booking-service
+- [ ] Implementar search-pricing-service
+- [ ] Implementar API Gateway
 
-Observabilidad
+### Fase 2: Integración y Comunicación
+- [ ] Configurar Redis para cache y locks
+- [ ] Implementar Saga de booking con Outbox Pattern
+- [ ] Implementar consumidores de eventos en search-pricing
+- [ ] Integración con pasarela de pago (Stripe stub)
+- [ ] Motor de pricing dinámico con Kafka Streams
 
-Actuator en todos los servicios (/actuator/health, /metrics, /prometheus si lo añades).
+### Fase 3: Frontend
+- [ ] Setup Angular 20 con standalone components
+- [ ] Configurar Tailwind CSS
+- [ ] Implementar autenticación con JWT
+- [ ] Páginas: Home, Búsqueda, Detalle, Booking, Perfil
+- [ ] Integración con API Gateway
 
-Tracing: añade micrometer-tracing (opcional) + headers (X-Correlation-Id) inyectados en Gateway.
+### Fase 4: Testing
+- [ ] Unit tests (JUnit 5 + Mockito)
+- [ ] Integration tests (Testcontainers)
+- [ ] Contract testing (Spring Cloud Contract)
+- [ ] E2E tests (Playwright)
 
-Pasos siguientes / cómo usarlo
+### Fase 5: Producción
+- [ ] Docker Compose completo para desarrollo
+- [ ] CI/CD con GitHub Actions
+- [ ] Deployment en AWS ECS/EKS
+- [ ] Configuración AWS MSK (Kafka managed)
+- [ ] Configuración AWS RDS (PostgreSQL managed)
+- [ ] Configuración AWS ElastiCache (Redis managed)
+- [ ] Monitoring con CloudWatch + Prometheus + Grafana
 
-Levanta el Compose.
+---
 
-Crea datos con catalog-service (spaces, availability).
+## 📞 COMANDOS ÚTILES
 
-Lanza un par de search queries desde Angular (se autopublican eventos a analytics.search.v1 si lo implementas en frontend → backend).
+### Desarrollo Local
 
-Observa search-pricing-service recalcular precios (Streams o scheduler) y poblar Redis.
+#### Arrancar catalog-service
+```bash
+cd /Users/angel/Desktop/BalconazoApp/catalog_microservice
+mvn spring-boot:run
+```
 
-Crea booking → confirma → revisa booking-service y eventos payment.* (simulados).
+#### Ver logs de PostgreSQL
+```bash
+docker logs balconazo-pg-catalog -f
+```
 
-Revisa métricas y latencias (búsqueda < 100–250 ms P95 con cache caliente).
+#### Conectarse a PostgreSQL
+```bash
+docker exec -it balconazo-pg-catalog psql -U postgres -d catalog_db
+```
+
+#### Health check
+```bash
+curl http://localhost:8085/actuator/health
+```
+
+#### Compilar proyecto
+```bash
+mvn clean install -DskipTests
+```
+
+### Docker
+
+#### Ver contenedores corriendo
+```bash
+docker ps
+```
+
+#### Detener todos los contenedores
+```bash
+docker stop $(docker ps -q)
+```
+
+#### Limpiar volúmenes
+```bash
+docker volume prune -f
+```
+
+---
+
+## 📚 REFERENCIAS
+
+- [Spring Boot 3.5 Documentation](https://docs.spring.io/spring-boot/docs/3.5.7/reference/)
+- [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
+- [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
+- [PostgreSQL 16 Documentation](https://www.postgresql.org/docs/16/)
+- [Angular 20 Documentation](https://angular.dev/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
+
+---
+
+**Última actualización:** 27 de octubre de 2025  
+**Versión:** 1.0.0  
+**Estado:** Catalog Service Funcional ✅
+
