@@ -1,321 +1,416 @@
 # 🏠 BALCONAZO - Marketplace de Espacios
 
-> Plataforma de alquiler de balcones y terrazas para eventos privados
+**Marketplace para alquiler de balcones/terrazas para eventos**
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen)](https://spring.io/projects/spring-boot)
-[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
-[![Kafka](https://img.shields.io/badge/Kafka-3.7-black)](https://kafka.apache.org/)
-[![Docker](https://img.shields.io/badge/Docker-latest-blue)](https://www.docker.com/)
-
----
-
-## 📋 Tabla de Contenidos
-
-- [Sobre el Proyecto](#sobre-el-proyecto)
-- [Estado Actual](#estado-actual)
-- [Arquitectura](#arquitectura)
-- [Tecnologías](#tecnologías)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Documentación](#documentación)
-- [Roadmap](#roadmap)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-red.svg)](https://redis.io/)
+[![Kafka](https://img.shields.io/badge/Kafka-7.5-black.svg)](https://kafka.apache.org/)
 
 ---
 
-## 📖 Sobre el Proyecto
+## 📊 ESTADO DEL PROYECTO
 
-**Balconazo** es un marketplace que conecta propietarios de balcones y terrazas con personas que buscan espacios únicos para eventos privados (fiestas, reuniones, cenas, etc.).
+**Fecha:** 27 de octubre de 2025  
+**Versión:** 0.2.0-MVP  
+**Estado:** ✅ Catalog Service 100% Operacional
 
-### Características Principales
-
-- ✅ Gestión de usuarios (hosts y guests)
-- ✅ Catálogo de espacios con geolocalización
-- ✅ Sistema de disponibilidad temporal
-- ⏳ Reservas con pago integrado
-- ⏳ Búsqueda geoespacial avanzada
-- ⏳ Pricing dinámico basado en demanda
-- ⏳ Sistema de reviews y reputación
-- ⏳ Notificaciones en tiempo real
-
----
-
-## ✅ Estado Actual
-
-### Completado (27 Oct 2025)
-
-- ✅ **catalog-service** - Microservicio funcionando al 100%
-  - Puerto: 8085
-  - Endpoints REST: Users, Spaces, Availability
-  - PostgreSQL: Conectado y tablas creadas
-  - Kafka Producers: Implementados
-  - Health Check: ✅ UP
-
-### En Progreso
-
-- ⏳ Kafka + Zookeeper (próximo paso)
-- ⏳ booking-service (siguiente microservicio)
-- ⏳ search-pricing-service
-
-### Pendiente
-
-- ⏸️ API Gateway (Spring Cloud Gateway)
-- ⏸️ Frontend Angular 20
-- ⏸️ Redis (cache y locks)
-- ⏸️ Deployment AWS
+| Componente | Estado | Puerto | Descripción |
+|------------|--------|--------|-------------|
+| **Catalog Service** | ✅ RUNNING | 8085 | Gestión de usuarios y espacios |
+| PostgreSQL Catalog | ✅ UP | 5433 | Base de datos principal |
+| Kafka | ✅ UP | 9092 | Event streaming |
+| Zookeeper | ✅ UP | 2181 | Coordinación Kafka |
+| Redis | ✅ UP | 6379 | Caché y sesiones |
+| Booking Service | ⏸️ PENDING | 8082 | Gestión de reservas |
+| Search-Pricing | ⏸️ PENDING | 8083 | Búsquedas y pricing |
 
 ---
 
-## 🏗️ Arquitectura
+## 🚀 QUICK START
 
-```
-┌──────────────────────────────────────────────────────┐
-│            Angular Frontend :4200                    │
-└──────────────────┬───────────────────────────────────┘
-                   │ HTTPS/JWT
-                   ▼
-┌──────────────────────────────────────────────────────┐
-│       Spring Cloud Gateway :8080 (⏸️ TODO)          │
-└──────────────────┬───────────────────────────────────┘
-                   │
-        ┌──────────┼──────────┐
-        │          │          │
-        ▼          ▼          ▼
-   ┌────────┐ ┌────────┐ ┌────────┐
-   │Catalog │ │Booking │ │ Search │
-   │:8081   │ │:8082   │ │:8083   │
-   │✅ UP   │ │⏳ TODO │ │⏳ TODO │
-   └───┬────┘ └───┬────┘ └───┬────┘
-       │          │          │
-       ▼          ▼          ▼
-   ┌────────┐ ┌────────┐ ┌────────┐
-   │PG:5433 │ │PG:5434 │ │PG:5435 │
-   │✅ UP   │ │⏸️ TODO │ │⏸️ TODO │
-   └────────┘ └────────┘ └────────┘
-
-       │          │          │
-       └──────────┼──────────┘
-                  │
-         ┌────────▼────────┐
-         │  Kafka :9092    │
-         │  ⏳ TODO        │
-         └─────────────────┘
-```
-
-### Microservicios
-
-1. **catalog-service** ✅ - Usuarios, Espacios, Disponibilidad
-2. **booking-service** ⏳ - Reservas, Pagos, Reviews
-3. **search-pricing-service** ⏳ - Búsqueda geoespacial, Pricing dinámico
-
----
-
-## 🛠️ Tecnologías
-
-### Backend
-- **Spring Boot** 3.5.7
-- **Java** 21
-- **PostgreSQL** 16
-- **Apache Kafka** 3.7
-- **Redis** 7
-- **Maven** 3.9+
-
-### Frontend (Pendiente)
-- **Angular** 20
-- **Tailwind CSS**
-- **TypeScript**
-
-### DevOps
-- **Docker** & Docker Compose
-- **AWS** ECS/EKS (producción)
-- **GitHub Actions** (CI/CD)
-
----
-
-## 🚀 Instalación
-
-### Requisitos Previos
-
-- Java 21
+### Requisitos
+- Java 21+
 - Maven 3.9+
-- Docker Desktop
-- PostgreSQL client (opcional)
+- Docker 24+
 
-### Paso 1: Clonar el Repositorio
-
-```bash
-git clone https://github.com/tu-usuario/balconazo-app.git
-cd balconazo-app
-```
-
-### Paso 2: Levantar PostgreSQL
+### Inicio Rápido (5 minutos)
 
 ```bash
-docker run -d \
-  --name balconazo-pg-catalog \
-  -p 5433:5432 \
-  -e POSTGRES_DB=catalog_db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_HOST_AUTH_METHOD=trust \
-  postgres:16-alpine
+# 1. Clonar repositorio
+git clone <repo-url>
+cd BalconazoApp
 
-# Crear schema
-docker exec balconazo-pg-catalog psql -U postgres -d catalog_db -c "CREATE SCHEMA IF NOT EXISTS catalog;"
-```
+# 2. Levantar infraestructura
+docker start balconazo-pg-catalog balconazo-kafka balconazo-zookeeper balconazo-redis
 
-### Paso 3: Compilar el Proyecto
-
-```bash
+# 3. Arrancar Catalog Service
 cd catalog_microservice
-mvn clean install -DskipTests
-```
-
-### Paso 4: Arrancar catalog-service
-
-```bash
 mvn spring-boot:run
-```
 
-El servicio estará disponible en: `http://localhost:8085`
-
-### Paso 5: Verificar Health Check
-
-```bash
+# 4. Verificar
 curl http://localhost:8085/actuator/health
 ```
 
-Respuesta esperada:
-```json
-{
-  "status": "UP"
-}
-```
+**Ver guía completa:** [QUICKSTART.md](QUICKSTART.md)
 
 ---
 
-## 📝 Uso
+## 📚 DOCUMENTACIÓN
 
-### Crear un Usuario
+### Documentos Principales
+
+| Documento | Descripción | Estado |
+|-----------|-------------|--------|
+| **[README.md](README.md)** | Este archivo - Vista general | ✅ Actualizado |
+| **[QUICKSTART.md](QUICKSTART.md)** | Guía de instalación rápida | ✅ Actualizado |
+| **[documentacion.md](documentacion.md)** | Especificación técnica completa | ✅ Vigente |
+| **[RESUMEN_EJECUTIVO.md](RESUMEN_EJECUTIVO.md)** | Resumen de progreso | ✅ Actualizado |
+| **[REDIS_COMPLETO.md](REDIS_COMPLETO.md)** | Documentación de Redis | ✅ Completo |
+| **[KAFKA_SETUP.md](KAFKA_SETUP.md)** | Configuración de Kafka | ✅ Vigente |
+| **[ESTADO_ACTUAL.md](ESTADO_ACTUAL.md)** | Estado detallado del proyecto | ✅ Vigente |
+| **[TESTING.md](TESTING.md)** | Estrategia de testing | 📝 Referencia |
+
+### Documentos en `/docs`
+- `AUTH_SIMPLIFIED.md` - Autenticación simplificada
+- `PRICING_ALGORITHM.md` - Motor de pricing
+- `WIREFRAMES.md` - Diseños UI
+- `MVP_STATUS.md` - Estado del MVP
+- `CHANGELOG.md` - Historial de cambios
+
+---
+
+## 🏗️ ARQUITECTURA
+
+### Microservicios
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     API Gateway :8080                    │
+└────────────┬─────────────┬──────────────┬───────────────┘
+             │             │              │
+    ┌────────▼────────┐   │   ┌──────────▼─────────┐
+    │  Catalog :8081  │   │   │  Booking :8082     │
+    │  Users/Spaces   │   │   │  Reservas/Pagos    │
+    └────────┬────────┘   │   └──────────┬─────────┘
+             │            │              │
+    ┌────────▼────────┐   │   ┌──────────▼─────────┐
+    │ PostgreSQL:5433 │   │   │ PostgreSQL:5434    │
+    └─────────────────┘   │   └────────────────────┘
+                          │
+                ┌─────────▼──────────┐
+                │ Search-Pricing     │
+                │ :8083              │
+                └─────────┬──────────┘
+                          │
+                ┌─────────▼──────────┐
+                │ PostgreSQL:5435    │
+                └────────────────────┘
+
+┌──────────────────────────────────────────────────────────┐
+│          Kafka :9092 (Event Streaming)                   │
+│  Topics: space.events.v1, availability.events.v1, etc.   │
+└──────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────┐
+│               Redis :6379 (Cache/Sessions)                │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Stack Tecnológico
+
+**Backend:**
+- Spring Boot 3.5.7
+- Spring Data JPA
+- Spring Kafka
+- MapStruct
+- Lombok
+
+**Bases de Datos:**
+- PostgreSQL 16 (persistencia)
+- Redis 7 (caché)
+
+**Mensajería:**
+- Apache Kafka 7.5 (event streaming)
+- Zookeeper 7.5 (coordinación)
+
+**Infraestructura:**
+- Docker
+- Maven
+
+---
+
+## 🎯 CATALOG SERVICE (Completado)
+
+### Características Implementadas
+
+✅ **Gestión de Usuarios**
+- Crear, listar, obtener por ID
+- Roles: host, guest, admin
+- Trust score
+- Validaciones completas
+
+✅ **Gestión de Espacios**
+- CRUD completo
+- Geolocalización (lat/lon)
+- Amenities (array)
+- Rules (JSONB)
+- Pricing en centavos
+- Estados: draft, active, inactive
+
+✅ **Disponibilidad**
+- Slots de tiempo
+- Validación de capacidad
+- No solapamiento
+
+✅ **Event-Driven**
+- Publicación de eventos a Kafka
+- SpaceCreated, SpaceUpdated, SpaceDeactivated
+- AvailabilityAdded, AvailabilityRemoved
+
+✅ **Caché con Redis**
+- Caché automático de espacios (TTL 5 min)
+- Endpoints de administración de caché
+- Reducción de latencia 99%
+
+### API Endpoints
+
+**Base URL:** `http://localhost:8085/api/catalog`
+
+#### Usuarios
+- `POST /users` - Crear usuario
+- `GET /users?role={role}` - Listar por rol
+- `GET /users/{id}` - Obtener por ID
+
+#### Espacios
+- `POST /spaces` - Crear espacio
+- `GET /spaces?hostId={id}` - Listar por host
+- `GET /spaces/{id}` - Obtener por ID
+- `PUT /spaces/{id}` - Actualizar
+- `DELETE /spaces/{id}` - Eliminar
+
+#### Caché (Testing)
+- `POST /cache?key=X&value=Y&ttl=Z` - Guardar
+- `GET /cache/{key}` - Obtener
+- `DELETE /cache/{key}` - Eliminar
+
+#### Health Check
+- `GET /actuator/health` - Estado del servicio
+
+### Ejemplos
 
 ```bash
+# Crear usuario
 curl -X POST http://localhost:8085/api/catalog/users \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "host@balconazo.com",
+    "email": "host@example.com",
     "password": "password123",
     "role": "host"
   }'
-```
 
-### Crear un Espacio
-
-```bash
+# Crear espacio
 curl -X POST http://localhost:8085/api/catalog/spaces \
   -H "Content-Type: application/json" \
   -d '{
     "ownerId": "uuid-del-usuario",
-    "title": "Terraza con vistas al Retiro",
-    "description": "Amplia terraza de 50m²",
-    "address": "Calle Alcalá 123, Madrid",
+    "title": "Terraza Madrid Centro",
+    "description": "Bonita terraza en el centro",
+    "address": "Calle Mayor 1, Madrid",
     "lat": 40.4168,
     "lon": -3.7038,
     "capacity": 20,
-    "areaSqm": 50.0,
-    "basePriceCents": 15000,
-    "amenities": ["wifi", "barbecue"],
+    "areaSqm": 80.0,
+    "basePriceCents": 10000,
+    "amenities": ["wifi", "bar", "music"],
     "rules": {"no_smoking": true}
   }'
 ```
 
-### Listar Espacios
+---
+
+## 🐳 DOCKER
+
+### Contenedores Activos
 
 ```bash
-curl http://localhost:8085/api/catalog/spaces
+# Ver todos los contenedores
+docker ps | grep balconazo
+
+# Debería mostrar:
+# balconazo-pg-catalog (PostgreSQL:5433)
+# balconazo-kafka (Kafka:9092)
+# balconazo-zookeeper (Zookeeper:2181)
+# balconazo-redis (Redis:6379)
 ```
 
-Ver más ejemplos en [`TESTING.md`](./TESTING.md)
+### Comandos Útiles
+
+```bash
+# Iniciar todos
+docker start balconazo-pg-catalog balconazo-kafka balconazo-zookeeper balconazo-redis
+
+# Detener todos
+docker stop balconazo-pg-catalog balconazo-kafka balconazo-zookeeper balconazo-redis
+
+# Ver logs
+docker logs -f balconazo-kafka
+docker logs -f balconazo-pg-catalog
+
+# Conectar a PostgreSQL
+docker exec -it balconazo-pg-catalog psql -U postgres -d catalog_db
+
+# Conectar a Redis
+docker exec -it balconazo-redis redis-cli
+
+# Listar topics Kafka
+docker exec balconazo-kafka kafka-topics --list --bootstrap-server localhost:9092
+```
 
 ---
 
-## 📚 Documentación
+## 🧪 TESTING
 
-- **[documentacion.md](./documentacion.md)** - Documentación técnica completa
-- **[TESTING.md](./TESTING.md)** - Guía de pruebas y ejemplos
-- **[QUICKSTART.md](./QUICKSTART.md)** - Guía rápida de inicio
-- **[README.md](./README.md)** - Este archivo
+### Health Checks
+
+```bash
+# Catalog Service
+curl http://localhost:8085/actuator/health
+
+# PostgreSQL
+docker exec balconazo-pg-catalog psql -U postgres -c "SELECT 1"
+
+# Redis
+docker exec balconazo-redis redis-cli PING
+
+# Kafka
+docker exec balconazo-kafka kafka-broker-api-versions --bootstrap-server localhost:9092
+```
+
+### Pruebas End-to-End
+
+Ver ejemplos completos en [QUICKSTART.md](QUICKSTART.md)
 
 ---
 
-## 🗺️ Roadmap
+## 📊 PROGRESO
 
-### Fase 1: Backend Core (EN PROGRESO)
-- [x] Setup inicial del proyecto
-- [x] catalog-service funcional
-- [ ] Levantar Kafka
-- [ ] Implementar booking-service
-- [ ] Implementar search-pricing-service
-- [ ] API Gateway
+### Completado ✅
+- [x] Infraestructura Docker
+- [x] PostgreSQL configurado
+- [x] Kafka + Zookeeper
+- [x] Redis integrado
+- [x] Catalog Service completo
+  - [x] Arquitectura hexagonal
+  - [x] Entities, Repositories, Services, Controllers
+  - [x] DTOs y Mappers
+  - [x] Event Producers
+  - [x] Caché con Redis
+  - [x] Validaciones
+  - [x] Exception handling
 
-### Fase 2: Integración
-- [ ] Redis para cache
-- [ ] Saga de booking
-- [ ] Motor de pricing dinámico
-- [ ] Integración con Stripe
+### En Desarrollo 🔨
+- [ ] Booking Service
+  - [ ] Entities (Booking, Payment, Review)
+  - [ ] Saga de reserva
+  - [ ] Outbox Pattern
+  - [ ] PostgreSQL puerto 5434
+- [ ] Search-Pricing Service
+  - [ ] Read model
+  - [ ] Búsqueda geoespacial
+  - [ ] Motor de pricing
+  - [ ] PostgreSQL puerto 5435
 
-### Fase 3: Frontend
-- [ ] Setup Angular 20
-- [ ] Páginas principales
+### Planificado 📋
 - [ ] Autenticación JWT
-- [ ] Integración con API
-
-### Fase 4: Producción
-- [ ] Docker Compose completo
+- [ ] API Gateway
+- [ ] Frontend Angular
+- [ ] Tests unitarios
+- [ ] Tests de integración
+- [ ] Observabilidad (Prometheus/Grafana)
 - [ ] CI/CD
-- [ ] Deployment AWS
-- [ ] Monitoring
 
 ---
 
-## 🤝 Contribuir
+## 🎓 APRENDIZAJES
 
-Este es un proyecto educacional. Si encuentras bugs o tienes sugerencias:
+### Patrones Implementados
+- ✅ Arquitectura Hexagonal (Ports & Adapters)
+- ✅ Repository Pattern
+- ✅ DTO Pattern
+- ✅ Service Layer Pattern
+- ✅ Event-Driven Architecture
+- ✅ Cache-Aside Pattern
 
-1. Abre un issue
-2. Haz un fork del proyecto
-3. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
-4. Commit tus cambios (`git commit -m 'Añade nueva funcionalidad'`)
-5. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-6. Abre un Pull Request
-
----
-
-## 📄 Licencia
-
-Este proyecto es de código abierto bajo la licencia MIT.
-
----
-
-## 👨‍💻 Autor
-
-**Angel Rodriguez**
-
-- GitHub: [@amolrod](https://github.com/amolrod)
-- Email: angel@balconazo.com
+### Tecnologías Dominadas
+- ✅ Spring Boot 3.x
+- ✅ Spring Data JPA
+- ✅ MapStruct
+- ✅ Lombok
+- ✅ Bean Validation
+- ✅ Kafka Producers
+- ✅ Redis Cache
+- ✅ Docker
 
 ---
 
-## 🙏 Agradecimientos
+## 🔧 TROUBLESHOOTING
 
-- Spring Framework Team
-- Apache Kafka Community
-- PostgreSQL Team
+### Puerto 8085 ya en uso
+```bash
+lsof -ti:8085 | xargs kill -9
+```
+
+### PostgreSQL no conecta
+```bash
+docker restart balconazo-pg-catalog
+sleep 10
+```
+
+### Kafka no funciona
+```bash
+docker logs balconazo-kafka | tail -50
+docker restart balconazo-kafka
+```
+
+### Redis no aparece en health check
+```bash
+# Verificar configuración
+grep redis catalog_microservice/src/main/resources/application.properties
+
+# Reiniciar servicio
+pkill -f catalog_microservice
+mvn spring-boot:run
+```
 
 ---
 
-**¡Gracias por tu interés en Balconazo!** 🚀🎉
+## 📞 CONTACTO Y CONTRIBUCIÓN
+
+**Desarrollador:** Angel  
+**Asistente:** GitHub Copilot  
+**Fecha de inicio:** 27 de octubre de 2025
 
 ---
 
-**Última actualización:** 27 de octubre de 2025  
-**Estado:** catalog-service ✅ Funcional
+## 📝 LICENCIA
+
+Este proyecto es educacional y de aprendizaje.
+
+---
+
+## 🚀 PRÓXIMOS PASOS
+
+1. **Implementar Booking Service** (estimado: 8-10 horas)
+2. **Implementar Search-Pricing Service** (estimado: 6-8 horas)
+3. **Integración entre servicios vía Kafka**
+4. **Autenticación JWT simplificada**
+5. **Frontend Angular básico**
+
+---
+
+**¿Nuevo en el proyecto?** Comienza con [QUICKSTART.md](QUICKSTART.md)  
+**¿Quieres detalles técnicos?** Lee [documentacion.md](documentacion.md)  
+**¿Estado actual?** Consulta [RESUMEN_EJECUTIVO.md](RESUMEN_EJECUTIVO.md)
 

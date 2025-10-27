@@ -23,13 +23,13 @@
 ## ✅ ESTADO ACTUAL DEL PROYECTO (27 Oct 2025)
 
 ### Completado
-- ✅ **catalog-service** - 100% funcional
+-  **catalog-service** - 100% funcional
   - Puerto: 8085
   - PostgreSQL: Conectado (puerto 5433)
   - Tablas: users, spaces, availability_slots, processed_events
   - Endpoints REST: Implementados
   - Kafka Producers: Preparados
-  - Health Check: ✅ UP
+  - Health Check:  UP
 
 ### En Progreso
 - ⏳ Kafka + Zookeeper (próximo paso)
