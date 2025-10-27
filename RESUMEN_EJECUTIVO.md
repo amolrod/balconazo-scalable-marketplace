@@ -1,254 +1,236 @@
-# 📊 Resumen Ejecutivo - Proyecto Balconazo
+# 📊 RESUMEN EJECUTIVO - Balconazo Project
 
-**Fecha:** 27 de octubre de 2025  
-**Estado:** ✅ **COMPLETADO Y FUNCIONAL**  
-**Versión:** 0.0.1-SNAPSHOT
-
----
-
-## 🎯 Objetivo del Proyecto
-
-Desarrollar un **marketplace de alquiler de espacios** tipo balcones/terrazas para eventos, implementado con arquitectura de microservicios.
+**Fecha:** 27 de octubre de 2025, 16:35  
+**Estado:** Infraestructura Core Completa ✅
 
 ---
 
-## ✅ Estado Actual - Microservicio Catalog
+## ✅ LO QUE ESTÁ FUNCIONANDO
 
-### Compilación
+### 1. Microservicios Implementados
+- ✅ **catalog-service** (Puerto 8085)
+  - REST API completa (Users, Spaces, Availability)
+  - PostgreSQL catalog_db conectado
+  - Kafka producers configurados
+  - Health check: UP
+
+### 2. Infraestructura Levantada
+- ✅ **PostgreSQL** (Puerto 5433)
+  - Base de datos: catalog_db
+  - Schema: catalog
+  - Tablas: users, spaces, availability_slots, processed_events
+  
+- ✅ **Zookeeper** (Puerto 2181)
+  - Imagen: confluentinc/cp-zookeeper:7.5.0
+  
+- ✅ **Kafka** (Puertos 9092/29092)
+  - Imagen: confluentinc/cp-kafka:7.5.0
+  - Modo: KRaft
+  - Cluster ID: 1qM70GTwS0eQqSEl3Exr3A
+  - Tópicos creados: space-events-v1, availability-events-v1, booking-events-v1
+
+---
+
+## 📋 ARQUITECTURA IMPLEMENTADA
 
 ```
-[INFO] BUILD SUCCESS
-[INFO] Total time: 3.411 s
-[INFO] Compiling 35 source files
-```
-
-✅ **Sin errores**  
-✅ **Sin warnings** (corregidos)  
-✅ **JAR generado correctamente**
-
----
-
-## 📦 Lo Implementado
-
-### 1. Microservicio Catalog (100%)
-
-**Archivos:** 35 archivos Java
-
-| Componente | Cantidad | Estado |
-|-----------|----------|--------|
-| Main Application | 1 | ✅ |
-| Constants | 1 | ✅ |
-| Exceptions | 4 | ✅ |
-| Entities (JPA) | 4 | ✅ |
-| Repositories | 4 | ✅ |
-| DTOs | 6 | ✅ |
-| Mappers (MapStruct) | 3 | ✅ |
-| Services (Interfaces) | 3 | ✅ |
-| Services (Impl) | 3 | ✅ |
-| Controllers (REST) | 3 | ✅ |
-| Config | 3 | ✅ |
-| **TOTAL** | **35** | **100%** |
-
-### 2. API REST (20 Endpoints)
-
-- **Users:** 7 endpoints (CRUD completo + gestión)
-- **Spaces:** 8 endpoints (CRUD + activación/pausa)
-- **Availability:** 5 endpoints (gestión de slots)
-
-### 3. Funcionalidades Implementadas
-
-✅ CRUD de Usuarios (host, guest, admin)  
-✅ CRUD de Espacios (balcones/terrazas)  
-✅ Gestión de Disponibilidad  
-✅ Validaciones con Bean Validation  
-✅ Manejo de errores global  
-✅ Transacciones con Spring  
-✅ Mapeo automático con MapStruct  
-✅ Seguridad con BCrypt  
-
----
-
-## 🏗️ Arquitectura Técnica
-
-### Stack Tecnológico
-
-- ✅ Spring Boot 3.3.5
-- ✅ Java 21
-- ✅ PostgreSQL 16
-- ✅ MapStruct 1.6.3
-- ✅ Lombok
-- ✅ Maven
-- ⏳ Redis (configurado, no usado aún)
-- ⏳ Kafka (configurado, no usado aún)
-
-### Patrones Implementados
-
-- ✅ Arquitectura Hexagonal
-- ✅ Repository Pattern
-- ✅ Service Layer
-- ✅ DTO Pattern
-- ✅ Mapper Pattern
-- ✅ Exception Handling Global
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-BalconazoApp/
-├── README.md                          ✅ Documentación principal
-├── QUICKSTART.md                      ✅ Guía de inicio rápido
-├── PROYECTO_100_COMPLETO.md           ✅ Estado del proyecto
-├── documentacion.md                   ✅ Especificación técnica
-├── docker-compose.yml                 ✅ Infraestructura
-├── pom.xml                            ✅ Maven parent
-│
-├── catalog_microservice/              ✅ 100% COMPLETO
-│   ├── pom.xml
-│   ├── src/main/java/                 35 archivos Java
-│   ├── src/main/resources/
-│   │   └── application.yml
-│   └── target/
-│       └── catalog_microservice.jar   ✅ Generado
-│
-├── booking_microservice/              ⏳ Por implementar
-│   └── ...
-│
-└── search_microservice/               ⏳ Por implementar
-    └── ...
+┌────────────────────────────────────┐
+│   catalog-service (Port 8085)     │
+│   ✅ RUNNING                       │
+│                                    │
+│   - UserController                │
+│   - SpaceController               │
+│   - AvailabilityController        │
+│   - Kafka Producers               │
+└───────┬────────────────────────────┘
+        │
+        ├──→ PostgreSQL (5433)
+        │    └─ catalog_db ✅
+        │
+        └──→ Kafka (9092)
+             ├─ space-events-v1 ✅
+             ├─ availability-events-v1 ✅
+             └─ booking-events-v1 ✅
 ```
 
 ---
 
-## 🚀 Cómo Ejecutar
+## 🎯 ENDPOINTS DISPONIBLES
 
-### Inicio Rápido (3 comandos)
+### Catalog Service (http://localhost:8085)
+
+#### Users
+```
+POST   /api/catalog/users          - Crear usuario
+GET    /api/catalog/users/{id}     - Obtener usuario
+```
+
+#### Spaces
+```
+POST   /api/catalog/spaces         - Crear espacio
+GET    /api/catalog/spaces         - Listar espacios
+GET    /api/catalog/spaces/{id}    - Obtener espacio
+PUT    /api/catalog/spaces/{id}    - Actualizar espacio
+DELETE /api/catalog/spaces/{id}    - Desactivar espacio
+```
+
+#### Availability
+```
+POST   /api/catalog/availability                   - Crear disponibilidad
+GET    /api/catalog/availability/space/{spaceId}   - Listar disponibilidad
+```
+
+#### Health
+```
+GET    /actuator/health            - Estado del servicio
+GET    /actuator/info              - Información
+GET    /actuator/metrics           - Métricas
+```
+
+---
+
+## 🚀 COMANDOS RÁPIDOS
+
+### Levantar Todo (desde cero)
 
 ```bash
-# 1. Levantar PostgreSQL
-docker-compose up -d postgres-catalog
+# 1. PostgreSQL
+docker run -d --name balconazo-pg-catalog -p 5433:5432 \
+  -e POSTGRES_DB=catalog_db -e POSTGRES_USER=postgres \
+  -e POSTGRES_HOST_AUTH_METHOD=trust postgres:16-alpine
 
-# 2. Ejecutar servicio
-cd catalog_microservice && mvn spring-boot:run
+docker exec balconazo-pg-catalog psql -U postgres -d catalog_db \
+  -c "CREATE SCHEMA IF NOT EXISTS catalog;"
 
-# 3. Verificar
-curl http://localhost:8081/actuator/health
+# 2. Zookeeper
+docker run -d --name balconazo-zookeeper -p 2181:2181 \
+  -e ZOOKEEPER_CLIENT_PORT=2181 -e ZOOKEEPER_TICK_TIME=2000 \
+  confluentinc/cp-zookeeper:7.5.0
+
+# 3. Kafka
+docker run -d --name balconazo-kafka -p 9092:9092 -p 29092:29092 \
+  -v balconazo_kafka_data:/var/lib/kafka/data \
+  -e KAFKA_NODE_ID=1 -e KAFKA_PROCESS_ROLES=broker,controller \
+  -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT \
+  -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093 \
+  -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \
+  -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+  -e KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093 \
+  -e KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT \
+  -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \
+  -e KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1 \
+  -e KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1 \
+  confluentinc/cp-kafka:7.5.0
+
+# Esperar 20 segundos
+sleep 20
+
+# 4. Crear tópicos
+docker exec balconazo-kafka kafka-topics --create --topic space-events-v1 \
+  --bootstrap-server localhost:9092 --partitions 12 --replication-factor 1
+
+docker exec balconazo-kafka kafka-topics --create --topic availability-events-v1 \
+  --bootstrap-server localhost:9092 --partitions 12 --replication-factor 1
+
+docker exec balconazo-kafka kafka-topics --create --topic booking-events-v1 \
+  --bootstrap-server localhost:9092 --partitions 12 --replication-factor 1
+
+# 5. Arrancar catalog-service
+cd catalog_microservice
+mvn spring-boot:run
 ```
 
-**Resultado esperado:** `{"status":"UP"}`
+### Verificar Estado
+
+```bash
+# Ver contenedores
+docker ps
+
+# Health check catalog-service
+curl http://localhost:8085/actuator/health
+
+# Listar tópicos Kafka
+docker exec balconazo-kafka kafka-topics --list --bootstrap-server localhost:9092
+```
 
 ---
 
-## 📊 Métricas del Desarrollo
+## 📁 DOCUMENTACIÓN DISPONIBLE
 
-### Tiempo de Desarrollo
-
-- **Planificación:** 30 min
-- **Configuración:** 45 min
-- **Implementación:** 3 horas
-- **Testing:** 30 min
-- **Documentación:** 45 min
-- **TOTAL:** ~5.5 horas
-
-### Código Generado
-
-- **Líneas de código:** ~2,500 líneas
-- **Archivos Java:** 35
-- **Endpoints REST:** 20
-- **Entidades JPA:** 4
-- **Test coverage:** Por implementar
+- **README.md** - Introducción y guía general
+- **QUICKSTART.md** - Instalación rápida (10 minutos)
+- **documentacion.md** - Documentación técnica completa
+- **TESTING.md** - Guía de pruebas con ejemplos
+- **ESTADO_ACTUAL.md** - Estado actual del proyecto
+- **KAFKA_SETUP.md** - Configuración detallada de Kafka
 
 ---
 
-## ✅ Logros Alcanzados
+## ⏭️ PRÓXIMOS PASOS
 
-1. ✅ Proyecto compila sin errores
-2. ✅ Arquitectura limpia y escalable
-3. ✅ API REST completamente funcional
-4. ✅ Validaciones implementadas
-5. ✅ Manejo de errores robusto
-6. ✅ Documentación completa
-7. ✅ Listo para producción (con ajustes)
+### Inmediato (Siguiente Sesión)
+1. ✅ Infraestructura base completa
+2. ⏭️ **AHORA:** Crear booking-service
+   - PostgreSQL booking_db (puerto 5434)
+   - Entidades: Booking, Payment, Review
+   - Saga de reserva (Outbox Pattern)
+   - Kafka producers y consumers
+   - REST API
 
----
+### Corto Plazo
+3. Implementar search-pricing-service
+4. API Gateway (Spring Cloud Gateway)
+5. Redis para cache
 
-## 🎯 Próximos Pasos
+### Medio Plazo
+6. Frontend Angular 20
+7. Tests (Unit, Integration, E2E)
+8. Docker Compose completo
+9. CI/CD con GitHub Actions
 
-### Fase 2: Completar Ecosystem (Prioridad Alta)
-
-1. **Booking Microservice**
-   - Gestión de reservas
-   - Saga de booking
-   - Integración con payment
-
-2. **Search Microservice**  
-   - Búsqueda geoespacial
-   - Pricing dinámico
-   - Read model (CQRS)
-
-3. **API Gateway**
-   - Routing
-   - JWT Authentication
-   - Rate limiting
-
-### Fase 3: Event-Driven (Prioridad Media)
-
-4. **Kafka Integration**
-   - Implementar eventos
-   - Event sourcing
-   - Outbox pattern
-
-5. **Redis Cache**
-   - Cache de espacios
-   - Session management
-   - Locks distribuidos
-
-### Fase 4: Observabilidad (Prioridad Baja)
-
-6. **Monitoring**
-   - Prometheus + Grafana
-   - Distributed tracing
-   - Logs centralizados
+### Largo Plazo
+10. Deployment AWS (ECS/EKS)
+11. Monitoring y observabilidad
+12. Optimizaciones de performance
 
 ---
 
-## 🐛 Issues Conocidos
+## 📈 PROGRESO
 
-Ninguno - El servicio funciona correctamente ✅
+```
+Infraestructura:  [████████████████████] 100%
+catalog-service:  [████████████████████] 100%
+booking-service:  [░░░░░░░░░░░░░░░░░░░░]   0%
+search-service:   [░░░░░░░░░░░░░░░░░░░░]   0%
+API Gateway:      [░░░░░░░░░░░░░░░░░░░░]   0%
+Frontend:         [░░░░░░░░░░░░░░░░░░░░]   0%
 
----
-
-## 📚 Documentación Disponible
-
-| Documento | Descripción |
-|-----------|-------------|
-| `README.md` | Documentación principal y guía de uso |
-| `QUICKSTART.md` | Inicio rápido en 3 pasos |
-| `PROYECTO_100_COMPLETO.md` | Estado detallado del proyecto |
-| `documentacion.md` | Especificación técnica completa |
+Overall: [████░░░░░░░░░░░░░░░░] 20%
+```
 
 ---
 
-## 👥 Equipo
+## 💡 LECCIONES APRENDIDAS
 
-- **Angel** - Desarrollo completo
+### PostgreSQL
+- ✅ Usar `POSTGRES_HOST_AUTH_METHOD=trust` para desarrollo local
+- ✅ Puerto 5433 para evitar conflictos con PostgreSQL del sistema
+- ✅ `application.properties` sobrescribe `application.yml`
+
+### Kafka
+- ✅ Modo KRaft es más simple que Zookeeper tradicional
+- ✅ `KAFKA_ADVERTISED_LISTENERS` debe apuntar a localhost para single-node
+- ✅ Usar guiones (`-`) en nombres de tópicos en lugar de puntos (`.`)
+- ✅ El CLUSTER_ID se genera automáticamente en cp-kafka 7.5.0
+
+### Spring Boot
+- ✅ HikariCP es muy estricto con autenticación PostgreSQL
+- ✅ MapStruct requiere configuración específica en Maven
+- ✅ Health checks deben excluir servicios opcionales (Redis)
 
 ---
 
-## 🎉 Conclusión
-
-El **microservicio catalog-service está 100% funcional** y listo para:
-
-✅ Desarrollo local  
-✅ Pruebas de integración  
-✅ Implementación de microservicios adicionales  
-✅ Despliegue en staging
-
-**Próximo milestone:** Implementar booking-service
-
----
-
-**Última actualización:** 27 de octubre de 2025, 12:45 PM  
-**Build:** SUCCESS  
-**Status:** OPERATIONAL ✅
+**Última actualización:** 27 de octubre de 2025, 16:35  
+**Mantenido por:** Angel Rodriguez  
+**Estado del Proyecto:** 🟢 Activo - Fase 1 Completa
 

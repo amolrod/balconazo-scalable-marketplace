@@ -16,8 +16,8 @@ public final class CatalogConstants {
     public static final String SPACE_STATUS_SNOOZED = "snoozed";
     public static final String SPACE_STATUS_DELETED = "deleted";
 
-    public static final String TOPIC_SPACE_EVENTS = "space.events.v1";
-    public static final String TOPIC_AVAILABILITY_EVENTS = "availability.events.v1";
+    public static final String TOPIC_SPACE_EVENTS = "space-events-v1";
+    public static final String TOPIC_AVAILABILITY_EVENTS = "availability-events-v1";
 
     public static final String EVENT_SPACE_CREATED = "SpaceCreated";
     public static final String EVENT_SPACE_UPDATED = "SpaceUpdated";

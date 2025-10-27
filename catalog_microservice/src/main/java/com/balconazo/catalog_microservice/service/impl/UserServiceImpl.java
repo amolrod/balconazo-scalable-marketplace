@@ -48,6 +48,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional(readOnly = true)
+    public List<UserDTO> getAllUsers() {
+        return repo.findAll().stream()
+            .map(mapper::toDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByRole(String role) {
         return repo.findByRoleAndStatus(role, STATUS_ACTIVE).stream()
             .map(mapper::toDTO).collect(Collectors.toList());

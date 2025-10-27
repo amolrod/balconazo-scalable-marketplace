@@ -9,6 +9,7 @@ public interface UserService {
     UserDTO createUser(CreateUserDTO dto);
     UserDTO getUserById(UUID id);
     UserDTO getUserByEmail(String email);
+    List<UserDTO> getAllUsers();
     List<UserDTO> getUsersByRole(String role);
     UserDTO updateTrustScore(UUID id, Integer score);
     UserDTO suspendUser(UUID id);

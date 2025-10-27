@@ -30,8 +30,11 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDTO> getByRole(@RequestParam String role) {
-        return service.getUsersByRole(role);
+    public List<UserDTO> getUsers(@RequestParam(required = false) String role) {
+        if (role != null && !role.isEmpty()) {
+            return service.getUsersByRole(role);
+        }
+        return service.getAllUsers();
     }
 
     @PatchMapping("/{id}/trust-score")
