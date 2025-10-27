@@ -1,0 +1,260 @@
+version: '3.9'
+
+services:
+  # ============================================
+  # INFRAESTRUCTURA BASE
+  # ============================================
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: balconazo-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: balconazo-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_CFG_LOG_RETENTION_HOURS=168
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: balconazo-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ============================================
+  # BASES DE DATOS POSTGRESQL
+  # ============================================
+
+  pg-catalog:
+    image: postgres:16-alpine
+    container_name: balconazo-pg-catalog
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: catalog_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg-catalog-data:/var/lib/postgresql/data
+      - ./ddl/catalog.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d catalog_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pg-booking:
+    image: postgres:16-alpine
+    container_name: balconazo-pg-booking
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: booking_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg-booking-data:/var/lib/postgresql/data
+      - ./ddl/booking.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d booking_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  pg-search:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: balconazo-pg-search
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: search_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pg-search-data:/var/lib/postgresql/data
+      - ./ddl/search.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - balconazo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d search_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ============================================
+  # MICROSERVICIOS (Comentados hasta implementar)
+  # ============================================
+
+  # api-gateway:
+  #   build:
+  #     context: ./backend/api-gateway
+  #     dockerfile: Dockerfile
+  #   container_name: balconazo-gateway
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     CATALOG_SERVICE_URL: http://catalog-service:8081
+  #     BOOKING_SERVICE_URL: http://booking-service:8082
+  #     SEARCH_SERVICE_URL: http://search-pricing-service:8083
+  #     JWT_SECRET: balconazo-dev-secret-change-in-prod
+  #   depends_on:
+  #     - redis
+  #     - catalog-service
+  #     - booking-service
+  #     - search-pricing-service
+  #   networks:
+  #     - balconazo-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # catalog-service:
+  #   build:
+  #     context: ./backend/catalog-service
+  #     dockerfile: Dockerfile
+  #   container_name: balconazo-catalog
+  #   ports:
+  #     - "8081:8081"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://pg-catalog:5432/catalog_db
+  #     SPRING_DATASOURCE_USERNAME: postgres
+  #     SPRING_DATASOURCE_PASSWORD: postgres
+  #     SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  #     SPRING_REDIS_HOST: redis
+  #     SPRING_REDIS_PORT: 6379
+  #   depends_on:
+  #     pg-catalog:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - balconazo-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # booking-service:
+  #   build:
+  #     context: ./backend/booking-service
+  #     dockerfile: Dockerfile
+  #   container_name: balconazo-booking
+  #   ports:
+  #     - "8082:8082"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://pg-booking:5432/booking_db
+  #     SPRING_DATASOURCE_USERNAME: postgres
+  #     SPRING_DATASOURCE_PASSWORD: postgres
+  #     SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  #     SPRING_REDIS_HOST: redis
+  #     SPRING_REDIS_PORT: 6379
+  #     BALCONAZO_BOOKING_HOLD_TTL_MS: 600000
+  #   depends_on:
+  #     pg-booking:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - balconazo-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # search-pricing-service:
+  #   build:
+  #     context: ./backend/search-pricing-service
+  #     dockerfile: Dockerfile
+  #   container_name: balconazo-search
+  #   ports:
+  #     - "8083:8083"
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: dev
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://pg-search:5432/search_db
+  #     SPRING_DATASOURCE_USERNAME: postgres
+  #     SPRING_DATASOURCE_PASSWORD: postgres
+  #     SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  #     SPRING_REDIS_HOST: redis
+  #     SPRING_REDIS_PORT: 6379
+  #   depends_on:
+  #     pg-search:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - balconazo-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+networks:
+  balconazo-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  pg-catalog-data:
+  pg-booking-data:
+  pg-search-data:
+
