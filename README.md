@@ -503,6 +503,6 @@ Ver **[HOJA_DE_RUTA.md](HOJA_DE_RUTA.md)** para detalles completos.
 
 ---
 
-**Desarrollado con ❤️ usando Spring Boot y Kafka**  
+**Desarrollado usando Spring Boot y Kafka**  
 **Última actualización:** 28 de Octubre de 2025
 
