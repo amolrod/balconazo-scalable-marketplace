@@ -1,178 +1,264 @@
-# 📚 ÍNDICE DE DOCUMENTACIÓN - BALCONAZO
+# 📚 ÍNDICE DE DOCUMENTACIÓN - PROYECTO BALCONAZO
 
-## 📖 DOCUMENTOS PRINCIPALES (Lectura recomendada)
-
-### 1. **README.md** ⭐ INICIO AQUÍ
-Documentación principal del proyecto con Quick Start, arquitectura, endpoints API y troubleshooting.
-
-**Cuándo leerlo:** Primera vez que accedes al proyecto
-
-### 2. **ESTADO_ACTUAL.md** 
-Estado detallado del proyecto al 28 de Octubre de 2025. Incluye qué está funcionando, infraestructura, health checks, y checklist de validación.
-
-**Cuándo leerlo:** Para saber exactamente qué está implementado y funcionando
-
-### 3. **HOJA_DE_RUTA.md**
-Roadmap completo del proyecto dividido en 5 fases. Plan detallado de implementación del Search Microservice y fases futuras.
-
-**Cuándo leerlo:** Para entender la visión completa y próximos pasos
-
-### 4. **SIGUIENTES_PASOS.md**
-Plan de acción inmediato para implementar el Search & Pricing Microservice. Incluye código de ejemplo, cronograma y criterios de éxito.
-
-**Cuándo leerlo:** Antes de empezar a trabajar en Search Microservice
+**Última actualización:** 28 de octubre de 2025, 14:30
 
 ---
 
-## 🔧 DOCUMENTOS TÉCNICOS
+## 🎯 GUÍAS DE INICIO RÁPIDO
 
-### 5. **documentacion.md**
-Especificación técnica original completa del proyecto. Stack, arquitectura de bounded contexts, DDL de bases de datos, tópicos Kafka, patrones.
+### 1. **README.md** 
+📄 Documentación principal del proyecto
+- Descripción general del marketplace
+- Stack tecnológico completo
+- Arquitectura de 3 microservicios
+- Quick Start para desarrolladores
+- Endpoints por servicio
 
-**Cuándo leerlo:** Para entender las decisiones arquitectónicas originales
+### 2. **QUICKSTART.md**
+⚡ Guía rápida para levantar el sistema en <30 minutos
+- Requisitos previos
+- Instalación paso a paso
+- Comandos copy-paste
+- Verificación de servicios
+- Flujo de prueba E2E
 
-### 6. **BOOKING_SERVICE_COMPLETADO.md**
-Documentación técnica completa del Booking Microservice. Estructura del código, patrón Outbox, eventos Kafka, endpoints.
-
-**Cuándo leerlo:** Para trabajar en o entender el Booking Service
-
-### 7. **GUIA_SCRIPTS.md**
-Guía completa de todos los scripts de arranque del proyecto.
-
-**Cuándo leerlo:** Para levantar la infraestructura y servicios
-
----
-
-## 📋 DOCUMENTOS DE REFERENCIA
-
-### 8. **QUICKSTART.md**
-Guía rápida de inicio (puede estar desactualizada, usar README.md en su lugar)
-
-### 9. **REDIS_COMPLETO.md**
-Documentación sobre Redis y su uso en el proyecto
-
-### 10. **RESUMEN_EJECUTIVO.md**
-Resumen ejecutivo del proyecto (puede estar desactualizado)
-
-### 11. **TESTING.md**
-Estrategias de testing (por desarrollar)
+### 3. **SIGUIENTES_PASOS.md** 🆕
+🚀 Próximos pasos para implementar API Gateway & Auth Service
+- Orden de implementación detallado
+- Checklist completo
+- Estimación de tiempos
+- Comandos listos para ejecutar
+- Criterios de éxito
 
 ---
 
-## 📂 ESTRUCTURA DE ARCHIVOS
+## 📊 ESTADO DEL PROYECTO
+
+### 4. **ESTADO_ACTUAL.md**
+📈 Estado actualizado del proyecto (85% completo)
+- Progreso por microservicio
+- Infraestructura Docker
+- Tópicos Kafka configurados
+- Pruebas E2E realizadas
+- Health checks
+
+### 5. **HOJA_DE_RUTA.md**
+🗺️ Roadmap completo del proyecto
+- Fase 1: Infraestructura ✅
+- Fase 2: Microservicios Core ✅
+- Fase 3: Search Microservice ✅
+- Fase 4: API Gateway & Auth 🔄 (en curso)
+- Fase 5: Frontend Angular ⏭️
+- Fase 6: Despliegue AWS ⏭️
+- Cronograma detallado
+
+### 6. **RESUMEN_FINAL.md**
+✅ Resumen de lo completado hasta hoy
+- Servicios operativos
+- Correcciones implementadas
+- Scripts disponibles
+- Cómo usar el sistema
+
+---
+
+## 🔧 DECISIONES ARQUITECTÓNICAS
+
+### 7. **docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md** 🆕
+📋 ADR (Architecture Decision Record) sobre API Gateway
+- **Decisión:** Gateway SIN JPA/MySQL
+- **Razón:** Evitar conflicto reactive vs bloqueante
+- **Alternativa:** Auth Service separado con MySQL
+- Comparación de performance
+- Flujo de autenticación completo
+- Consecuencias de la decisión
+
+### 8. **documentacion.md**
+📖 Especificación técnica original completa
+- Stack tecnológico detallado
+- DDL de bases de datos
+- Tópicos y eventos de Kafka
+- Saga de booking con Outbox
+- Motor de pricing dinámico
+- Docker Compose
+
+---
+
+## 🐛 CORRECCIONES Y MEJORAS
+
+### 9. **CORRECCIONES_IMPLEMENTADAS.md**
+🔧 Detalle técnico de todas las correcciones realizadas
+- Validación de fechas futuras corregida
+- Excepciones personalizadas implementadas
+- Códigos HTTP apropiados (400, 409, 500)
+- Mensajes de error con contexto
+- Snippets de código antes/después
+
+### 10. **DIAGNOSTICO_COMPLETO.md**
+🔍 Análisis completo de problemas identificados
+- Diagnóstico de errores HTTP 400
+- Problemas de validación
+- Configuraciones incorrectas
+- Soluciones implementadas paso a paso
+- Estado final del sistema
+
+---
+
+## 📜 SCRIPTS Y HERRAMIENTAS
+
+### 11. **GUIA_SCRIPTS.md**
+🛠️ Guía de scripts de inicio y gestión
+- `start-all.sh` - Iniciar sistema completo
+- `start-catalog.sh` - Catalog Service individual
+- `start-booking.sh` - Booking Service individual
+- `start-search.sh` - Search Service individual
+- `test-e2e.sh` - Pruebas end-to-end
+- Ubicación de logs
+
+---
+
+## 📚 DOCUMENTACIÓN COMPLEMENTARIA
+
+### 12. **docs/CHANGELOG.md**
+📝 Historial de cambios del proyecto
+- Versiones y releases
+- Features añadidas
+- Bugs corregidos
+
+### 13. **docs/PRICING_ALGORITHM.md**
+💰 Algoritmo de pricing dinámico
+- Factores de precio
+- Fórmulas aplicadas
+- Ejemplos de cálculo
+
+### 14. **docs/WIREFRAMES.md**
+🎨 Wireframes del frontend (pendiente)
+- Mockups de páginas
+- Flujos de usuario
+
+---
+
+## 🗑️ DOCUMENTOS ELIMINADOS (Obsoletos)
+
+Los siguientes documentos fueron eliminados por estar desactualizados o duplicados:
+
+- ❌ `BOOKING_SERVICE_COMPLETADO.md` - Info duplicada en ESTADO_ACTUAL.md
+- ❌ `REDIS_COMPLETO.md` - Info incluida en documentacion.md
+- ❌ `RESUMEN_EJECUTIVO.md` - Reemplazado por RESUMEN_FINAL.md
+- ❌ `TESTING.md` - Info incluida en QUICKSTART.md y test-e2e.sh
+- ❌ `docs/MVP_STATUS.md` - Info duplicada en ESTADO_ACTUAL.md
+- ❌ `docs/AUTH_SIMPLIFIED.md` - Reemplazado por ADR_API_GATEWAY_SIN_PERSISTENCIA.md
+
+---
+
+## 🚀 FLUJO DE LECTURA RECOMENDADO
+
+### Para Nuevos Desarrolladores:
+1. **README.md** - Entender qué es Balconazo
+2. **QUICKSTART.md** - Levantar el sistema
+3. **test-e2e.sh** - Ejecutar prueba completa
+4. **ESTADO_ACTUAL.md** - Ver estado del proyecto
+5. **SIGUIENTES_PASOS.md** - Qué falta por hacer
+
+### Para Arquitectura y Diseño:
+1. **documentacion.md** - Especificación completa
+2. **docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md** - Decisión sobre Gateway
+3. **HOJA_DE_RUTA.md** - Plan completo
+4. **docs/PRICING_ALGORITHM.md** - Motor de pricing
+
+### Para Debugging:
+1. **DIAGNOSTICO_COMPLETO.md** - Problemas identificados
+2. **CORRECCIONES_IMPLEMENTADAS.md** - Soluciones aplicadas
+3. **GUIA_SCRIPTS.md** - Cómo ver logs
+4. **ESTADO_ACTUAL.md** - Verificar health checks
+
+### Para Implementar API Gateway:
+1. **docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md** - Entender la decisión
+2. **SIGUIENTES_PASOS.md** - Guía paso a paso
+3. **HOJA_DE_RUTA.md** - Fase 4 completa
+4. **documentacion.md** - Referencia técnica
+
+---
+
+## 📂 ESTRUCTURA DE CARPETAS
 
 ```
-BalconazoApp/
-├── README.md                         ⭐ INICIO AQUÍ
-├── ESTADO_ACTUAL.md                  Estado del proyecto
-├── HOJA_DE_RUTA.md                   Roadmap completo
-├── SIGUIENTES_PASOS.md               Plan Search Microservice
-├── GUIA_SCRIPTS.md                   Guía de scripts
-├── BOOKING_SERVICE_COMPLETADO.md     Docs Booking Service
-├── documentacion.md                  Especificación técnica original
-├── QUICKSTART.md                     Guía rápida
-├── REDIS_COMPLETO.md                 Docs Redis
-├── RESUMEN_EJECUTIVO.md              Resumen ejecutivo
-└── TESTING.md                        Estrategias de testing
+/Users/angel/Desktop/BalconazoApp/
+├── README.md                          # Principal
+├── QUICKSTART.md                      # Inicio rápido
+├── SIGUIENTES_PASOS.md               # Próximos pasos 🆕
+├── ESTADO_ACTUAL.md                   # Estado actual
+├── HOJA_DE_RUTA.md                    # Roadmap
+├── RESUMEN_FINAL.md                   # Resumen de hoy
+├── CORRECCIONES_IMPLEMENTADAS.md      # Correcciones técnicas
+├── DIAGNOSTICO_COMPLETO.md            # Diagnóstico completo
+├── GUIA_SCRIPTS.md                    # Guía de scripts
+├── documentacion.md                   # Especificación original
+├── INDICE_DOCUMENTACION.md            # Este archivo
+│
+├── docs/                              # Documentación complementaria
+│   ├── ADR_API_GATEWAY_SIN_PERSISTENCIA.md  🆕
+│   ├── CHANGELOG.md
+│   ├── PRICING_ALGORITHM.md
+│   └── WIREFRAMES.md
+│
+├── catalog_microservice/
+├── booking_microservice/
+├── search_microservice/
+├── api-gateway/                       # Por crear
+├── auth-service/                      # Por crear
+└── eureka-server/                     # Por crear
 ```
-
----
-
-## 🎯 FLUJO DE LECTURA RECOMENDADO
-
-### Para nuevos desarrolladores:
-
-1. **README.md** - Entender qué es el proyecto
-2. **ESTADO_ACTUAL.md** - Ver qué está funcionando
-3. **GUIA_SCRIPTS.md** - Levantar el proyecto localmente
-4. Ejecutar `./test-e2e.sh` - Probar el flujo completo
-5. **BOOKING_SERVICE_COMPLETADO.md** - Entender un microservicio completo
-6. **SIGUIENTES_PASOS.md** - Ver qué implementar siguiente
-
-### Para continuar el desarrollo:
-
-1. **SIGUIENTES_PASOS.md** - Plan del Search Microservice
-2. **HOJA_DE_RUTA.md** - Visión completa del proyecto
-3. **documentacion.md** - Especificación técnica detallada
-
-### Para deployment:
-
-1. **HOJA_DE_RUTA.md** (Fase 5) - Plan de despliegue AWS
-2. **documentacion.md** - Configuración de infraestructura
 
 ---
 
 ## 🔍 BÚSQUEDA RÁPIDA
 
-### ¿Cómo levantar el proyecto?
-👉 **README.md** (sección Quick Start) o **GUIA_SCRIPTS.md**
+### ¿Cómo levanto el sistema?
+→ **QUICKSTART.md** o `./start-all.sh`
 
-### ¿Qué está funcionando ahora?
-👉 **ESTADO_ACTUAL.md**
+### ¿Cuál es el estado actual?
+→ **ESTADO_ACTUAL.md** o **RESUMEN_FINAL.md**
 
-### ¿Cómo crear una reserva?
-👉 **README.md** (sección Endpoints API → Booking Service)
+### ¿Qué falta por hacer?
+→ **SIGUIENTES_PASOS.md** y **HOJA_DE_RUTA.md**
 
-### ¿Cómo funciona el Outbox Pattern?
-👉 **BOOKING_SERVICE_COMPLETADO.md** (sección Patrón Outbox)
+### ¿Por qué el Gateway no tiene MySQL?
+→ **docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md**
 
-### ¿Qué endpoints hay disponibles?
-👉 **README.md** (sección Endpoints API) o **ESTADO_ACTUAL.md**
+### ¿Cómo arreglo un error HTTP 400?
+→ **DIAGNOSTICO_COMPLETO.md** y **CORRECCIONES_IMPLEMENTADAS.md**
 
-### ¿Cómo ver eventos en Kafka?
-👉 **ESTADO_ACTUAL.md** (sección Comandos útiles)
+### ¿Dónde están los logs?
+→ **GUIA_SCRIPTS.md** (sección de logs)
 
-### ¿Qué implementar siguiente?
-👉 **SIGUIENTES_PASOS.md**
+### ¿Cómo funciona el pricing?
+→ **docs/PRICING_ALGORITHM.md**
 
-### ¿Cuál es el plan completo?
-👉 **HOJA_DE_RUTA.md**
-
-### ¿Cómo hacer pruebas E2E?
-👉 **GUIA_SCRIPTS.md** o ejecutar `./test-e2e.sh`
+### ¿Cuáles son los endpoints?
+→ **README.md** (sección de endpoints) o **documentacion.md**
 
 ---
 
-## 📊 ESTADO DE DOCUMENTACIÓN
+## ✅ DOCUMENTOS ACTIVOS (15)
 
-| Documento | Estado | Última actualización |
-|-----------|--------|---------------------|
-| README.md | ✅ Actualizado | 28 Oct 2025 |
-| ESTADO_ACTUAL.md | ✅ Actualizado | 28 Oct 2025 |
-| HOJA_DE_RUTA.md | ✅ Actualizado | 28 Oct 2025 |
-| SIGUIENTES_PASOS.md | ✅ Actualizado | 28 Oct 2025 |
-| GUIA_SCRIPTS.md | ✅ Actualizado | 28 Oct 2025 |
-| BOOKING_SERVICE_COMPLETADO.md | ✅ Actualizado | 28 Oct 2025 |
-| documentacion.md | ⚠️ Original | - |
-| QUICKSTART.md | ⚠️ Puede estar desactualizado | - |
-| REDIS_COMPLETO.md | ⚠️ Referencia | - |
-| RESUMEN_EJECUTIVO.md | ⚠️ Puede estar desactualizado | - |
-| TESTING.md | ⏳ Por desarrollar | - |
-
----
-
-## 🗑️ DOCUMENTOS ELIMINADOS (obsoletos)
-
-Los siguientes documentos fueron eliminados por ser temporales o redundantes:
-
-- ❌ KAFKA_SETUP.md (info redundante con ESTADO_ACTUAL.md)
-- ❌ SESION_COMPLETADA.md (temporal)
-- ❌ KAFKA_HEALTH_CHECK.md (ya implementado)
-- ❌ KAFKA_HEALTH_IMPLEMENTADO.md (temporal)
-- ❌ SIGUIENTE_PASO.md (sustituido por SIGUIENTES_PASOS.md)
-- ❌ RESUMEN_SESION_BOOKING.md (temporal)
+1. README.md
+2. QUICKSTART.md
+3. SIGUIENTES_PASOS.md 🆕
+4. ESTADO_ACTUAL.md
+5. HOJA_DE_RUTA.md
+6. RESUMEN_FINAL.md
+7. CORRECCIONES_IMPLEMENTADAS.md
+8. DIAGNOSTICO_COMPLETO.md
+9. GUIA_SCRIPTS.md
+10. documentacion.md
+11. INDICE_DOCUMENTACION.md (este archivo)
+12. docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md 🆕
+13. docs/CHANGELOG.md
+14. docs/PRICING_ALGORITHM.md
+15. docs/WIREFRAMES.md
 
 ---
 
-## 📝 CONTRIBUIR A LA DOCUMENTACIÓN
-
-Si actualizas la documentación:
-
-1. Actualiza la fecha en el documento
-2. Actualiza este índice si es necesario
-3. Marca el documento como ✅ Actualizado en la tabla de estado
-
----
-
-**Última actualización de este índice:** 28 de Octubre de 2025
+**Última revisión:** 28 de octubre de 2025, 14:30  
+**Próxima actualización:** Al completar Fase 4 (API Gateway & Auth Service)
 

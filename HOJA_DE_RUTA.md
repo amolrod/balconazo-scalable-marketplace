@@ -1,55 +1,245 @@
 # 🗺️ HOJA DE RUTA - PROYECTO BALCONAZO
 
-## 📊 PROGRESO ACTUAL: 65%
+**Última actualización:** 28 de octubre de 2025, 14:00
+
+## 📊 PROGRESO ACTUAL: 85%
 
 ```
-████████████████████████████████░░░░░░░░░░░░░░░░  65%
+█████████████████████████████████████████░░░░░░░░  85%
 
 Completado:
-✅ Infraestructura (PostgreSQL, Kafka, Redis)
+✅ Infraestructura (PostgreSQL x3, Kafka, Redis)
 ✅ Catalog Microservice (100%)
 ✅ Booking Microservice (100%)
+✅ Search Microservice (100%) 🆕
+✅ Manejo robusto de errores
 ✅ Pruebas E2E exitosas
 
 Pendiente:
-⏭️ Search & Pricing Microservice
-⏭️ API Gateway
-⏭️ Frontend
-⏭️ Despliegue en la nube
+⏭️ API Gateway + Auth Service (15%)
+⏭️ Frontend Angular (0%)
+⏭️ Observabilidad (0%)
+⏭️ Despliegue en la nube (0%)
 ```
 
 ---
 
-## 🎯 FASE ACTUAL: MVP FUNCIONAL (FASE 3 DE 5)
+## 🎯 FASE ACTUAL: API GATEWAY & AUTENTICACIÓN (FASE 4 DE 6)
 
-### ✅ FASE 1: INFRAESTRUCTURA (COMPLETADA)
-- ✅ PostgreSQL con 2 bases de datos independientes
-- ✅ Kafka en modo KRaft
-- ✅ Redis para cache y locks
+### ✅ FASE 1: INFRAESTRUCTURA (COMPLETADA - 100%)
+- ✅ PostgreSQL con 3 bases de datos independientes (Catalog, Booking, Search)
+- ✅ PostgreSQL con PostGIS para búsqueda geoespacial
+- ✅ Kafka en modo KRaft (7 topics configurados)
+- ✅ Redis para cache, locks y rate limiting
+- ✅ Zookeeper para coordinación
 - ✅ Scripts de inicio automatizados
 
-### ✅ FASE 2: MICROSERVICIOS CORE (COMPLETADA)
+### ✅ FASE 2: MICROSERVICIOS CORE (COMPLETADA - 100%)
 - ✅ Catalog Microservice (gestión de espacios y usuarios)
 - ✅ Booking Microservice (gestión de reservas y reviews)
 - ✅ Eventos Kafka entre servicios
 - ✅ Patrón Outbox en Booking
 - ✅ Health checks completos
+- ✅ Excepciones personalizadas con códigos HTTP apropiados 🆕
 
-### ⏭️ FASE 3: BÚSQUEDA Y PRICING (EN CURSO)
-**Objetivo:** Motor de búsqueda geoespacial y pricing dinámico
+### ✅ FASE 3: BÚSQUEDA GEOESPACIAL (COMPLETADA - 100%) 🆕
+- ✅ Search Microservice implementado
+- ✅ Búsqueda geoespacial con PostGIS
+- ✅ Consumers de Kafka (Space, Booking, Review events)
+- ✅ Proyección optimizada para lecturas (CQRS)
+- ✅ Filtros múltiples (precio, capacidad, rating, amenities)
+- ✅ Ordenamiento y paginación
+- ✅ Idempotencia garantizada
 
-**Duración estimada:** 1-2 semanas
+### 🔄 FASE 4: API GATEWAY & AUTENTICACIÓN (EN CURSO - 0%) 🆕
+**Objetivo:** Punto de entrada único con seguridad centralizada
+
+**Duración estimada:** 1 semana
+
+**Decisión arquitectónica:** Gateway SIN persistencia + Auth Service separado  
+**Documento:** `docs/ADR_API_GATEWAY_SIN_PERSISTENCIA.md`
 
 **Componentes:**
 
-#### 1. Search Microservice (Alta Prioridad)
-**Puerto:** 8083  
-**Base de datos:** search_db (puerto 5435)  
-**Tecnologías:** PostgreSQL + PostGIS
+#### 1. API Gateway (Prioridad Alta)
+**Puerto:** 8080  
+**Tecnología:** Spring Cloud Gateway (WebFlux - reactive)
+
+**Stack:**
+```xml
+- spring-cloud-starter-gateway (reactive)
+- spring-boot-starter-security
+- spring-boot-starter-oauth2-resource-server (JWT)
+- spring-cloud-starter-netflix-eureka-client
+- spring-boot-starter-data-redis-reactive (rate limiting)
+- spring-boot-starter-actuator
+```
+
+**❌ NO INCLUYE:**
+- ❌ spring-boot-starter-data-jpa (bloqueante, incompatible con WebFlux)
+- ❌ mysql-connector-j (el gateway no debe tener BD propia)
 
 **Funcionalidades:**
-- ✅ Búsqueda geoespacial por ubicación (radio en km)
-- ✅ Filtros: precio, capacidad, amenidades, rating
+- ✅ Enrutamiento a 4 microservicios (Catalog, Booking, Search, Auth)
+- ✅ Validación de JWT (sin consultar BD en cada request)
+- ✅ Rate limiting global con Redis (reactive)
+- ✅ CORS configurado para frontend
+- ✅ Circuit breaker con Resilience4j
+- ✅ Request/Response logging con correlation ID
+- ✅ Health checks agregados
+
+**Rutas:**
+```yaml
+/api/auth/**     → auth-service:8084     (público para login/register)
+/api/catalog/**  → catalog-service:8085  (protegido con JWT)
+/api/bookings/** → booking-service:8082  (protegido con JWT)
+/api/search/**   → search-service:8083   (público para búsqueda)
+```
+
+**Rate Limiting:**
+- Búsqueda: 50 req/min por IP
+- Autenticación: 5 req/min por IP
+- Operaciones CRUD: 10 req/min por usuario autenticado
+
+#### 2. Auth Service (Prioridad Alta) 🆕
+**Puerto:** 8084  
+**Base de datos:** MySQL auth_db (puerto 3307)  
+**Tecnología:** Spring Boot Web + JPA
+
+**Stack:**
+```xml
+- spring-boot-starter-web (bloqueante, OK para este servicio)
+- spring-boot-starter-security
+- spring-boot-starter-data-jpa
+- mysql-connector-j
+- jjwt-api, jjwt-impl, jjwt-jackson (generación JWT)
+- spring-cloud-starter-netflix-eureka-client
+```
+
+**Responsabilidades:**
+- ✅ Registro de usuarios (POST `/api/auth/register`)
+- ✅ Login con credenciales (POST `/api/auth/login`)
+- ✅ Generación de JWT firmado (RS256, TTL 24h)
+- ✅ Refresh tokens (POST `/api/auth/refresh`)
+- ✅ Gestión de API keys (opcional)
+- ✅ Validación de email único
+- ✅ Hashing de contraseñas (BCrypt)
+
+**Entidades:**
+```java
+@Entity
+@Table(name = "users")
+class User {
+    UUID id;
+    String email;
+    String passwordHash;
+    String role; // GUEST, HOST, ADMIN
+    boolean active;
+    LocalDateTime createdAt;
+}
+
+@Entity
+@Table(name = "refresh_tokens")
+class RefreshToken {
+    UUID id;
+    UUID userId;
+    String token;
+    LocalDateTime expiresAt;
+}
+```
+
+**Endpoints:**
+```
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/refresh
+POST   /api/auth/logout
+GET    /api/auth/me (info del usuario autenticado)
+```
+
+**Flujo de autenticación:**
+```
+1. Cliente → POST /api/auth/register
+            {email, password, role}
+   
+2. Auth Service → Valida, hashea password, persiste en MySQL
+                → Devuelve HTTP 201
+
+3. Cliente → POST /api/auth/login
+            {email, password}
+   
+4. Auth Service → Busca user en MySQL
+                → Valida password con BCrypt
+                → Genera JWT firmado con clave RSA privada
+                → Devuelve {accessToken, refreshToken, expiresIn}
+
+5. Cliente → GET /api/catalog/spaces
+            Header: Authorization: Bearer <JWT>
+   
+6. API Gateway → Extrae JWT
+                → Valida firma con clave RSA pública (de JWK endpoint)
+                → Verifica expiración y claims
+                → Si válido: enruta a Catalog Service
+                → Si inválido: HTTP 401 Unauthorized
+```
+
+#### 3. Eureka Server (Service Discovery) 🆕
+**Puerto:** 8761  
+**Tecnología:** Spring Cloud Netflix Eureka
+
+**Función:**
+- Registro automático de microservicios
+- Gateway descubre servicios dinámicamente (lb://service-name)
+- Health checks de servicios
+
+**Servicios registrados:**
+```
+- api-gateway
+- auth-service
+- catalog-service
+- booking-service
+- search-service
+```
+
+#### 4. MySQL para Auth Service
+**Puerto:** 3307  
+**Base de datos:** auth_db
+
+**Schema:**
+```sql
+CREATE SCHEMA auth;
+
+CREATE TABLE auth.users (
+    id VARCHAR(36) PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('GUEST', 'HOST', 'ADMIN') NOT NULL,
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE auth.refresh_tokens (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+);
+```
+
+---
+
+### ⏭️ FASE 5: FRONTEND ANGULAR (PENDIENTE - 0%)
+**Objetivo:** Interfaz de usuario completa
+
+**Duración estimada:** 2-3 semanas
+
+#### Frontend Angular 20
+**Puerto:** 4200  
+
+**Páginas:**
 - ✅ Ordenamiento: distancia, precio, rating
 - ✅ Paginación de resultados
 - ✅ Proyección de datos desde Catalog y Booking
