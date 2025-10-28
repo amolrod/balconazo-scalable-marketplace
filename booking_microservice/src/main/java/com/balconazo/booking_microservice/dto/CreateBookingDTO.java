@@ -20,11 +20,9 @@ public class CreateBookingDTO {
     private UUID guestId;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
-    @Future(message = "La fecha de inicio debe ser en el futuro")
     private LocalDateTime startTs;
 
     @NotNull(message = "La fecha de fin es obligatoria")
-    @Future(message = "La fecha de fin debe ser en el futuro")
     private LocalDateTime endTs;
 
     @NotNull(message = "El número de huéspedes es obligatorio")

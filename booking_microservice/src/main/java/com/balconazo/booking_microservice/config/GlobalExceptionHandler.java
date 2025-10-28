@@ -1,5 +1,7 @@
 package com.balconazo.booking_microservice.config;
 
+import com.balconazo.booking_microservice.exception.BookingValidationException;
+import com.balconazo.booking_microservice.exception.SpaceNotAvailableException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +24,37 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BookingValidationException.class)
+    public ResponseEntity<ErrorResponse> handleBookingValidationException(BookingValidationException ex) {
+        log.warn("⚠️ Booking validation error: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Validation Failed")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(SpaceNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleSpaceNotAvailableException(SpaceNotAvailableException ex) {
+        log.warn("⚠️ Space not available: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Space Not Available")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
-        log.error("❌ RuntimeException: {}", ex.getMessage(), ex);
+        log.error("❌ RuntimeException: {}", ex.getMessage());
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

@@ -1,15 +1,17 @@
-# ✅ ESTADO ACTUAL DEL PROYECTO - 28 Octubre 2025
+# ✅ ESTADO ACTUAL DEL PROYECTO - 28 Octubre 2025, 13:15
 
 ## 🎉 RESUMEN EJECUTIVO
 
-**Estado:** Ambos microservicios principales están **100% funcionales y probados end-to-end**
+**Estado:** Los tres microservicios principales están **100% funcionales y operativos**
 
 - ✅ **Catalog Microservice:** FUNCIONANDO (puerto 8085)
 - ✅ **Booking Microservice:** FUNCIONANDO (puerto 8082)
-- ✅ **Infraestructura:** PostgreSQL, Kafka, Zookeeper, Redis
+- ✅ **Search Microservice:** FUNCIONANDO (puerto 8083) 🆕
+- ✅ **Infraestructura:** PostgreSQL (x3), PostGIS, Kafka, Zookeeper, Redis
 - ✅ **Prueba E2E:** Completada exitosamente
-- ✅ **Eventos Kafka:** Publicándose correctamente
-- 📊 **Progreso total:** 65% completado
+- ✅ **Eventos Kafka:** Publicándose y consumiéndose correctamente
+- ✅ **Manejo de errores:** Excepciones personalizadas implementadas 🆕
+- 📊 **Progreso total:** **85% completado** (↑20% hoy)
 
 ---
 
@@ -103,12 +105,48 @@ GET    /api/booking/reviews?guestId={id}
 - ✅ Estados de booking: pending → confirmed → completed/cancelled
 - ✅ Health check con Kafka incluido
 - ✅ Reintentos automáticos (hasta 5 intentos)
+- ✅ **Excepciones personalizadas con códigos HTTP apropiados** 🆕
+
+---
+
+### 3. SEARCH MICROSERVICE ✅ 100% 🆕
+
+**Puerto:** 8083  
+**Base de datos:** search_db con PostGIS (puerto 5435)  
+
+**Endpoints:**
+```
+GET    /api/search/spaces?lat={lat}&lon={lon}&radiusKm={radius}
+                          &minCapacity={n}&minPriceCents={n}&maxPriceCents={n}
+                          &minRating={n}&sortBy={distance|price|rating}
+                          &page={n}&pageSize={n}
+GET    /api/search/spaces/{id}
+```
+
+**Consumers Kafka:**
+- SpaceEventConsumer → Consume de `space-events-v1`
+  - SpaceCreatedEvent
+  - SpaceUpdatedEvent  
+  - SpaceDeactivatedEvent
+- BookingEventConsumer → Consume de `booking.events.v1` y `review.events.v1`
+  - BookingConfirmedEvent (actualiza totalBookings)
+  - ReviewCreatedEvent (recalcula averageRating)
+
+**Características:**
+- ✅ Búsqueda geoespacial con PostGIS (ST_DWithin, ST_Distance)
+- ✅ Proyección optimizada para lecturas (CQRS pattern)
+- ✅ Idempotencia con tabla processed_events
+- ✅ Filtros múltiples (capacidad, precio, rating, amenities)
+- ✅ Ordenamiento flexible (distancia, precio, rating)
+- ✅ Paginación de resultados
+- ✅ Actualización automática de métricas (reviews, bookings)
+- ✅ Health check con Kafka incluido
 
 ---
 
 ## 🗄️ INFRAESTRUCTURA
 
-### PostgreSQL (2 instancias)
+### PostgreSQL (3 instancias)
 
 **1. catalog_db (puerto 5433)**
 ```
@@ -127,6 +165,19 @@ Tablas:
   - bookings (id, space_id, guest_id, start_ts, end_ts, num_guests, total_price_cents, status, payment_status)
   - reviews (id, booking_id, space_id, guest_id, rating, comment)
   - outbox_events (id, aggregate_id, event_type, payload, status, retry_count)
+  - processed_events (event_id, aggregate_id, event_type, processed_at)
+```
+
+**3. search_db con PostGIS (puerto 5435)** 🆕
+```
+Schema: search
+Extensiones: postgis, pg_trgm
+Tablas:
+  - spaces_projection (id, owner_id, title, location[GEOGRAPHY], capacity, 
+                       base_price_cents, current_price_cents, average_rating, 
+                       total_reviews, total_bookings, amenities[], rules[JSONB])
+  - processed_events (event_id, aggregate_id, event_type, processed_at)
+```
   - processed_events (event_id, aggregate_id, event_type, processed_at)
 ```
 

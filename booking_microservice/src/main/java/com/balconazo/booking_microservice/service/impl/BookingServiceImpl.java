@@ -4,6 +4,8 @@ import com.balconazo.booking_microservice.constants.BookingConstants;
 import com.balconazo.booking_microservice.dto.BookingDTO;
 import com.balconazo.booking_microservice.dto.CreateBookingDTO;
 import com.balconazo.booking_microservice.entity.BookingEntity;
+import com.balconazo.booking_microservice.exception.BookingValidationException;
+import com.balconazo.booking_microservice.exception.SpaceNotAvailableException;
 import com.balconazo.booking_microservice.kafka.event.BookingCancelledEvent;
 import com.balconazo.booking_microservice.kafka.event.BookingConfirmedEvent;
 import com.balconazo.booking_microservice.kafka.event.BookingCreatedEvent;
@@ -174,30 +176,30 @@ public class BookingServiceImpl implements BookingService {
     private void validateBookingDates(CreateBookingDTO dto) {
         LocalDateTime now = LocalDateTime.now();
 
-        if (dto.getStartTs().isBefore(now)) {
-            throw new RuntimeException("La fecha de inicio debe ser futura");
+        if (dto.getStartTs().isBefore(now.minusMinutes(5))) { // Margen de 5 min para compensar latencia
+            throw new BookingValidationException("La fecha de inicio debe ser futura");
         }
 
         if (dto.getEndTs().isBefore(dto.getStartTs())) {
-            throw new RuntimeException("La fecha de fin debe ser posterior a la de inicio");
+            throw new BookingValidationException("La fecha de fin debe ser posterior a la de inicio");
         }
 
         // Mínimo 4 horas
         long hours = Duration.between(dto.getStartTs(), dto.getEndTs()).toHours();
         if (hours < BookingConstants.MIN_BOOKING_HOURS) {
-            throw new RuntimeException("La reserva debe ser de al menos " + BookingConstants.MIN_BOOKING_HOURS + " horas");
+            throw new BookingValidationException("La reserva debe ser de al menos " + BookingConstants.MIN_BOOKING_HOURS + " horas");
         }
 
         // Máximo 365 días
         long days = Duration.between(dto.getStartTs(), dto.getEndTs()).toDays();
         if (days > BookingConstants.MAX_BOOKING_DAYS) {
-            throw new RuntimeException("La reserva no puede superar " + BookingConstants.MAX_BOOKING_DAYS + " días");
+            throw new BookingValidationException("La reserva no puede superar " + BookingConstants.MAX_BOOKING_DAYS + " días");
         }
 
         // Reservar con al menos 24h de antelación
         long advanceHours = Duration.between(now, dto.getStartTs()).toHours();
         if (advanceHours < BookingConstants.MIN_ADVANCE_HOURS) {
-            throw new RuntimeException("Debes reservar con al menos " + BookingConstants.MIN_ADVANCE_HOURS + " horas de antelación");
+            throw new BookingValidationException("Debes reservar con al menos " + BookingConstants.MIN_ADVANCE_HOURS + " horas de antelación");
         }
     }
 
@@ -206,7 +208,11 @@ public class BookingServiceImpl implements BookingService {
                 dto.getSpaceId(), dto.getStartTs(), dto.getEndTs());
 
         if (!overlapping.isEmpty()) {
-            throw new RuntimeException("El espacio no está disponible en esas fechas");
+            BookingEntity existing = overlapping.get(0);
+            throw new SpaceNotAvailableException(
+                String.format("El espacio no está disponible en esas fechas. Conflicto con reserva #%s del %s al %s",
+                    existing.getId(), existing.getStartTs(), existing.getEndTs())
+            );
         }
     }
 
@@ -215,7 +221,7 @@ public class BookingServiceImpl implements BookingService {
         long hoursUntilStart = Duration.between(now, booking.getStartTs()).toHours();
 
         if (hoursUntilStart < BookingConstants.CANCELLATION_DEADLINE_HOURS) {
-            throw new RuntimeException("No se puede cancelar con menos de " +
+            throw new BookingValidationException("No se puede cancelar con menos de " +
                     BookingConstants.CANCELLATION_DEADLINE_HOURS + " horas de antelación");
         }
     }
