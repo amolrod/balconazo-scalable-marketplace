@@ -2,12 +2,16 @@ package com.balconazo.search_microservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableKafka
+@EnableScheduling
 public class SearchMicroserviceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SearchMicroserviceApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(SearchMicroserviceApplication.class, args);
+    }
 }
+
