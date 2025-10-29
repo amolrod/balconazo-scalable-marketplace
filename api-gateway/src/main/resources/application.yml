@@ -1,0 +1,263 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  # Cloud Gateway Configuration
+  cloud:
+    gateway:
+      # Service Discovery Integration
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      # Global CORS Configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "http://localhost:4200"
+              - "http://localhost:3000"
+              - "https://balconazo.com"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+
+      # Routes Configuration
+      routes:
+        # ==========================================
+        # AUTH SERVICE - Public endpoints
+        # ==========================================
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: authServiceCircuitBreaker
+                fallbackUri: forward:/fallback/auth
+
+        # ==========================================
+        # CATALOG SERVICE - Protected endpoints
+        # ==========================================
+        - id: catalog-service-spaces
+          uri: lb://catalog-service
+          predicates:
+            - Path=/api/catalog/spaces/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: catalogServiceCircuitBreaker
+                fallbackUri: forward:/fallback/catalog
+
+        - id: catalog-service-users
+          uri: lb://catalog-service
+          predicates:
+            - Path=/api/catalog/users/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: catalogServiceCircuitBreaker
+                fallbackUri: forward:/fallback/catalog
+
+        - id: catalog-service-availability
+          uri: lb://catalog-service
+          predicates:
+            - Path=/api/catalog/availability/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: catalogServiceCircuitBreaker
+                fallbackUri: forward:/fallback/catalog
+
+        # ==========================================
+        # BOOKING SERVICE - Protected endpoints
+        # ==========================================
+        - id: booking-service-bookings
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/booking/bookings/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: bookingServiceCircuitBreaker
+                fallbackUri: forward:/fallback/booking
+
+        - id: booking-service-reviews
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/booking/reviews/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: bookingServiceCircuitBreaker
+                fallbackUri: forward:/fallback/booking
+
+        # ==========================================
+        # SEARCH SERVICE - Public endpoints (read-only)
+        # ==========================================
+        - id: search-service
+          uri: lb://search-service
+          predicates:
+            - Path=/api/search/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: searchServiceCircuitBreaker
+                fallbackUri: forward:/fallback/search
+
+      # Default filters for all routes
+      default-filters:
+        - AddRequestHeader=X-Gateway-Request, API-Gateway
+        - AddResponseHeader=X-Gateway-Response, API-Gateway
+
+  # Redis Configuration (Rate Limiting)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # JWT secret key (same as Auth Service)
+          # In production, use environment variables or secrets manager
+          issuer-uri: http://localhost:8084
+          # We'll use a custom JWT decoder with the shared secret
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+    instance-id: ${spring.application.name}:${random.value}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# JWT Configuration (shared secret with Auth Service)
+jwt:
+  secret: BalconazoSecretKeyForJWTGenerationMustBe256BitsLongMinimumForHS256AlgorithmSecureKey2025
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      authServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+      catalogServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+      bookingServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+      searchServiceCircuitBreaker:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+
+  timelimiter:
+    instances:
+      authServiceCircuitBreaker:
+        timeout-duration: 5s
+      catalogServiceCircuitBreaker:
+        timeout-duration: 5s
+      bookingServiceCircuitBreaker:
+        timeout-duration: 5s
+      searchServiceCircuitBreaker:
+        timeout-duration: 5s
+
+# Logging
+logging:
+  level:
+    com.balconazo.gateway: INFO
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: INFO
+    reactor.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+

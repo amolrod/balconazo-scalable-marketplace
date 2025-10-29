@@ -1,0 +1,365 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-10-29 10:55:23 - Starting ApiGatewayApplication v1.0.0 using Java 21.0.6 with PID 69928 (/Users/angel/Desktop/BalconazoApp/api-gateway/target/api-gateway-1.0.0.jar started by angel in /Users/angel/Desktop/BalconazoApp/api-gateway)
+2025-10-29 10:55:23 - The following 1 profile is active: "dev"
+2025-10-29 10:55:24 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-10-29 10:55:24 - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-10-29 10:55:24 - Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
+2025-10-29 10:55:24 - BeanFactory id=3096214b-7135-3e9a-a1e6-311ef0e03dd2
+2025-10-29 10:55:25 - 
+
+**********************************************************
+
+The artifact spring-cloud-gateway-server is deprecated. It will be removed in the next major release. Please add spring-cloud-gateway-server-webflux dependency.
+
+**********************************************************
+
+
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [After]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Before]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Between]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Cookie]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Header]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Host]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Method]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Path]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Query]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [ReadBody]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [RemoteAddr]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Weight]
+2025-10-29 10:55:25 - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-10-29 10:55:25 - Exposing 4 endpoints beneath base path '/actuator'
+2025-10-29 10:55:26 - Eureka HTTP Client uses RestTemplate.
+2025-10-29 10:55:26 - 
+
+**********************************************************
+
+spring-cloud-starter-gateway is deprecated. It will be removed in the next major release. Please use spring-cloud-starter-gateway-server-webflux instead.
+
+**********************************************************
+
+
+2025-10-29 10:55:26 - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2025-10-29 10:55:26 - Setting initial instance status as: STARTING
+2025-10-29 10:55:26 - Initializing Eureka in region us-east-1
+2025-10-29 10:55:26 - Resolving eureka endpoints via configuration
+2025-10-29 10:55:26 - Disable delta property : false
+2025-10-29 10:55:26 - Single vip registry refresh property : null
+2025-10-29 10:55:26 - Force full registry fetch : false
+2025-10-29 10:55:26 - Application is null : false
+2025-10-29 10:55:26 - Registered Applications size is zero : true
+2025-10-29 10:55:26 - Application version is -1: true
+2025-10-29 10:55:26 - Getting all instance registry info from the eureka server
+2025-10-29 10:55:26 - The response status is 200
+2025-10-29 10:55:26 - Starting heartbeat executor: renew interval is: 30
+2025-10-29 10:55:26 - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2025-10-29 10:55:26 - Discovery Client initialized at timestamp 1761731726613 with initial instances count: 5
+2025-10-29 10:55:26 - Registering application API-GATEWAY with eureka with status UP
+2025-10-29 10:55:26 - Saw local status change event StatusChangeEvent [timestamp=1761731726615, current=UP, previous=STARTING]
+2025-10-29 10:55:26 - DiscoveryClient_API-GATEWAY/api-gateway:1ab31f87c9f6bbdd48b5f07b4d905839: registering service...
+2025-10-29 10:55:26 - DiscoveryClient_API-GATEWAY/api-gateway:1ab31f87c9f6bbdd48b5f07b4d905839 - registration status: 204
+2025-10-29 10:55:26 - Netty started on port 8080 (http)
+2025-10-29 10:55:26 - Updating port to 8080
+2025-10-29 10:55:26 - Started ApiGatewayApplication in 4.094 seconds (process running for 4.406)
+2025-10-29 10:55:26 - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'':
+	Key: spring.cloud.gateway.routes[0].id
+		Line: 41
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].id
+	Key: spring.cloud.gateway.routes[0].uri
+		Line: 42
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].uri
+	Key: spring.cloud.gateway.routes[0].predicates[0]
+		Line: 44
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].predicates[0]
+	Key: spring.cloud.gateway.routes[0].filters[0]
+		Line: 46
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[0]
+	Key: spring.cloud.gateway.routes[0].filters[1].name
+		Line: 47
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[1].name
+	Key: spring.cloud.gateway.routes[0].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 49
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[0].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 50
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[0].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 51
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[0].filters[2].name
+		Line: 52
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[2].name
+	Key: spring.cloud.gateway.routes[0].filters[2].args.name
+		Line: 54
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[2].args.name
+	Key: spring.cloud.gateway.routes[0].filters[2].args.fallbackuri
+		Line: 55
+		Replacement: spring.cloud.gateway.server.webflux.routes[0].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[1].id
+		Line: 60
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].id
+	Key: spring.cloud.gateway.routes[1].uri
+		Line: 61
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].uri
+	Key: spring.cloud.gateway.routes[1].predicates[0]
+		Line: 63
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].predicates[0]
+	Key: spring.cloud.gateway.routes[1].filters[0]
+		Line: 65
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[0]
+	Key: spring.cloud.gateway.routes[1].filters[1].name
+		Line: 66
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[1].name
+	Key: spring.cloud.gateway.routes[1].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 68
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[1].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 69
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[1].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 70
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[1].filters[2].name
+		Line: 71
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[2].name
+	Key: spring.cloud.gateway.routes[1].filters[2].args.name
+		Line: 73
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[2].args.name
+	Key: spring.cloud.gateway.routes[1].filters[2].args.fallbackuri
+		Line: 74
+		Replacement: spring.cloud.gateway.server.webflux.routes[1].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[2].id
+		Line: 76
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].id
+	Key: spring.cloud.gateway.routes[2].uri
+		Line: 77
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].uri
+	Key: spring.cloud.gateway.routes[2].predicates[0]
+		Line: 79
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].predicates[0]
+	Key: spring.cloud.gateway.routes[2].filters[0]
+		Line: 81
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[0]
+	Key: spring.cloud.gateway.routes[2].filters[1].name
+		Line: 82
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[1].name
+	Key: spring.cloud.gateway.routes[2].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 84
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[2].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 85
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[2].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 86
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[2].filters[2].name
+		Line: 87
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[2].name
+	Key: spring.cloud.gateway.routes[2].filters[2].args.name
+		Line: 89
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[2].args.name
+	Key: spring.cloud.gateway.routes[2].filters[2].args.fallbackuri
+		Line: 90
+		Replacement: spring.cloud.gateway.server.webflux.routes[2].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[3].id
+		Line: 92
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].id
+	Key: spring.cloud.gateway.routes[3].uri
+		Line: 93
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].uri
+	Key: spring.cloud.gateway.routes[3].predicates[0]
+		Line: 95
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].predicates[0]
+	Key: spring.cloud.gateway.routes[3].filters[0]
+		Line: 97
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[0]
+	Key: spring.cloud.gateway.routes[3].filters[1].name
+		Line: 98
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[1].name
+	Key: spring.cloud.gateway.routes[3].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 100
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[3].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 101
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[3].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 102
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[3].filters[2].name
+		Line: 103
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[2].name
+	Key: spring.cloud.gateway.routes[3].filters[2].args.name
+		Line: 105
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[2].args.name
+	Key: spring.cloud.gateway.routes[3].filters[2].args.fallbackuri
+		Line: 106
+		Replacement: spring.cloud.gateway.server.webflux.routes[3].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[4].id
+		Line: 111
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].id
+	Key: spring.cloud.gateway.routes[4].uri
+		Line: 112
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].uri
+	Key: spring.cloud.gateway.routes[4].predicates[0]
+		Line: 114
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].predicates[0]
+	Key: spring.cloud.gateway.routes[4].filters[0]
+		Line: 116
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[0]
+	Key: spring.cloud.gateway.routes[4].filters[1].name
+		Line: 117
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[1].name
+	Key: spring.cloud.gateway.routes[4].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 119
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[4].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 120
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[4].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 121
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[4].filters[2].name
+		Line: 122
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[2].name
+	Key: spring.cloud.gateway.routes[4].filters[2].args.name
+		Line: 124
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[2].args.name
+	Key: spring.cloud.gateway.routes[4].filters[2].args.fallbackuri
+		Line: 125
+		Replacement: spring.cloud.gateway.server.webflux.routes[4].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[5].id
+		Line: 127
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].id
+	Key: spring.cloud.gateway.routes[5].uri
+		Line: 128
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].uri
+	Key: spring.cloud.gateway.routes[5].predicates[0]
+		Line: 130
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].predicates[0]
+	Key: spring.cloud.gateway.routes[5].filters[0]
+		Line: 132
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[0]
+	Key: spring.cloud.gateway.routes[5].filters[1].name
+		Line: 133
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[1].name
+	Key: spring.cloud.gateway.routes[5].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 135
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[5].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 136
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[5].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 137
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[5].filters[2].name
+		Line: 138
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[2].name
+	Key: spring.cloud.gateway.routes[5].filters[2].args.name
+		Line: 140
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[2].args.name
+	Key: spring.cloud.gateway.routes[5].filters[2].args.fallbackuri
+		Line: 141
+		Replacement: spring.cloud.gateway.server.webflux.routes[5].filters[2].args.fallbackuri
+	Key: spring.cloud.gateway.routes[6].id
+		Line: 146
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].id
+	Key: spring.cloud.gateway.routes[6].uri
+		Line: 147
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].uri
+	Key: spring.cloud.gateway.routes[6].predicates[0]
+		Line: 149
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].predicates[0]
+	Key: spring.cloud.gateway.routes[6].filters[0]
+		Line: 151
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[0]
+	Key: spring.cloud.gateway.routes[6].filters[1].name
+		Line: 152
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[1].name
+	Key: spring.cloud.gateway.routes[6].filters[1].args.redis-rate-limiter.replenishrate
+		Line: 154
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[1].args.redis-rate-limiter.replenishrate
+	Key: spring.cloud.gateway.routes[6].filters[1].args.redis-rate-limiter.burstcapacity
+		Line: 155
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[1].args.redis-rate-limiter.burstcapacity
+	Key: spring.cloud.gateway.routes[6].filters[1].args.redis-rate-limiter.requestedtokens
+		Line: 156
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[1].args.redis-rate-limiter.requestedtokens
+	Key: spring.cloud.gateway.routes[6].filters[2].name
+		Line: 157
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[2].name
+	Key: spring.cloud.gateway.routes[6].filters[2].args.name
+		Line: 159
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[2].args.name
+	Key: spring.cloud.gateway.routes[6].filters[2].args.fallbackuri
+		Line: 160
+		Replacement: spring.cloud.gateway.server.webflux.routes[6].filters[2].args.fallbackuri
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2025-10-29 10:55:26 - 
+The use of configuration keys that have been renamed was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'':
+	Key: management.metrics.export.prometheus.enabled
+		Line: 208
+		Replacement: management.prometheus.metrics.export.enabled
+	Key: spring.cloud.gateway.discovery.locator.enabled
+		Line: 14
+		Replacement: spring.cloud.gateway.server.webflux.discovery.locator.enabled
+	Key: spring.cloud.gateway.discovery.locator.lower-case-service-id
+		Line: 15
+		Replacement: spring.cloud.gateway.server.webflux.discovery.locator.lower-case-service-id
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-origins[0]
+		Line: 22
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-origins[0]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-origins[1]
+		Line: 23
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-origins[1]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-origins[2]
+		Line: 24
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-origins[2]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[0]
+		Line: 26
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[0]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[1]
+		Line: 27
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[1]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[2]
+		Line: 28
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[2]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[3]
+		Line: 29
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[3]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[4]
+		Line: 30
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[4]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-methods[5]
+		Line: 31
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-methods[5]
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allowed-headers
+		Line: 32
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allowed-headers
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].allow-credentials
+		Line: 33
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].allow-credentials
+	Key: spring.cloud.gateway.globalcors.cors-configurations[/**].max-age
+		Line: 34
+		Replacement: spring.cloud.gateway.server.webflux.globalcors.cors-configurations[/**].max-age
+
+
+Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
+
+2025-10-29 11:00:26 - Resolving eureka endpoints via configuration

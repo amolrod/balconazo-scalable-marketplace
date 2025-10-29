@@ -12,47 +12,52 @@
 
 ## 📊 ESTADO DEL PROYECTO
 
-**Fecha:** 28 de Octubre de 2025  
-**Versión:** 0.3.0-MVP  
-**Progreso:** 65% completado
+**Fecha:** 29 de Octubre de 2025  
+**Versión:** 0.9.0-MVP  
+**Progreso:** 95% completado
 
 | Componente | Estado | Puerto | Descripción |
 |------------|--------|--------|-------------|
+| **API Gateway** | ✅ RUNNING | 8080 | Punto de entrada único + JWT + Rate limiting |
+| **Auth Service** | ✅ RUNNING | 8084 | Autenticación JWT + Refresh tokens |
 | **Catalog Service** | ✅ RUNNING | 8085 | Gestión de usuarios y espacios |
 | **Booking Service** | ✅ RUNNING | 8082 | Gestión de reservas y reviews |
-| Search-Pricing Service | ⏭️ NEXT | 8083 | Búsquedas y pricing dinámico |
-| API Gateway | ⏭️ PENDING | 8080 | Unificación de endpoints |
+| **Search Service** | ✅ RUNNING | 8083 | Búsqueda geoespacial + PostGIS |
+| **Eureka Server** | ✅ RUNNING | 8761 | Service Discovery |
 | PostgreSQL Catalog | ✅ UP | 5433 | BD catalog_db |
 | PostgreSQL Booking | ✅ UP | 5434 | BD booking_db |
-| Kafka | ✅ UP | 9092 | Event streaming (KRaft) |
+| PostgreSQL Search | ✅ UP | 5435 | BD search_db (PostGIS) |
+| MySQL Auth | ✅ UP | 3307 | BD auth_db |
+| Kafka | ✅ UP | 9092 | Event streaming |
 | Zookeeper | ✅ UP | 2181 | Coordinación Kafka |
-| Redis | ✅ UP | 6379 | Cache y locks |
+| Redis | ✅ UP | 6379 | Cache, locks y rate limiting |
 
 ---
 
 ## 🎯 CARACTERÍSTICAS PRINCIPALES
 
 ### ✅ Implementado
+- **API Gateway** (punto de entrada único con Spring Cloud Gateway)
+- **Autenticación JWT** (Auth Service con MySQL)
+- **Service Discovery** (Eureka Server)
 - **Gestión de usuarios** (hosts y guests)
 - **Gestión de espacios** (CRUD completo)
 - **Sistema de reservas** (crear, confirmar, cancelar)
 - **Sistema de reviews** (rating y comentarios)
+- **Búsqueda geoespacial** (PostGIS con radio en km)
 - **Eventos Kafka** (comunicación entre servicios)
 - **Patrón Outbox** (consistencia transaccional)
+- **Rate Limiting** (Redis con token bucket)
+- **Circuit Breaker** (Resilience4j)
+- **Correlation ID** (trazabilidad de requests)
 - **Health checks** (monitoreo completo)
 - **Pruebas E2E** (flujo completo funcionando)
 
-### ⏭️ En desarrollo
-- Búsqueda geoespacial con PostGIS
+### ⏭️ Planificado
 - Pricing dinámico con Kafka Streams
-- API Gateway con JWT auth
-- Rate limiting con Redis
-
-### 📋 Planificado
 - Frontend Angular 20
 - Despliegue en AWS (ECS/MSK/RDS)
-- CI/CD con GitHub Actions
-- Observabilidad (Prometheus/Grafana)
+- Observabilidad (Prometheus/Grafana/Jaeger)
 
 ---
 
@@ -60,23 +65,57 @@
 
 ```
 ┌─────────────────────────────────────────────────┐
-│           INFRAESTRUCTURA COMPARTIDA            │
-├─────────────────────────────────────────────────┤
-│  Kafka (9092)      - Eventos entre servicios    │
-│  Zookeeper (2181)  - Gestión de Kafka           │
-│  Redis (6379)      - Cache y locks              │
-└─────────────────────────────────────────────────┘
-           ↓                            ↓
-┌──────────────────────┐    ┌──────────────────────┐
-│  CATALOG SERVICE ✅  │    │  BOOKING SERVICE ✅  │
-│  Puerto: 8085        │    │  Puerto: 8082        │
-│  DB: catalog_db      │    │  DB: booking_db      │
-│  Puerto DB: 5433     │    │  Puerto DB: 5434     │
-│                      │    │                      │
-│  - Users             │    │  - Bookings          │
-│  - Spaces            │    │  - Reviews           │
-│  - Availability      │    │  - Outbox Pattern    │
-└──────────────────────┘    └──────────────────────┘
+│              FRONTEND (Planificado)             │
+│           Angular 20 + Tailwind CSS             │
+└──────────────────┬──────────────────────────────┘
+                   │ HTTP/JWT
+                   ▼
+┌─────────────────────────────────────────────────┐
+│          🌐 API GATEWAY :8080 ✅                │
+│     Spring Cloud Gateway (Reactive)              │
+│  • JWT Validation (stateless)                   │
+│  • Rate Limiting (Redis)                        │
+│  • Circuit Breaker (Resilience4j)               │
+│  • CORS + Correlation ID                        │
+└──────────────────┬──────────────────────────────┘
+                   │ Service Discovery
+                   ▼
+┌─────────────────────────────────────────────────┐
+│         🎯 EUREKA SERVER :8761 ✅               │
+│           Service Registry                       │
+└──────────────────┬──────────────────────────────┘
+                   │
+     ┌─────────────┼─────────────┬──────────┐
+     ▼             ▼             ▼          ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│  AUTH    │  │ CATALOG  │  │ BOOKING  │  │ SEARCH   │
+│ SERVICE  │  │ SERVICE  │  │ SERVICE  │  │ SERVICE  │
+│  :8084   │  │  :8085   │  │  :8082   │  │  :8083   │
+│    ✅    │  │    ✅    │  │    ✅    │  │    ✅    │
+└────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘
+     │             │             │             │
+     ▼             ▼             ▼             ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│  MySQL   │  │PostgreSQL│  │PostgreSQL│  │PostgreSQL│
+│ auth_db  │  │catalog_db│  │booking_db│  │search_db │
+│  :3307   │  │  :5433   │  │  :5434   │  │  :5435   │
+│   ✅     │  │    ✅    │  │    ✅    │  │ +PostGIS │
+└──────────┘  └──────────┘  └──────────┘  └─────✅────┘
+     
+              ▲             ▲             ▲
+              └─────────────┼─────────────┘
+                            │
+              ┌─────────────▼─────────────┐
+              │    Apache Kafka :9092     │
+              │  + Zookeeper :2181        │
+              │          ✅               │
+              └───────────────────────────┘
+              
+              ┌───────────────────────────┐
+              │      Redis :6379          │
+              │  (Cache + Rate Limit)     │
+              │          ✅               │
+              └───────────────────────────┘
 ```
 
 ### Eventos Kafka
@@ -96,11 +135,44 @@
 - Java 21+
 - Maven 3.9+
 - Docker 24+
-- Python 3 (para scripts)
+- Redis (puerto 6379)
 
-### Opción 1: Inicio automático (recomendado)
+### Opción 1: Inicio automático completo (recomendado)
 
 ```bash
+cd /Users/angel/Desktop/BalconazoApp
+./start-all-complete.sh
+```
+
+Este script inicia **todo el sistema** automáticamente:
+1. ✅ Infraestructura (Kafka, Redis, PostgreSQL, MySQL)
+2. ✅ Eureka Server
+3. ✅ Auth Service
+4. ✅ Catalog Service
+5. ✅ Booking Service
+6. ✅ Search Service
+7. ✅ API Gateway
+
+**Tiempo estimado:** 2-3 minutos
+
+### Opción 2: Inicio individual del API Gateway
+
+```bash
+./start-gateway.sh
+```
+
+### Verificar que todo está corriendo
+
+```bash
+# Health check del API Gateway
+curl http://localhost:8080/actuator/health
+
+# Ver servicios registrados en Eureka
+open http://localhost:8761
+
+# Todas las rutas configuradas
+curl http://localhost:8080/actuator/gateway/routes | jq
+```
 # 1. Clonar repositorio
 git clone https://github.com/tu-usuario/BalconazoApp
 cd BalconazoApp

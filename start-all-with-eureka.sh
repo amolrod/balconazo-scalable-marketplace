@@ -79,6 +79,17 @@ mvn spring-boot:run > /tmp/search-service.log 2>&1 &
 echo $! > /tmp/search-pid.txt
 echo "   PID: $(cat /tmp/search-pid.txt)"
 
+sleep 20
+
+echo ""
+echo "7️⃣ Iniciando API Gateway (puerto 8080)..."
+cd /Users/angel/Desktop/BalconazoApp/api-gateway
+lsof -ti:8080 | xargs kill -9 2>/dev/null
+mvn spring-boot:run > /tmp/api-gateway.log 2>&1 &
+echo $! > /tmp/gateway-pid.txt
+echo "   PID: $(cat /tmp/gateway-pid.txt)"
+echo "   Logs: tail -f /tmp/api-gateway.log"
+
 echo ""
 echo "⏳ Esperando 30 segundos para que todos los servicios inicien..."
 sleep 30
@@ -88,6 +99,7 @@ echo "✅ SISTEMA COMPLETO INICIADO"
 echo "============================="
 echo ""
 echo "🌐 URLs:"
+echo "   API Gateway:       http://localhost:8080"
 echo "   Eureka Dashboard:  http://localhost:8761"
 echo "   Auth Service:      http://localhost:8084/api/auth"
 echo "   Catalog Service:   http://localhost:8085/api/catalog"
@@ -95,6 +107,7 @@ echo "   Booking Service:   http://localhost:8082/api/bookings"
 echo "   Search Service:    http://localhost:8083/api/search"
 echo ""
 echo "🔍 Health Checks:"
+curl -s http://localhost:8080/actuator/health | python3 -m json.tool 2>/dev/null && echo "✅ API Gateway UP" || echo "⚠️  API Gateway DOWN"
 curl -s http://localhost:8761/actuator/health | python3 -m json.tool 2>/dev/null && echo "✅ Eureka UP" || echo "⚠️  Eureka DOWN"
 curl -s http://localhost:8084/actuator/health | python3 -m json.tool 2>/dev/null && echo "✅ Auth UP" || echo "⚠️  Auth DOWN"
 curl -s http://localhost:8085/actuator/health | python3 -m json.tool 2>/dev/null && echo "✅ Catalog UP" || echo "⚠️  Catalog DOWN"
@@ -103,12 +116,60 @@ curl -s http://localhost:8083/actuator/health | python3 -m json.tool 2>/dev/null
 
 echo ""
 echo "📝 Ver logs:"
+echo "   tail -f /tmp/api-gateway.log"
 echo "   tail -f /tmp/eureka-server.log"
 echo "   tail -f /tmp/auth-service.log"
 echo "   tail -f /tmp/catalog-service.log"
 echo "   tail -f /tmp/booking-service.log"
 echo "   tail -f /tmp/search-service.log"
 echo ""
+echo "🔍 Ver errores en los logs:"
+echo "   grep -i error /tmp/api-gateway.log | tail -20"
+echo "   grep -i error /tmp/auth-service.log | tail -20"
+echo "   grep -i error /tmp/catalog-service.log | tail -20"
+echo ""
 echo "🛑 Para detener todo:"
-echo "   kill \$(cat /tmp/eureka-pid.txt /tmp/auth-pid.txt /tmp/catalog-pid.txt /tmp/booking-pid.txt /tmp/search-pid.txt 2>/dev/null)"
+echo "   kill \$(cat /tmp/gateway-pid.txt /tmp/eureka-pid.txt /tmp/auth-pid.txt /tmp/catalog-pid.txt /tmp/booking-pid.txt /tmp/search-pid.txt 2>/dev/null)"
+echo ""
+
+# Verificación adicional de logs para detectar errores
+echo "🔎 Verificación rápida de errores en logs..."
+echo ""
+
+# Función para verificar errores reales (ignorando warnings conocidos)
+check_real_errors() {
+    local log_file=$1
+    local service_name=$2
+
+    if [ -f "$log_file" ]; then
+        # Contar solo errores críticos, ignorando:
+        # - DEBUG messages
+        # - Campos SQL como 'last_error'
+        # - Warnings de Netty DNS en macOS
+        # - Configuración de Spring Security (no son errores)
+        local error_count=$(grep -i "error\|exception" "$log_file" 2>/dev/null | \
+                           grep -v "DEBUG\|last_error\|MacOSDnsServerAddressStreamProvider\|DisableEncodeUrlFilter\|Will secure any request" | \
+                           wc -l | tr -d ' ')
+
+        if [ -n "$error_count" ] && [ "$error_count" -gt 0 ]; then
+            echo "⚠️  $service_name tiene $error_count errores críticos:"
+            grep -i "error\|exception" "$log_file" | \
+                grep -v "DEBUG\|last_error\|MacOSDnsServerAddressStreamProvider\|DisableEncodeUrlFilter\|Will secure any request" | \
+                tail -3 | sed 's/^/   /'
+            echo ""
+        fi
+    fi
+}
+
+check_real_errors "/tmp/api-gateway.log" "API Gateway"
+check_real_errors "/tmp/auth-service.log" "Auth Service"
+check_real_errors "/tmp/catalog-service.log" "Catalog Service"
+check_real_errors "/tmp/booking-service.log" "Booking Service"
+check_real_errors "/tmp/search-service.log" "Search Service"
+
+echo "✅ Verificación de logs completada"
+echo ""
+echo "💡 Tip: Si algún servicio está DOWN, revisa sus logs con:"
+echo "   tail -f /tmp/[nombre-servicio].log"
+
 
