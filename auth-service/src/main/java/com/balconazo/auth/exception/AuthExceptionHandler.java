@@ -40,14 +40,24 @@ public class AuthExceptionHandler {
 
     /**
      * Maneja cualquier otra RuntimeException no capturada
-     * Para debugging - en producción deberías ser más específico
+     * Verifica si es "Usuario no encontrado" para devolver 404 en lugar de 500
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        log.error("Unexpected runtime exception: ", ex);
+        log.error("Runtime exception: {}", ex.getMessage());
 
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
+
+        // Si es "Usuario no encontrado", devolver 404
+        if (ex.getMessage() != null && ex.getMessage().contains("Usuario no encontrado")) {
+            body.put("status", HttpStatus.NOT_FOUND.value());
+            body.put("error", "Not Found");
+            body.put("message", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        }
+
+        // Otros errores → 500
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.put("error", "Internal Server Error");
         body.put("message", "An unexpected error occurred");

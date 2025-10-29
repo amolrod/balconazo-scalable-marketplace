@@ -58,8 +58,23 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(@RequestHeader("X-User-Id") String userId) {
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        // Obtener autenticación del contexto de seguridad
+        var authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        // Verificar que hay autenticación válida
+        if (authentication == null || !authentication.isAuthenticated() ||
+            authentication.getPrincipal() instanceof String &&
+            "anonymousUser".equals(authentication.getPrincipal())) {
+            log.warn("GET /api/auth/me called without valid authentication");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String userId = (String) authentication.getPrincipal();
         log.info("GET /api/auth/me - UserId: {}", userId);
+
         UserResponse response = authService.getUserById(userId);
         return ResponseEntity.ok(response);
     }

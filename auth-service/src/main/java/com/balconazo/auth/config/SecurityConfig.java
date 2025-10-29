@@ -21,7 +21,8 @@ public class SecurityConfig {
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/**", "/error").permitAll() // Permitir actuator y error handler
-                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers("/api/auth/**").permitAll() // TEMPORALMENTE: Permitir todos los endpoints de auth
+                // TODO: Implementar filtro JWT para proteger /api/auth/me, /api/auth/logout, etc.
                 .anyRequest().authenticated()
             );
 
