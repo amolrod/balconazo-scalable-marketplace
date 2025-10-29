@@ -54,12 +54,12 @@
 
 ```
 ┌─────────────────────────────────────────────────┐
-│           Eureka Server (8761) ✅               │
-│           Service Discovery & Registry           │
+│           Eureka Server (8761)✅               │
+│           Service Discovery & Registry          │
 └─────────────────────────────────────────────────┘
                        ↓
 ┌─────────────────────────────────────────────────┐
-│        API Gateway (8080) ⏭️ PENDIENTE          │
+│        API Gateway (8080)          ✅           │
 │   (Spring Cloud Gateway - Reactive, Stateless)  │
 │   - JWT Validation                              │
 │   - Rate Limiting (Redis)                       │

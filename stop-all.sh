@@ -1,46 +1,119 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# stop-all.sh - Detiene todos los servicios de BalconazoApp
+#
+# Descripción:
+#   Detiene todos los microservicios, Eureka y la infraestructura Docker
+#
+# Uso:
+#   ./stop-all.sh [opciones]
+#
+# Opciones:
+#   -h, --help          Muestra esta ayuda
+#   -k, --keep-infra    Mantiene la infraestructura Docker corriendo
+#   -f, --force         Forzar cierre (kill -9)
+#
 
-echo "🛑 Deteniendo Sistema Balconazo..."
-echo ""
+set -euo pipefail
 
-# Función para detener un servicio por puerto
+# Colores
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m'
+
+KEEP_INFRA=false
+FORCE=false
+
+log_info() {
+    echo -e "${BLUE}ℹ️  $*${NC}"
+}
+
+log_success() {
+    echo -e "${GREEN}✅ $*${NC}"
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠️  $*${NC}"
+}
+
+show_help() {
+    sed -n '/^#/,/^$/s/^# \?//p' "$0"
+    exit 0
+}
+
 stop_service() {
-    local port=$1
-    local name=$2
+    local name=$1
+    local port=$2
+    local signal=${3:-TERM}
 
-    if lsof -ti:$port > /dev/null 2>&1; then
-        lsof -ti:$port | xargs kill -9 2>/dev/null
-        echo "✅ $name detenido (puerto $port)"
+    if lsof -ti:"$port" >/dev/null 2>&1; then
+        log_info "Deteniendo $name (puerto $port)..."
+        if [ "$FORCE" = true ]; then
+            lsof -ti:"$port" | xargs kill -9 2>/dev/null || true
+        else
+            lsof -ti:"$port" | xargs kill -"$signal" 2>/dev/null || true
+        fi
+        sleep 2
+        if ! lsof -ti:"$port" >/dev/null 2>&1; then
+            log_success "$name detenido"
+        else
+            log_warning "$name aún en ejecución"
+        fi
     else
-        echo "⚪ $name no estaba corriendo (puerto $port)"
+        log_info "$name no está en ejecución"
     fi
 }
 
-# Detener microservicios
-stop_service 8761 "Eureka Server"
-stop_service 8084 "Auth Service"
-stop_service 8085 "Catalog Service"
-stop_service 8082 "Booking Service"
-stop_service 8083 "Search Service"
+# Parsear argumentos
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            ;;
+        -k|--keep-infra)
+            KEEP_INFRA=true
+            shift
+            ;;
+        -f|--force)
+            FORCE=true
+            shift
+            ;;
+        *)
+            echo "Opción desconocida: $1"
+            show_help
+            ;;
+    esac
+done
 
 echo ""
-echo "🗑️  Limpiando archivos de PID..."
-rm -f /tmp/eureka-pid.txt
-rm -f /tmp/auth-pid.txt
-rm -f /tmp/catalog-pid.txt
-rm -f /tmp/booking-pid.txt
-rm -f /tmp/search-pid.txt
+echo -e "${RED}╔════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║    🛑 DETENIENDO SISTEMA BALCONAZO        ║${NC}"
+echo -e "${RED}╚════════════════════════════════════════════╝${NC}"
+echo ""
+
+# Detener servicios
+stop_service "Search Service" 8083
+stop_service "Booking Service" 8082
+stop_service "Catalog Service" 8085
+stop_service "Auth Service" 8084
+stop_service "API Gateway" 8080
+stop_service "Eureka Server" 8761
+
+# Detener infraestructura Docker
+if [ "$KEEP_INFRA" = false ]; then
+    log_info "Deteniendo infraestructura Docker..."
+    docker-compose down 2>/dev/null || log_warning "Docker Compose no encontrado o ya detenido"
+    log_success "Infraestructura detenida"
+else
+    log_info "Manteniendo infraestructura Docker (--keep-infra)"
+fi
+
+# Limpiar archivos PID
+rm -f /tmp/*-pid.txt 2>/dev/null
 
 echo ""
-echo "✅ Sistema detenido completamente"
+log_success "Sistema detenido correctamente"
 echo ""
-echo "📝 Los logs siguen disponibles en:"
-echo "   /tmp/eureka-server.log"
-echo "   /tmp/auth-service.log"
-echo "   /tmp/catalog-service.log"
-echo "   /tmp/booking-service.log"
-echo "   /tmp/search-service.log"
-echo ""
-echo "🐳 Infraestructura Docker (PostgreSQL, MySQL, Kafka, Redis) sigue corriendo"
-echo "   Para detenerla: docker stop \$(docker ps -q --filter 'name=balconazo')"
 

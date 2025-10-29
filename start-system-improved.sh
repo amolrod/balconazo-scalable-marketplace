@@ -1,273 +1,245 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# start-system-improved.sh - Inicia el sistema completo de BalconazoApp
+#
+# Descripción:
+#   Script maestro que inicia todos los microservicios en el orden correcto:
+#   1. Infraestructura (DBs, Kafka, Redis)
+#   2. Eureka Server (Service Discovery)
+#   3. API Gateway
+#   4. Microservicios (Auth, Catalog, Booking, Search)
+#
+# Uso:
+#   ./start-system-improved.sh [opciones]
+#
+# Opciones:
+#   -h, --help     Muestra esta ayuda
+#   -v, --verbose  Modo verbose
+#   -s, --skip-infra  Salta la inicialización de infraestructura
+#
+# Ejemplo:
+#   ./start-system-improved.sh
+#   ./start-system-improved.sh --skip-infra
+#
 
-echo "🚀 INICIANDO SISTEMA COMPLETO BALCONAZO (Mejorado)"
-echo "==================================================="
-echo ""
+set -euo pipefail
 
 # Colores
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
 
-# Función para esperar que un servicio esté listo
-wait_for_service() {
-    local service_name=$1
-    local url=$2
-    local log_file=$3
-    local max_attempts=60
-    local attempt=1
+# Configuración
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly LOG_DIR="/tmp"
+readonly WAIT_TIME=20
+SKIP_INFRA=false
+VERBOSE=false
 
-    echo -n "⏳ Esperando a que $service_name esté listo"
-
-    while [ $attempt -le $max_attempts ]; do
-        if curl -s $url > /dev/null 2>&1; then
-            echo ""
-            echo -e "${GREEN}✅ $service_name está listo${NC}"
-            return 0
-        fi
-
-        # Verificar errores críticos en el log
-        if [ -f "$log_file" ]; then
-            if grep -q "APPLICATION FAILED TO START\|Error starting ApplicationContext\|Port .* was already in use" "$log_file" 2>/dev/null; then
-                echo ""
-                echo -e "${RED}❌ $service_name falló al iniciar. Últimas líneas del log:${NC}"
-                tail -10 "$log_file"
-                return 1
-            fi
-        fi
-
-        echo -n "."
-        sleep 2
-        attempt=$((attempt + 1))
-    done
-
-    echo ""
-    echo -e "${RED}❌ Timeout esperando a $service_name${NC}"
-    echo -e "${YELLOW}📋 Revisando últimas líneas del log:${NC}"
-    tail -20 "$log_file"
-    return 1
+# Funciones auxiliares
+log_info() {
+    echo -e "${BLUE}ℹ️  $*${NC}"
 }
 
-# Verificar infraestructura Docker
-echo "🔍 Verificando infraestructura Docker..."
-REQUIRED_CONTAINERS=("balconazo-pg-catalog" "balconazo-pg-booking" "balconazo-pg-search" "balconazo-kafka" "balconazo-redis")
-MISSING=0
+log_success() {
+    echo -e "${GREEN}✅ $*${NC}"
+}
 
-for container in "${REQUIRED_CONTAINERS[@]}"; do
-    if ! docker ps | grep -q $container; then
-        echo -e "${YELLOW}⚠️  $container no está corriendo${NC}"
-        MISSING=1
-    else
-        echo -e "${GREEN}✅ $container OK${NC}"
-    fi
-done
+log_warning() {
+    echo -e "${YELLOW}⚠️  $*${NC}"
+}
 
-if [ $MISSING -eq 1 ]; then
-    echo ""
-    echo -e "${RED}❌ Falta infraestructura. Iniciando contenedores Docker...${NC}"
-    cd /Users/angel/Desktop/BalconazoApp
-    docker-compose up -d zookeeper kafka redis pg-catalog pg-booking pg-search 2>/dev/null
-    echo "⏳ Esperando 15 segundos a que la infraestructura esté lista..."
-    sleep 15
-fi
+log_error() {
+    echo -e "${RED}❌ $*${NC}" >&2
+}
 
-echo ""
+show_help() {
+    sed -n '/^#/,/^$/s/^# \?//p' "$0"
+    exit 0
+}
 
-# 1. Eureka Server
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}1️⃣ Iniciando Eureka Server (puerto 8761)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/eureka-server
-lsof -ti:8761 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/eureka-server.log 2>&1 &
-echo $! > /tmp/eureka-pid.txt
-echo "   PID: $(cat /tmp/eureka-pid.txt)"
+check_port() {
+    local port=$1
+    nc -z localhost "$port" 2>/dev/null
+}
 
-wait_for_service "Eureka Server" "http://localhost:8761/actuator/health" "/tmp/eureka-server.log"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Abortando inicio del sistema${NC}"
-    exit 1
-fi
+wait_for_service() {
+    local name=$1
+    local port=$2
+    local max_attempts=30
+    local attempt=0
 
-echo ""
+    log_info "Esperando a que $name esté disponible en puerto $port..."
 
-# 2. MySQL Auth
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}2️⃣ Iniciando MySQL Auth (puerto 3307)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-if ! docker ps | grep -q balconazo-mysql-auth; then
-    chmod +x /Users/angel/Desktop/BalconazoApp/start-mysql-auth.sh
-    /Users/angel/Desktop/BalconazoApp/start-mysql-auth.sh
-    sleep 5
-else
-    echo -e "${GREEN}✅ MySQL Auth ya está corriendo${NC}"
-fi
-
-echo ""
-
-# 3. Auth Service
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}3️⃣ Iniciando Auth Service (puerto 8084)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/auth-service
-lsof -ti:8084 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/auth-service.log 2>&1 &
-echo $! > /tmp/auth-pid.txt
-echo "   PID: $(cat /tmp/auth-pid.txt)"
-
-wait_for_service "Auth Service" "http://localhost:8084/actuator/health" "/tmp/auth-service.log"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Abortando inicio del sistema${NC}"
-    exit 1
-fi
-
-echo ""
-
-# 4. Catalog Service
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}4️⃣ Iniciando Catalog Service (puerto 8085)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/catalog_microservice
-lsof -ti:8085 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/catalog-service.log 2>&1 &
-echo $! > /tmp/catalog-pid.txt
-echo "   PID: $(cat /tmp/catalog-pid.txt)"
-
-wait_for_service "Catalog Service" "http://localhost:8085/actuator/health" "/tmp/catalog-service.log"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Abortando inicio del sistema${NC}"
-    exit 1
-fi
-
-echo ""
-
-# 5. Booking Service
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}5️⃣ Iniciando Booking Service (puerto 8082)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/booking_microservice
-lsof -ti:8082 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/booking-service.log 2>&1 &
-echo $! > /tmp/booking-pid.txt
-echo "   PID: $(cat /tmp/booking-pid.txt)"
-
-wait_for_service "Booking Service" "http://localhost:8082/actuator/health" "/tmp/booking-service.log"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Abortando inicio del sistema${NC}"
-    exit 1
-fi
-
-echo ""
-
-# 6. Search Service
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}6️⃣ Iniciando Search Service (puerto 8083)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/search_microservice
-lsof -ti:8083 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/search-service.log 2>&1 &
-echo $! > /tmp/search-pid.txt
-echo "   PID: $(cat /tmp/search-pid.txt)"
-
-wait_for_service "Search Service" "http://localhost:8083/actuator/health" "/tmp/search-service.log"
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Abortando inicio del sistema${NC}"
-    exit 1
-fi
-
-echo ""
-
-# 7. API Gateway
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-echo -e "${BLUE}7️⃣ Iniciando API Gateway (puerto 8080)${NC}"
-echo -e "${BLUE}═══════════════════════════════════════════${NC}"
-cd /Users/angel/Desktop/BalconazoApp/api-gateway
-lsof -ti:8080 | xargs kill -9 2>/dev/null
-mvn spring-boot:run > /tmp/api-gateway.log 2>&1 &
-echo $! > /tmp/gateway-pid.txt
-echo "   PID: $(cat /tmp/gateway-pid.txt)"
-
-wait_for_service "API Gateway" "http://localhost:8080/actuator/health" "/tmp/api-gateway.log"
-if [ $? -ne 0 ]; then
-    echo -e "${YELLOW}⚠️  API Gateway falló, pero continuando...${NC}"
-fi
-
-echo ""
-echo -e "${GREEN}═══════════════════════════════════════════${NC}"
-echo -e "${GREEN}✅ SISTEMA COMPLETO INICIADO${NC}"
-echo -e "${GREEN}═══════════════════════════════════════════${NC}"
-echo ""
-
-echo -e "${BLUE}🌐 URLs:${NC}"
-echo "   API Gateway:       http://localhost:8080"
-echo "   Eureka Dashboard:  http://localhost:8761"
-echo "   Auth Service:      http://localhost:8084/api/auth"
-echo "   Catalog Service:   http://localhost:8085/api/catalog"
-echo "   Booking Service:   http://localhost:8082/api/bookings"
-echo "   Search Service:    http://localhost:8083/api/search"
-echo ""
-
-echo -e "${BLUE}🔍 Health Checks Finales:${NC}"
-curl -s http://localhost:8080/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ API Gateway UP${NC}" || echo -e "   ${RED}❌ API Gateway DOWN${NC}"
-curl -s http://localhost:8761/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ Eureka UP${NC}" || echo -e "   ${RED}❌ Eureka DOWN${NC}"
-curl -s http://localhost:8084/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ Auth UP${NC}" || echo -e "   ${RED}❌ Auth DOWN${NC}"
-curl -s http://localhost:8085/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ Catalog UP${NC}" || echo -e "   ${RED}❌ Catalog DOWN${NC}"
-curl -s http://localhost:8082/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ Booking UP${NC}" || echo -e "   ${RED}❌ Booking DOWN${NC}"
-curl -s http://localhost:8083/actuator/health > /dev/null 2>&1 && echo -e "   ${GREEN}✅ Search UP${NC}" || echo -e "   ${RED}❌ Search DOWN${NC}"
-
-echo ""
-echo -e "${BLUE}📝 Ver logs:${NC}"
-echo "   tail -f /tmp/api-gateway.log"
-echo "   tail -f /tmp/eureka-server.log"
-echo "   tail -f /tmp/auth-service.log"
-echo "   tail -f /tmp/catalog-service.log"
-echo "   tail -f /tmp/booking-service.log"
-echo "   tail -f /tmp/search-service.log"
-echo ""
-
-echo -e "${BLUE}🔍 Verificar errores en logs:${NC}"
-echo "   grep -i error /tmp/api-gateway.log | tail -20"
-echo "   grep -i error /tmp/auth-service.log | tail -20"
-echo ""
-
-echo -e "${BLUE}🛑 Para detener todo:${NC}"
-echo "   kill \$(cat /tmp/gateway-pid.txt /tmp/eureka-pid.txt /tmp/auth-pid.txt /tmp/catalog-pid.txt /tmp/booking-pid.txt /tmp/search-pid.txt 2>/dev/null)"
-echo ""
-
-# Verificación final de errores en logs
-echo -e "${YELLOW}🔎 Verificación de errores en logs...${NC}"
-echo ""
-
-ERROR_FOUND=0
-
-for service in api-gateway auth-service catalog-service booking-service search-service; do
-    LOG_FILE="/tmp/${service}.log"
-    if [ -f "$LOG_FILE" ]; then
-        # Filtrar solo errores reales (excluir DEBUG, campos SQL como last_error, etc)
-        ERROR_COUNT=$(grep -i "error\|exception" "$LOG_FILE" 2>/dev/null | \
-                      grep -v "DEBUG\|last_error\|MacOSDnsServerAddressStreamProvider\|DisableEncodeUrlFilter" | \
-                      wc -l | tr -d ' ')
-
-        if [ -n "$ERROR_COUNT" ] && [ "$ERROR_COUNT" -gt 0 ]; then
-            echo -e "${YELLOW}⚠️  $service tiene $ERROR_COUNT errores críticos en el log${NC}"
-            echo "   Últimos errores:"
-            grep -i "error\|exception" "$LOG_FILE" | \
-                grep -v "DEBUG\|last_error\|MacOSDnsServerAddressStreamProvider\|DisableEncodeUrlFilter" | \
-                tail -2 | sed 's/^/   /'
-            echo ""
-            ERROR_FOUND=1
+    while ! check_port "$port"; do
+        attempt=$((attempt + 1))
+        if [ $attempt -ge $max_attempts ]; then
+            log_error "$name no respondió después de $max_attempts intentos"
+            return 1
         fi
+        sleep 2
+        echo -n "."
+    done
+    echo ""
+    log_success "$name está disponible"
+}
+
+check_service_health() {
+    local name=$1
+    local port=$2
+    local response
+
+    response=$(curl -s "http://localhost:$port/actuator/health" 2>/dev/null || echo "")
+    if echo "$response" | jq -e '.status == "UP"' >/dev/null 2>&1; then
+        log_success "$name: UP"
+        return 0
+    else
+        log_warning "$name: DOWN o sin respuesta"
+        return 1
     fi
+}
+
+# Parsear argumentos
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -s|--skip-infra)
+            SKIP_INFRA=true
+            shift
+            ;;
+        *)
+            log_error "Opción desconocida: $1"
+            show_help
+            ;;
+    esac
 done
 
-if [ $ERROR_FOUND -eq 0 ]; then
-    echo -e "${GREEN}✅ No se encontraron errores críticos en los logs${NC}"
-else
-    echo -e "${YELLOW}💡 Tip: Revisa los logs completos para más detalles${NC}"
+# Verificar prerequisitos
+if ! command -v java &> /dev/null; then
+    log_error "Java no está instalado. Por favor instala Java 21+"
+    exit 1
 fi
 
+if ! command -v mvn &> /dev/null; then
+    log_error "Maven no está instalado"
+    exit 1
+fi
+
+if ! command -v docker &> /dev/null; then
+    log_error "Docker no está instalado"
+    exit 1
+fi
+
+# Banner
 echo ""
-echo -e "${GREEN}🎉 ¡Sistema listo para usar!${NC}"
+echo -e "${BLUE}╔════════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║     🚀 INICIANDO SISTEMA BALCONAZO        ║${NC}"
+echo -e "${BLUE}╔════════════════════════════════════════════╗${NC}"
+echo ""
+
+# 1. Infraestructura
+if [ "$SKIP_INFRA" = false ]; then
+    log_info "PASO 1/5: Iniciando infraestructura (DBs, Kafka, Redis)..."
+    if [ -f "$SCRIPT_DIR/start-infrastructure.sh" ]; then
+        bash "$SCRIPT_DIR/start-infrastructure.sh"
+    else
+        log_warning "start-infrastructure.sh no encontrado, saltando..."
+    fi
+    sleep 10
+else
+    log_info "PASO 1/5: Saltando infraestructura (--skip-infra)"
+fi
+
+# 2. Eureka Server
+log_info "PASO 2/5: Iniciando Eureka Server..."
+if [ -f "$SCRIPT_DIR/start-eureka.sh" ]; then
+    bash "$SCRIPT_DIR/start-eureka.sh"
+    wait_for_service "Eureka Server" 8761
+else
+    log_error "start-eureka.sh no encontrado"
+    exit 1
+fi
+
+# 3. API Gateway
+log_info "PASO 3/5: Iniciando API Gateway..."
+if [ -f "$SCRIPT_DIR/start-gateway.sh" ]; then
+    bash "$SCRIPT_DIR/start-gateway.sh"
+    wait_for_service "API Gateway" 8080
+else
+    log_warning "start-gateway.sh no encontrado, saltando..."
+fi
+
+# 4. Auth Service
+log_info "PASO 4/5: Iniciando Auth Service..."
+cd "$SCRIPT_DIR/auth-service" || exit 1
+nohup java -jar target/auth-service-1.0.0.jar > "$LOG_DIR/auth-service.log" 2>&1 &
+echo $! > "$LOG_DIR/auth-pid.txt"
+wait_for_service "Auth Service" 8084
+
+# 5. Catalog Service
+log_info "Iniciando Catalog Service..."
+cd "$SCRIPT_DIR/catalog_microservice" || exit 1
+nohup java -jar target/catalog_microservice-0.0.1-SNAPSHOT.jar > "$LOG_DIR/catalog-service.log" 2>&1 &
+echo $! > "$LOG_DIR/catalog-pid.txt"
+wait_for_service "Catalog Service" 8085
+
+# 6. Booking Service
+log_info "Iniciando Booking Service..."
+cd "$SCRIPT_DIR/booking_microservice" || exit 1
+nohup java -jar target/booking_microservice-0.0.1-SNAPSHOT.jar > "$LOG_DIR/booking-service.log" 2>&1 &
+echo $! > "$LOG_DIR/booking-pid.txt"
+wait_for_service "Booking Service" 8082
+
+# 7. Search Service
+log_info "Iniciando Search Service..."
+cd "$SCRIPT_DIR/search_microservice" || exit 1
+nohup java -jar target/search_microservice-0.0.1-SNAPSHOT.jar > "$LOG_DIR/search-service.log" 2>&1 &
+echo $! > "$LOG_DIR/search-pid.txt"
+wait_for_service "Search Service" 8083
+
+# Esperar un poco para que se registren en Eureka
+log_info "PASO 5/5: Esperando registro en Eureka..."
+sleep 15
+
+# Verificación final
+echo ""
+log_info "Verificando estado de los servicios..."
+echo ""
+
+check_service_health "API Gateway" 8080
+check_service_health "Eureka Server" 8761
+check_service_health "Auth Service" 8084
+check_service_health "Catalog Service" 8085
+check_service_health "Booking Service" 8082
+check_service_health "Search Service" 8083
+
+echo ""
+echo -e "${GREEN}╔════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║   ✅ SISTEMA INICIADO CORRECTAMENTE       ║${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════╝${NC}"
+echo ""
+
+log_info "URLs útiles:"
+echo "  • API Gateway:     http://localhost:8080"
+echo "  • Eureka Dashboard: http://localhost:8761"
+echo "  • Auth Service:     http://localhost:8084"
+echo "  • Catalog Service:  http://localhost:8085"
+echo "  • Booking Service:  http://localhost:8082"
+echo "  • Search Service:   http://localhost:8083"
+echo ""
+
+log_info "Logs disponibles en: $LOG_DIR/*.log"
+echo ""
+
+log_info "Para ejecutar tests: ./test-e2e-completo.sh"
+log_info "Para detener el sistema: ./stop-all.sh"
+echo ""
 
