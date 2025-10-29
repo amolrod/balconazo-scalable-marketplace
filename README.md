@@ -153,6 +153,6 @@ MIT License - ver [LICENSE](LICENSE)
 ---
 
 **Versión:** 1.1.0  
-**Última Actualización:** 29 de Octubre de 2025  
+**Última Actualización:** 29 Octubre de 2025  
 **Estado:** 🟢 Producción Ready
 
