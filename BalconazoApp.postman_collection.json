@@ -1,0 +1,310 @@
+{
+  "info": {
+    "name": "BalconazoApp API",
+    "description": "Colección completa de endpoints de BalconazoApp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 AUTH SERVICE",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"token\", jsonData.accessToken);",
+                  "pm.environment.set(\"userId\", jsonData.userId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"host1@balconazo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"HOST\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏠 CATALOG - Espacios",
+      "item": [
+        {
+          "name": "Crear Espacio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ownerId\": \"11111111-1111-1111-1111-111111111111\",\n  \"title\": \"Mi Balcón de Prueba\",\n  \"description\": \"Balcón acogedor para eventos\",\n  \"address\": \"Calle Test 123, Madrid\",\n  \"lat\": 40.4168,\n  \"lon\": -3.7038,\n  \"capacity\": 8,\n  \"areaSqm\": 20.5,\n  \"basePriceCents\": 2500,\n  \"amenities\": [\"wifi\", \"mesa\", \"sillas\"],\n  \"rules\": {\n    \"no_fumar\": true,\n    \"mascotas\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces"]
+            }
+          }
+        },
+        {
+          "name": "Listar Espacios Activos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "active"]
+            }
+          }
+        },
+        {
+          "name": "Obtener Espacio por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎫 BOOKING",
+      "item": [
+        {
+          "name": "Crear Reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spaceId\": \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\n  \"guestId\": \"22222222-2222-2222-2222-222222222222\",\n  \"startTs\": \"2025-11-20T14:00:00\",\n  \"endTs\": \"2025-11-20T18:00:00\",\n  \"numGuests\": 6,\n  \"priceCents\": 3000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Listar Reservas por Guest",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/guest/22222222-2222-2222-2222-222222222222",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "guest", "22222222-2222-2222-2222-222222222222"]
+            }
+          }
+        },
+        {
+          "name": "Confirmar Reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/33333333-3333-3333-3333-333333333333/confirm?paymentIntentId=pi_test_333",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "33333333-3333-3333-3333-333333333333", "confirm"],
+              "query": [
+                {
+                  "key": "paymentIntentId",
+                  "value": "pi_test_333"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 SEARCH (Público)",
+      "item": [
+        {
+          "name": "Búsqueda Geoespacial",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/search/spaces?lat=40.4200&lon=-3.7050&radius=5000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "spaces"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "40.4200"
+                },
+                {
+                  "key": "lon",
+                  "value": "-3.7050"
+                },
+                {
+                  "key": "radius",
+                  "value": "5000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Búsqueda por Ciudad",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/search/spaces/city?city=Madrid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "spaces", "city"],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "Madrid"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 HEALTH CHECKS",
+      "item": [
+        {
+          "name": "API Gateway Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Eureka Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8761/actuator/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8761",
+              "path": ["actuator", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

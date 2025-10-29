@@ -15,11 +15,13 @@
     <artifactId>BalconazoApp</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>TFG_WireHec</name>
+    <name>BalconazoApp</name>
     <packaging>pom</packaging>
 
     <modules>
-    <!-- <module>microservice-Eureka</module>-->
+         <module>eureka-server</module>
+         <module>api-gateway</module>
+         <module>auth-service</module>
          <module>catalog_microservice</module>
          <module>booking_microservice</module>
          <module>search_microservice</module>

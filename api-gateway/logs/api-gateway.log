@@ -8,13 +8,14 @@
 
  :: Spring Boot ::                (v3.5.7)
 
-2025-10-29 10:55:23 - Starting ApiGatewayApplication v1.0.0 using Java 21.0.6 with PID 69928 (/Users/angel/Desktop/BalconazoApp/api-gateway/target/api-gateway-1.0.0.jar started by angel in /Users/angel/Desktop/BalconazoApp/api-gateway)
-2025-10-29 10:55:23 - The following 1 profile is active: "dev"
-2025-10-29 10:55:24 - Multiple Spring Data modules found, entering strict repository configuration mode
-2025-10-29 10:55:24 - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2025-10-29 10:55:24 - Finished Spring Data repository scanning in 8 ms. Found 0 Redis repository interfaces.
-2025-10-29 10:55:24 - BeanFactory id=3096214b-7135-3e9a-a1e6-311ef0e03dd2
-2025-10-29 10:55:25 - 
+2025-10-29 14:28:44 - Starting ApiGatewayApplication v1.0.0 using Java 21.0.6 with PID 90372 (/Users/angel/Desktop/BalconazoApp/api-gateway/target/api-gateway-1.0.0.jar started by angel in /Users/angel/Desktop/BalconazoApp/api-gateway)
+2025-10-29 14:28:44 - The following 1 profile is active: "dev"
+2025-10-29 14:28:45 - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-10-29 14:28:45 - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-10-29 14:28:45 - Finished Spring Data repository scanning in 6 ms. Found 0 Redis repository interfaces.
+2025-10-29 14:28:45 - BeanFactory id=18f7a0bc-9426-36f9-b36b-c8ebf6d50e6d
+2025-10-29 14:28:46 - 🔓 Configurando Gateway sin validación JWT - los microservicios validarán
+2025-10-29 14:28:46 - 
 
 **********************************************************
 
@@ -23,23 +24,23 @@ The artifact spring-cloud-gateway-server is deprecated. It will be removed in th
 **********************************************************
 
 
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [After]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Before]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Between]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Cookie]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Header]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Host]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Method]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Path]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Query]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [ReadBody]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [RemoteAddr]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [Weight]
-2025-10-29 10:55:25 - Loaded RoutePredicateFactory [CloudFoundryRouteService]
-2025-10-29 10:55:25 - Exposing 4 endpoints beneath base path '/actuator'
-2025-10-29 10:55:26 - Eureka HTTP Client uses RestTemplate.
-2025-10-29 10:55:26 - 
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [After]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Before]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Between]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Cookie]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Header]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Host]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Method]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Path]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Query]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [ReadBody]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [RemoteAddr]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [Weight]
+2025-10-29 14:28:47 - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-10-29 14:28:47 - Exposing 5 endpoints beneath base path '/actuator'
+2025-10-29 14:28:47 - Eureka HTTP Client uses RestTemplate.
+2025-10-29 14:28:47 - 
 
 **********************************************************
 
@@ -48,29 +49,29 @@ spring-cloud-starter-gateway is deprecated. It will be removed in the next major
 **********************************************************
 
 
-2025-10-29 10:55:26 - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
-2025-10-29 10:55:26 - Setting initial instance status as: STARTING
-2025-10-29 10:55:26 - Initializing Eureka in region us-east-1
-2025-10-29 10:55:26 - Resolving eureka endpoints via configuration
-2025-10-29 10:55:26 - Disable delta property : false
-2025-10-29 10:55:26 - Single vip registry refresh property : null
-2025-10-29 10:55:26 - Force full registry fetch : false
-2025-10-29 10:55:26 - Application is null : false
-2025-10-29 10:55:26 - Registered Applications size is zero : true
-2025-10-29 10:55:26 - Application version is -1: true
-2025-10-29 10:55:26 - Getting all instance registry info from the eureka server
-2025-10-29 10:55:26 - The response status is 200
-2025-10-29 10:55:26 - Starting heartbeat executor: renew interval is: 30
-2025-10-29 10:55:26 - InstanceInfoReplicator onDemand update allowed rate per min is 4
-2025-10-29 10:55:26 - Discovery Client initialized at timestamp 1761731726613 with initial instances count: 5
-2025-10-29 10:55:26 - Registering application API-GATEWAY with eureka with status UP
-2025-10-29 10:55:26 - Saw local status change event StatusChangeEvent [timestamp=1761731726615, current=UP, previous=STARTING]
-2025-10-29 10:55:26 - DiscoveryClient_API-GATEWAY/api-gateway:1ab31f87c9f6bbdd48b5f07b4d905839: registering service...
-2025-10-29 10:55:26 - DiscoveryClient_API-GATEWAY/api-gateway:1ab31f87c9f6bbdd48b5f07b4d905839 - registration status: 204
-2025-10-29 10:55:26 - Netty started on port 8080 (http)
-2025-10-29 10:55:26 - Updating port to 8080
-2025-10-29 10:55:26 - Started ApiGatewayApplication in 4.094 seconds (process running for 4.406)
-2025-10-29 10:55:26 - 
+2025-10-29 14:28:47 - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2025-10-29 14:28:47 - Setting initial instance status as: STARTING
+2025-10-29 14:28:47 - Initializing Eureka in region us-east-1
+2025-10-29 14:28:47 - Resolving eureka endpoints via configuration
+2025-10-29 14:28:47 - Disable delta property : false
+2025-10-29 14:28:47 - Single vip registry refresh property : null
+2025-10-29 14:28:47 - Force full registry fetch : false
+2025-10-29 14:28:47 - Application is null : false
+2025-10-29 14:28:47 - Registered Applications size is zero : true
+2025-10-29 14:28:47 - Application version is -1: true
+2025-10-29 14:28:47 - Getting all instance registry info from the eureka server
+2025-10-29 14:28:47 - The response status is 200
+2025-10-29 14:28:47 - Starting heartbeat executor: renew interval is: 30
+2025-10-29 14:28:47 - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2025-10-29 14:28:47 - Discovery Client initialized at timestamp 1761744527819 with initial instances count: 0
+2025-10-29 14:28:47 - Registering application API-GATEWAY with eureka with status UP
+2025-10-29 14:28:47 - Saw local status change event StatusChangeEvent [timestamp=1761744527822, current=UP, previous=STARTING]
+2025-10-29 14:28:47 - DiscoveryClient_API-GATEWAY/api-gateway:d308f4cbea4fa5a82623c3b8739a23dd: registering service...
+2025-10-29 14:28:47 - DiscoveryClient_API-GATEWAY/api-gateway:d308f4cbea4fa5a82623c3b8739a23dd - registration status: 204
+2025-10-29 14:28:47 - Netty started on port 8080 (http)
+2025-10-29 14:28:47 - Updating port to 8080
+2025-10-29 14:28:47 - Started ApiGatewayApplication in 3.673 seconds (process running for 3.997)
+2025-10-29 14:28:47 - 
 The use of configuration keys that have been renamed was found in the environment:
 
 Property source 'Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'':
@@ -309,12 +310,12 @@ Property source 'Config resource 'class path resource [application.yml]' via loc
 
 Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
 
-2025-10-29 10:55:26 - 
+2025-10-29 14:28:47 - 
 The use of configuration keys that have been renamed was found in the environment:
 
 Property source 'Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'':
 	Key: management.metrics.export.prometheus.enabled
-		Line: 208
+		Line: 210
 		Replacement: management.prometheus.metrics.export.enabled
 	Key: spring.cloud.gateway.discovery.locator.enabled
 		Line: 14
@@ -362,4 +363,123 @@ Property source 'Config resource 'class path resource [application.yml]' via loc
 
 Each configuration key has been temporarily mapped to its replacement for your convenience. To silence this warning, please update your configuration to use the new keys.
 
-2025-10-29 11:00:26 - Resolving eureka endpoints via configuration
+2025-10-29 14:28:47 - 
+The use of configuration keys that are no longer supported was found in the environment:
+
+Property source 'Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'':
+	Key: management.endpoint.gateway.enabled
+		Line: 206
+		Reason: Replacement key 'management.endpoint.gateway.access' uses an incompatible target type
+
+
+Please refer to the release notes or reference guide for potential alternatives.
+
+2025-10-29 14:29:17 - Disable delta property : false
+2025-10-29 14:29:17 - Single vip registry refresh property : null
+2025-10-29 14:29:17 - Force full registry fetch : false
+2025-10-29 14:29:17 - Application is null : false
+2025-10-29 14:29:17 - Registered Applications size is zero : true
+2025-10-29 14:29:17 - Application version is -1: false
+2025-10-29 14:29:17 - Getting all instance registry info from the eureka server
+2025-10-29 14:29:17 - The response status is 200
+2025-10-29 14:31:45 - 🔗 [76161dc7-90c7-4e5a-b0d9-3282a9ed76bb] POST /api/auth/register - Remote: /[0:0:0:0:0:0:0:1]:60051
+2025-10-29 14:31:45 - No servers available for service: auth-service
+2025-10-29 14:31:45 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:31:45 - ✅ [76161dc7-90c7-4e5a-b0d9-3282a9ed76bb] Request completed successfully
+2025-10-29 14:33:13 - 🔗 [1c5e5bfd-653b-4f17-bb22-ac6754eccf75] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60087
+2025-10-29 14:33:14 - No servers available for service: auth-service
+2025-10-29 14:33:14 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 14:33:14 - ✅ [1c5e5bfd-653b-4f17-bb22-ac6754eccf75] Request completed successfully
+2025-10-29 14:33:14 - 🔗 [b64c7d36-186f-4894-8a54-d8e8207cb7a1] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60107
+2025-10-29 14:33:14 - No servers available for service: auth-service
+2025-10-29 14:33:14 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 14:33:14 - ✅ [b64c7d36-186f-4894-8a54-d8e8207cb7a1] Request completed successfully
+2025-10-29 14:33:14 - ⚠️ Response Status Error: 404 NOT_FOUND "No static resource favicon.ico." - Path: /favicon.ico
+2025-10-29 14:33:14 - ⚠️ Response Status Error: 404 NOT_FOUND "No static resource favicon.ico." - Path: /favicon.ico
+2025-10-29 14:33:19 - 🔗 [77ed7e92-de73-4add-a873-b6a441269c51] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60116
+2025-10-29 14:33:19 - No servers available for service: auth-service
+2025-10-29 14:33:19 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 14:33:19 - ✅ [77ed7e92-de73-4add-a873-b6a441269c51] Request completed successfully
+2025-10-29 14:33:20 - 🔗 [07d26915-f2f8-4b0e-a418-384593ef8c4b] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60117
+2025-10-29 14:33:20 - No servers available for service: auth-service
+2025-10-29 14:33:20 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 14:33:20 - ✅ [07d26915-f2f8-4b0e-a418-384593ef8c4b] Request completed successfully
+2025-10-29 14:33:20 - 🔗 [e1411e9f-0d68-41f6-97cb-da24219a3d56] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60116
+2025-10-29 14:33:20 - No servers available for service: auth-service
+2025-10-29 14:33:20 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 14:33:20 - ✅ [e1411e9f-0d68-41f6-97cb-da24219a3d56] Request completed successfully
+2025-10-29 14:33:47 - Resolving eureka endpoints via configuration
+2025-10-29 14:34:07 - 🔗 [11d85f91-3e60-4fcb-80c8-d3afdcd58cfd] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60169
+2025-10-29 14:34:07 - No servers available for service: auth-service
+2025-10-29 14:34:07 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:34:07 - ✅ [11d85f91-3e60-4fcb-80c8-d3afdcd58cfd] Request completed successfully
+2025-10-29 14:37:42 - 🔗 [49e60579-361e-484a-8641-7eaeda0e9bcf] POST /api/auth/register - Remote: /[0:0:0:0:0:0:0:1]:60256
+2025-10-29 14:37:42 - No servers available for service: auth-service
+2025-10-29 14:37:42 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:37:42 - ✅ [49e60579-361e-484a-8641-7eaeda0e9bcf] Request completed successfully
+2025-10-29 14:37:42 - 🔗 [5714c70c-5ece-4624-ac78-bab70da8a82f] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60257
+2025-10-29 14:37:42 - No servers available for service: auth-service
+2025-10-29 14:37:42 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:37:42 - ✅ [5714c70c-5ece-4624-ac78-bab70da8a82f] Request completed successfully
+2025-10-29 14:38:47 - Resolving eureka endpoints via configuration
+2025-10-29 14:38:54 - 🔗 [9b743634-2e8d-40aa-a7b8-2eac04fe9483] POST /api/auth/register - Remote: /[0:0:0:0:0:0:0:1]:60288
+2025-10-29 14:38:55 - No servers available for service: auth-service
+2025-10-29 14:38:55 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:38:55 - ✅ [9b743634-2e8d-40aa-a7b8-2eac04fe9483] Request completed successfully
+2025-10-29 14:38:55 - 🔗 [ba5ce1dc-bc00-4401-a31e-cbb8e59d2086] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60289
+2025-10-29 14:38:55 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 14:38:55 - ✅ [ba5ce1dc-bc00-4401-a31e-cbb8e59d2086] Request completed successfully
+2025-10-29 15:20:51 - DiscoveryClient_API-GATEWAY/api-gateway:d308f4cbea4fa5a82623c3b8739a23dd - Re-registering apps/API-GATEWAY
+2025-10-29 15:20:52 - DiscoveryClient_API-GATEWAY/api-gateway:d308f4cbea4fa5a82623c3b8739a23dd: registering service...
+2025-10-29 15:20:54 - DiscoveryClient_API-GATEWAY/api-gateway:d308f4cbea4fa5a82623c3b8739a23dd - registration status: 204
+2025-10-29 15:25:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:30:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:35:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:40:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:45:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:47:03 - 🔗 [edb0dd38-dfc2-4464-b8fa-6d45c339b3d5] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60567
+2025-10-29 15:47:04 - No servers available for service: auth-service
+2025-10-29 15:47:04 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:04 - ✅ [edb0dd38-dfc2-4464-b8fa-6d45c339b3d5] Request completed successfully
+2025-10-29 15:47:04 - 🔗 [dcbec320-06e3-49a0-941b-26910d86d991] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60571
+2025-10-29 15:47:04 - No servers available for service: auth-service
+2025-10-29 15:47:04 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:04 - ✅ [dcbec320-06e3-49a0-941b-26910d86d991] Request completed successfully
+2025-10-29 15:47:08 - 🔗 [8a30c1de-3404-41ae-a47f-5ff56c398303] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60575
+2025-10-29 15:47:08 - No servers available for service: auth-service
+2025-10-29 15:47:08 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:08 - ✅ [8a30c1de-3404-41ae-a47f-5ff56c398303] Request completed successfully
+2025-10-29 15:47:09 - 🔗 [671aaeda-0b98-453d-ad20-8431637f8373] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60575
+2025-10-29 15:47:09 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:09 - ✅ [671aaeda-0b98-453d-ad20-8431637f8373] Request completed successfully
+2025-10-29 15:47:10 - 🔗 [555c64bd-2f18-4a14-9546-a62ffc161c9e] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60577
+2025-10-29 15:47:10 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:10 - ✅ [555c64bd-2f18-4a14-9546-a62ffc161c9e] Request completed successfully
+2025-10-29 15:47:12 - 🔗 [6c3d753e-f00e-48fc-a3af-04ac48daf381] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60577
+2025-10-29 15:47:12 - 🔴 Auth Service fallback triggered - Service unavailable
+2025-10-29 15:47:12 - ✅ [6c3d753e-f00e-48fc-a3af-04ac48daf381] Request completed successfully
+2025-10-29 15:50:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:55:01 - Resolving eureka endpoints via configuration
+2025-10-29 15:59:37 - 🔗 [fa250c9d-1a32-4bd9-ab74-885cc7132a26] GET /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60835
+2025-10-29 15:59:38 - ✅ [fa250c9d-1a32-4bd9-ab74-885cc7132a26] Request completed successfully
+2025-10-29 16:00:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:00:55 - 🔗 [32d19261-ddb7-4f56-b5a4-c857cdea2503] GET /api/auth/me - Remote: /[0:0:0:0:0:0:0:1]:60894
+2025-10-29 16:00:55 - ✅ [32d19261-ddb7-4f56-b5a4-c857cdea2503] Request completed successfully
+2025-10-29 16:03:48 - 🔗 [21e77e7f-d373-4262-b94b-c4223f8b8115] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60909
+2025-10-29 16:03:55 - ⚠️ Response Status Error: 405 METHOD_NOT_ALLOWED "Request method 'POST' is not supported." - Path: /fallback/auth
+2025-10-29 16:03:55 - ✅ [21e77e7f-d373-4262-b94b-c4223f8b8115] Request completed successfully
+2025-10-29 16:05:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:10:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:10:19 - 🔗 [361db55f-f957-4939-9b97-32e7c40b2018] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60972
+2025-10-29 16:10:20 - ✅ [361db55f-f957-4939-9b97-32e7c40b2018] Request completed successfully
+2025-10-29 16:10:20 - 🔗 [fb1df251-968d-4bac-8311-0906c6ca2a65] GET /api/search/spaces - Remote: /[0:0:0:0:0:0:0:1]:60976
+2025-10-29 16:10:26 - 🔴 Search Service fallback triggered - Service unavailable
+2025-10-29 16:10:26 - ✅ [fb1df251-968d-4bac-8311-0906c6ca2a65] Request completed successfully
+2025-10-29 16:10:33 - 🔗 [ae813c8c-b1ae-4af9-b4dc-6166f4b51e4c] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:60982
+2025-10-29 16:10:33 - ✅ [ae813c8c-b1ae-4af9-b4dc-6166f4b51e4c] Request completed successfully
+2025-10-29 16:12:31 - 🔗 [cafebc0b-1db5-4ca6-b03d-34d6911bbacb] POST /api/auth/login - Remote: /[0:0:0:0:0:0:0:1]:61009
+2025-10-29 16:12:32 - ✅ [cafebc0b-1db5-4ca6-b03d-34d6911bbacb] Request completed successfully
+2025-10-29 16:15:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:20:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:25:01 - Resolving eureka endpoints via configuration
+2025-10-29 16:30:01 - Resolving eureka endpoints via configuration

@@ -68,17 +68,17 @@ public class AuthService {
 
         // Buscar usuario por email
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
+                .orElseThrow(() -> new org.springframework.security.authentication.BadCredentialsException("Invalid email or password"));
 
         // Verificar contraseña
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             log.warn("Contraseña incorrecta para: {}", request.getEmail());
-            throw new RuntimeException("Credenciales inválidas");
+            throw new org.springframework.security.authentication.BadCredentialsException("Invalid email or password");
         }
 
         // Verificar que el usuario esté activo
         if (!user.getActive()) {
-            throw new RuntimeException("Usuario inactivo");
+            throw new org.springframework.security.authentication.BadCredentialsException("User account is disabled");
         }
 
         // Generar tokens

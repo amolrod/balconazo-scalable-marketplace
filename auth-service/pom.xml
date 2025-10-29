@@ -13,10 +13,10 @@
     </parent>
 
     <groupId>com.balconazo</groupId>
-    <artifactId>auth-service</artifactId>
-    <version>1.0.0</version>
-    <name>Balconazo Auth Service</name>
-    <description>Authentication and Authorization Service for Balconazo Marketplace</description>
+    <artifactId>auth_service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>auth_service</name>
+    <description>authentication api for Balconazo</description>
 
     <properties>
         <java.version>21</java.version>

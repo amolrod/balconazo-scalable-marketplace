@@ -46,6 +46,8 @@ spring:
             - StripPrefix=0
             - name: RequestRateLimiter
               args:
+                key-resolver: "#{@userKeyResolver}"
+                deny-empty-key: false
                 redis-rate-limiter.replenishRate: 5
                 redis-rate-limiter.burstCapacity: 10
                 redis-rate-limiter.requestedTokens: 1
