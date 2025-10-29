@@ -120,6 +120,13 @@ balconazo:
       ttl-seconds: 3600
     kafka:
       topics:
-        space-events: space.events.v1
+        space-events: space-events-v1
         availability-events: availability.events.v1
+
+# ============================================
+# JWT Configuration (compartido con Auth Service)
+# ============================================
+jwt:
+  secret: BalconazoSecretKeyForJWTGenerationMustBe256BitsLongMinimumForHS256AlgorithmSecureKey2025
+  expiration: 86400000  # 24 horas en milisegundos
 

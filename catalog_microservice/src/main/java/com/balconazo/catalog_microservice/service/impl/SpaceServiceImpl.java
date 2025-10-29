@@ -3,6 +3,8 @@ package com.balconazo.catalog_microservice.service.impl;
 import com.balconazo.catalog_microservice.dto.CreateSpaceDTO;
 import com.balconazo.catalog_microservice.dto.SpaceDTO;
 import com.balconazo.catalog_microservice.entity.SpaceEntity;
+import com.balconazo.catalog_microservice.event.EventPublisher;
+import com.balconazo.catalog_microservice.event.SpaceCreatedEvent;
 import com.balconazo.catalog_microservice.exception.BusinessValidationException;
 import com.balconazo.catalog_microservice.exception.ResourceNotFoundException;
 import com.balconazo.catalog_microservice.mapper.SpaceMapper;
@@ -28,6 +30,7 @@ public class SpaceServiceImpl implements SpaceService {
     private final UserRepository userRepo;
     private final SpaceMapper mapper;
     private final CacheService cacheService;
+    private final EventPublisher eventPublisher; // ← NUEVO
 
     private static final String CACHE_KEY_SPACE = "space:";
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
@@ -41,6 +44,26 @@ public class SpaceServiceImpl implements SpaceService {
         space.setStatus(SPACE_STATUS_DRAFT);
         var saved = repo.save(space);
         log.info("Espacio creado: {}", saved.getId());
+
+        // Publicar evento a Kafka para que Search Service lo indexe
+        SpaceCreatedEvent event = SpaceCreatedEvent.builder()
+            .spaceId(saved.getId())
+            .ownerId(saved.getOwner().getId())
+            .title(saved.getTitle())
+            .description(saved.getDescription())
+            .address(saved.getAddress())
+            .lat(saved.getLat())
+            .lon(saved.getLon())
+            .capacity(saved.getCapacity())
+            .areaSqm(saved.getAreaSqm())
+            .basePriceCents(saved.getBasePriceCents() != null ? saved.getBasePriceCents().longValue() : 0L)
+            .amenities(saved.getAmenities())
+            .status(saved.getStatus())
+            .createdAt(saved.getCreatedAt())
+            .build();
+
+        eventPublisher.publishSpaceCreated(event);
+
         return mapper.toDTO(saved);
     }
 
