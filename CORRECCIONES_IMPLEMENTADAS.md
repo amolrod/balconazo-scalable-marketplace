@@ -353,5 +353,4 @@ curl http://localhost:8083/actuator/health  # Search
 - ✅ Mensajes de error claros y contextuales
 - ✅ Script maestro para inicio automático
 
-**Estado del proyecto: LISTO PARA PRUEBAS E2E** 🎉
 
