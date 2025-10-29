@@ -68,41 +68,21 @@ public class SecurityConfig {
                 // Otras rutas son públicas
                 .anyExchange().permitAll()
             )
-            .addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+            // Configuración OAuth2 Resource Server para JWT
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .jwtDecoder(jwtDecoder())
+                )
+            )
             .build();
     }
 
     /**
-     * Filtro de autenticación JWT
-     */
-    private AuthenticationWebFilter authenticationWebFilter() {
-        AuthenticationWebFilter filter = new AuthenticationWebFilter(authenticationManager());
-        filter.setServerAuthenticationConverter(jwtAuthenticationConverter());
-        return filter;
-    }
-
-    /**
-     * Convertidor de JWT a Authentication
+     * Decoder de JWT personalizado con secret key compartido
      */
     @Bean
-    public ServerAuthenticationConverter jwtAuthenticationConverter() {
-        return exchange -> {
-            String token = extractToken(exchange);
-            if (token == null) {
-                return Mono.empty();
-            }
-            return Mono.just(new UsernamePasswordAuthenticationToken(token, token));
-        };
-    }
-
-    /**
-     * Manager de autenticación (valida JWT)
-     */
-    @Bean
-    public ReactiveAuthenticationManager authenticationManager() {
-        return authentication -> {
-            String token = authentication.getCredentials().toString();
-
+    public org.springframework.security.oauth2.jwt.ReactiveJwtDecoder jwtDecoder() {
+        return token -> {
             try {
                 SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
@@ -117,36 +97,20 @@ public class SecurityConfig {
 
                 log.debug("JWT validado correctamente - userId: {}, role: {}", userId, role);
 
-                List<SimpleGrantedAuthority> authorities = Collections.singletonList(
-                    new SimpleGrantedAuthority("ROLE_" + role)
-                );
-
-                Authentication auth = new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    authorities
-                );
-
-                return Mono.just(auth);
+                // Crear JWT de Spring Security
+                return Mono.just(org.springframework.security.oauth2.jwt.Jwt.withTokenValue(token)
+                    .header("alg", "HS512")
+                    .claim("sub", userId)
+                    .claim("role", role)
+                    .claim("userId", claims.get("userId"))
+                    .claim("email", claims.get("email"))
+                    .build());
 
             } catch (Exception e) {
                 log.error("Error validando JWT: {}", e.getMessage());
-                return Mono.empty();
+                return Mono.error(new org.springframework.security.oauth2.jwt.JwtException("Invalid JWT token", e));
             }
         };
-    }
-
-    /**
-     * Extrae el token JWT del header Authorization
-     */
-    private String extractToken(ServerWebExchange exchange) {
-        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
-
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
-        }
-
-        return null;
     }
 }
 
