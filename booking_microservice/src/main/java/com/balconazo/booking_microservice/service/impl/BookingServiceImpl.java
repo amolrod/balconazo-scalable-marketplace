@@ -66,10 +66,14 @@ public class BookingServiceImpl implements BookingService {
         log.info("🔵 Confirmando reserva: {} con paymentIntentId: {}", bookingId, paymentIntentId);
 
         BookingEntity booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + bookingId));
+                .orElseThrow(() -> new com.balconazo.booking_microservice.exception.BookingNotFoundException(bookingId));
 
+        // Validar estado actual
         if (booking.getStatus() != BookingEntity.BookingStatus.pending) {
-            throw new RuntimeException("La reserva no está en estado pendiente");
+            throw new com.balconazo.booking_microservice.exception.BookingStateException(
+                booking.getStatus().name(),
+                BookingEntity.BookingStatus.pending.name()
+            );
         }
 
         // Actualizar estado
@@ -78,7 +82,8 @@ public class BookingServiceImpl implements BookingService {
         booking.setPaymentIntentId(paymentIntentId);
 
         BookingEntity updatedBooking = bookingRepository.save(booking);
-        log.info("✅ Reserva confirmada: {}", bookingId);
+        log.info("✅ Reserva confirmada: {} - Estado: {} -> {}",
+            bookingId, BookingEntity.BookingStatus.pending, BookingEntity.BookingStatus.confirmed);
 
         // Publicar evento vía Outbox
         publishBookingConfirmedEvent(updatedBooking);
@@ -92,14 +97,22 @@ public class BookingServiceImpl implements BookingService {
         log.info("🔵 Cancelando reserva: {} - Razón: {}", bookingId, reason);
 
         BookingEntity booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + bookingId));
+                .orElseThrow(() -> new com.balconazo.booking_microservice.exception.BookingNotFoundException(bookingId));
 
+        // Validar que no esté ya cancelada
         if (booking.getStatus() == BookingEntity.BookingStatus.cancelled) {
-            throw new RuntimeException("La reserva ya está cancelada");
+            throw new com.balconazo.booking_microservice.exception.BookingStateException(
+                booking.getStatus().name(),
+                "pending o confirmed"
+            );
         }
 
+        // Validar que no esté completada
         if (booking.getStatus() == BookingEntity.BookingStatus.completed) {
-            throw new RuntimeException("No se puede cancelar una reserva completada");
+            throw new com.balconazo.booking_microservice.exception.BookingStateException(
+                booking.getStatus().name(),
+                "pending o confirmed"
+            );
         }
 
         // Validar deadline de cancelación
@@ -110,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setCancellationReason(reason);
 
         BookingEntity cancelledBooking = bookingRepository.save(booking);
-        log.info("✅ Reserva cancelada: {}", bookingId);
+        log.info("✅ Reserva cancelada: {} - Estado anterior: {}", bookingId, booking.getStatus());
 
         // Publicar evento vía Outbox
         publishBookingCancelledEvent(cancelledBooking, reason);
@@ -124,18 +137,22 @@ public class BookingServiceImpl implements BookingService {
         log.info("✅ Completando reserva: {}", bookingId);
 
         BookingEntity booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + bookingId));
+                .orElseThrow(() -> new com.balconazo.booking_microservice.exception.BookingNotFoundException(bookingId));
 
         // Validar que esté confirmada
         if (booking.getStatus() != BookingEntity.BookingStatus.confirmed) {
-            throw new RuntimeException("Solo se pueden completar reservas confirmadas");
+            throw new com.balconazo.booking_microservice.exception.BookingStateException(
+                booking.getStatus().name(),
+                BookingEntity.BookingStatus.confirmed.name()
+            );
         }
 
         // Actualizar estado
         booking.setStatus(BookingEntity.BookingStatus.completed);
 
         BookingEntity completedBooking = bookingRepository.save(booking);
-        log.info("✅ Reserva completada: {}", bookingId);
+        log.info("✅ Reserva completada: {} - Estado: {} -> {}",
+            bookingId, BookingEntity.BookingStatus.confirmed, BookingEntity.BookingStatus.completed);
 
         return bookingMapper.toDTO(completedBooking);
     }

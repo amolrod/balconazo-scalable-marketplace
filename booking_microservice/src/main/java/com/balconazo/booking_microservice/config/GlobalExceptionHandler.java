@@ -1,5 +1,7 @@
 package com.balconazo.booking_microservice.config;
 
+import com.balconazo.booking_microservice.exception.BookingNotFoundException;
+import com.balconazo.booking_microservice.exception.BookingStateException;
 import com.balconazo.booking_microservice.exception.BookingValidationException;
 import com.balconazo.booking_microservice.exception.SpaceNotAvailableException;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,34 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBookingNotFoundException(BookingNotFoundException ex) {
+        log.warn("⚠️ Booking not found: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(BookingStateException.class)
+    public ResponseEntity<ErrorResponse> handleBookingStateException(BookingStateException ex) {
+        log.warn("⚠️ Invalid booking state: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Invalid State")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
     @ExceptionHandler(BookingValidationException.class)
     public ResponseEntity<ErrorResponse> handleBookingValidationException(BookingValidationException ex) {

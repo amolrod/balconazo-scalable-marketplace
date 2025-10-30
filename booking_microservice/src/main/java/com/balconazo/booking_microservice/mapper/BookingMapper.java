@@ -11,16 +11,20 @@ public interface BookingMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "totalPriceCents", ignore = true)
-    @Mapping(target = "status", constant = "pending")
+    @Mapping(target = "status", ignore = true) // Se establece manualmente en el servicio
     @Mapping(target = "paymentIntentId", ignore = true)
-    @Mapping(target = "paymentStatus", constant = "pending")
+    @Mapping(target = "paymentStatus", ignore = true) // Se establece manualmente en el servicio
     @Mapping(target = "cancellationReason", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     BookingEntity toEntity(CreateBookingDTO dto);
 
-    @Mapping(source = "status", target = "status")
-    @Mapping(source = "paymentStatus", target = "paymentStatus")
+    /**
+     * Mapea BookingEntity a BookingDTO.
+     * Los enums se convierten automáticamente a String usando .name()
+     */
+    @Mapping(target = "status", expression = "java(entity.getStatus() != null ? entity.getStatus().name() : null)")
+    @Mapping(target = "paymentStatus", expression = "java(entity.getPaymentStatus() != null ? entity.getPaymentStatus().name() : null)")
     BookingDTO toDTO(BookingEntity entity);
 }
 
