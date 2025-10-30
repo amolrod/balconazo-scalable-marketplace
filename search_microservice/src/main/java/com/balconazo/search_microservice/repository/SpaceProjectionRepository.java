@@ -18,22 +18,22 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
     @Query(value = """
         SELECT 
             s.*,
-            ST_Distance(s.location::geography, 
+            ST_Distance(s.geo::geography, 
                        ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) / 1000 as distance_km
         FROM search.spaces_projection s
-        WHERE ST_DWithin(s.location::geography, 
+        WHERE ST_DWithin(s.geo::geography, 
                         ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, 
                         :radiusMeters)
           AND s.status = 'active'
           AND (:minCapacity IS NULL OR s.capacity >= :minCapacity)
-          AND (:minPrice IS NULL OR s.current_price_cents >= :minPrice)
-          AND (:maxPrice IS NULL OR s.current_price_cents <= :maxPrice)
-          AND (:minRating IS NULL OR s.average_rating >= :minRating)
+          AND (:minPrice IS NULL OR s.base_price_cents >= :minPrice)
+          AND (:maxPrice IS NULL OR s.base_price_cents <= :maxPrice)
+          AND (:minRating IS NULL OR s.avg_rating >= :minRating)
         ORDER BY 
-          CASE WHEN :sortBy = 'distance' THEN ST_Distance(s.location::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) END ASC,
-          CASE WHEN :sortBy = 'price' THEN s.current_price_cents END ASC,
-          CASE WHEN :sortBy = 'price_desc' THEN s.current_price_cents END DESC,
-          CASE WHEN :sortBy = 'rating' THEN s.average_rating END DESC,
+          CASE WHEN :sortBy = 'distance' THEN ST_Distance(s.geo::geography, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) END ASC,
+          CASE WHEN :sortBy = 'price' THEN s.base_price_cents END ASC,
+          CASE WHEN :sortBy = 'price_desc' THEN s.base_price_cents END DESC,
+          CASE WHEN :sortBy = 'rating' THEN s.avg_rating END DESC,
           CASE WHEN :sortBy = 'capacity' THEN s.capacity END DESC
         LIMIT :limit OFFSET :offset
         """, nativeQuery = true)
@@ -56,14 +56,14 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
     @Query(value = """
         SELECT COUNT(*)
         FROM search.spaces_projection s
-        WHERE ST_DWithin(s.location::geography, 
+        WHERE ST_DWithin(s.geo::geography, 
                         ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, 
                         :radiusMeters)
           AND s.status = 'active'
           AND (:minCapacity IS NULL OR s.capacity >= :minCapacity)
-          AND (:minPrice IS NULL OR s.current_price_cents >= :minPrice)
-          AND (:maxPrice IS NULL OR s.current_price_cents <= :maxPrice)
-          AND (:minRating IS NULL OR s.average_rating >= :minRating)
+          AND (:minPrice IS NULL OR s.base_price_cents >= :minPrice)
+          AND (:maxPrice IS NULL OR s.base_price_cents <= :maxPrice)
+          AND (:minRating IS NULL OR s.avg_rating >= :minRating)
         """, nativeQuery = true)
     long countSearchResults(
         @Param("lat") double lat,

@@ -94,7 +94,7 @@ public class SpaceEventConsumer {
         log.info("Creating space projection...");
 
         SpaceProjection projection = new SpaceProjection();
-        projection.setId(extractSpaceId(event));
+        projection.setSpaceId(extractSpaceId(event));
         projection.setOwnerId(UUID.fromString(event.get("ownerId").asText()));
         projection.setOwnerEmail(event.has("ownerEmail") ? event.get("ownerEmail").asText() : null);
         projection.setTitle(event.get("title").asText());
@@ -104,8 +104,8 @@ public class SpaceEventConsumer {
         // Crear Point de PostGIS
         double lon = event.get("lon").asDouble();
         double lat = event.get("lat").asDouble();
-        Point location = geometryFactory.createPoint(new Coordinate(lon, lat));
-        projection.setLocation(location);
+        Point geo = geometryFactory.createPoint(new Coordinate(lon, lat));
+        projection.setGeo(geo);
 
         projection.setCapacity(event.get("capacity").asInt());
 
@@ -114,7 +114,6 @@ public class SpaceEventConsumer {
         }
 
         projection.setBasePriceCents(event.get("basePriceCents").asInt());
-        projection.setCurrentPriceCents(event.get("basePriceCents").asInt());
         projection.setStatus(event.has("status") ? event.get("status").asText() : "draft");
 
         // Amenities
@@ -130,7 +129,7 @@ public class SpaceEventConsumer {
         }
 
         spaceRepository.save(projection);
-        log.info("Created space projection: {}", projection.getId());
+        log.info("Created space projection: {}", projection.getSpaceId());
     }
 
     private void handleSpaceUpdated(JsonNode event) {
@@ -147,8 +146,6 @@ public class SpaceEventConsumer {
 
         if (event.has("basePriceCents")) {
             projection.setBasePriceCents(event.get("basePriceCents").asInt());
-            // TODO: Recalcular precio dinámico
-            projection.setCurrentPriceCents(event.get("basePriceCents").asInt());
         }
 
         if (event.has("status")) projection.setStatus(event.get("status").asText());

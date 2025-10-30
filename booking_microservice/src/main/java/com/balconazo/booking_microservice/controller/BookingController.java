@@ -46,6 +46,13 @@ public class BookingController {
         return ResponseEntity.ok(booking);
     }
 
+    @PostMapping("/{bookingId}/complete")
+    public ResponseEntity<BookingDTO> completeBooking(@PathVariable UUID bookingId) {
+        log.info("📥 POST /api/booking/bookings/{}/complete", bookingId);
+        BookingDTO booking = bookingService.completeBooking(bookingId);
+        return ResponseEntity.ok(booking);
+    }
+
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDTO> getBookingById(@PathVariable UUID bookingId) {
         log.info("📥 GET /api/booking/bookings/{}", bookingId);
@@ -69,6 +76,13 @@ public class BookingController {
     public ResponseEntity<List<BookingDTO>> getBookingsBySpace(@PathVariable UUID spaceId) {
         log.info("📥 GET /api/booking/bookings/space/{}", spaceId);
         List<BookingDTO> bookings = bookingService.getBookingsBySpace(spaceId);
+        return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/guest/{guestId}")
+    public ResponseEntity<List<BookingDTO>> getBookingsByGuest(@PathVariable UUID guestId) {
+        log.info("📥 GET /api/booking/bookings/guest/{}", guestId);
+        List<BookingDTO> bookings = bookingService.getBookingsByGuest(guestId);
         return ResponseEntity.ok(bookings);
     }
 }

@@ -105,25 +105,29 @@ services:
       timeout: 3s
       retries: 5
 
-  pg-search:
-    image: postgis/postgis:16-3.4-alpine
-    container_name: balconazo-pg-search
-    ports:
-      - "5435:5432"
-    environment:
-      POSTGRES_DB: search_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - pg-search-data:/var/lib/postgresql/data
-      - ./ddl/search.sql:/docker-entrypoint-initdb.d/01-schema.sql
-    networks:
-      - balconazo-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d search_db"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+  # pg-search:
+  #   NOTA: Este contenedor se crea manualmente con docker run
+  #   para evitar prefijos de docker-compose y mantener el nombre exacto
+  #   Ver: start-pg-search.sh
+  #   image: kartoza/postgis:16-3.4
+  #   container_name: balconazo-pg-search
+  #   ports:
+  #     - "5435:5432"
+  #   environment:
+  #     POSTGRES_DB: search_db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     ALLOW_IP_RANGE: 0.0.0.0/0
+  #   volumes:
+  #     - pg-search-data:/var/lib/postgresql/data
+  #     - ./ddl/search.sql:/docker-entrypoint-initdb.d/01-schema.sql
+  #   networks:
+  #     - balconazo-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres -d search_db"]
+  #     interval: 5s
+  #     timeout: 3s
+  #     retries: 5
 
   # ============================================
   # MICROSERVICIOS (Comentados hasta implementar)

@@ -5,11 +5,59 @@
 
 ---
 
+## 🚀 IMPORTAR A POSTMAN (OPCIÓN RECOMENDADA)
+
+### Archivo JSON para importar directamente
+
+**Archivo:** `Balconazo_API.postman_collection.json`
+
+**Pasos:**
+1. Abre Postman
+2. Click en **Import** (botón superior izquierdo)
+3. Arrastra el archivo `Balconazo_API.postman_collection.json` o selecciónalo
+4. Click en **Import**
+5. ✅ La colección completa con 29 endpoints estará lista
+
+**Incluye:**
+- ✅ Todos los endpoints organizados por servicio
+- ✅ Scripts automáticos para guardar tokens
+- ✅ Variables preconfiguradas ({{baseUrl}}, {{accessToken}}, etc.)
+- ✅ Headers y bodies ya configurados
+
+### Configurar Environment en Postman
+
+Después de importar, crea un Environment:
+
+1. Click en **Environments** (panel izquierdo)
+2. Click en **+** (Create Environment)
+3. Nombre: `Balconazo Local`
+4. Añadir variables:
+
+| Variable | Initial Value | Current Value |
+|----------|---------------|---------------|
+| `baseUrl` | `http://localhost:8080` | `http://localhost:8080` |
+| `accessToken` | (dejar vacío) | (se actualiza automáticamente) |
+| `refreshToken` | (dejar vacío) | (se actualiza automáticamente) |
+| `userId` | (dejar vacío) | (se actualiza automáticamente) |
+| `spaceId` | (dejar vacío) | (se actualiza automáticamente) |
+| `bookingId` | (dejar vacío) | (se actualiza automáticamente) |
+
+5. Click en **Save**
+6. Selecciona el environment `Balconazo Local` en el dropdown superior
+
+---
+
+## 📋 ALTERNATIVA: COPIAR MANUALMENTE
+
+Si prefieres copiar los endpoints manualmente, aquí están con URLs completas:
+
+---
+
 ## 🔐 AUTH SERVICE - Autenticación
 
 ### 1. Register (Registro de usuario)
 
-**POST** `/api/auth/register`
+**POST** `http://localhost:8080/api/auth/register`
 
 **Headers:**
 ```
@@ -40,7 +88,7 @@ Content-Type: application/json
 
 ### 2. Login
 
-**POST** `/api/auth/login`
+**POST** `http://localhost:8080/api/auth/login`
 
 **Headers:**
 ```
@@ -72,7 +120,7 @@ Content-Type: application/json
 
 ### 3. Get Current User (Me)
 
-**GET** `/api/auth/me`
+**GET** `http://localhost:8080/api/auth/me`
 
 **Headers:**
 ```
@@ -94,7 +142,7 @@ Authorization: Bearer {{accessToken}}
 
 ### 4. Refresh Token
 
-**POST** `/api/auth/refresh`
+**POST** `http://localhost:8080/api/auth/refresh`
 
 **Headers:**
 ```
@@ -125,7 +173,7 @@ Content-Type: application/json
 
 ### 5. Logout
 
-**POST** `/api/auth/logout`
+**POST** `http://localhost:8080/api/auth/logout`
 
 **Headers:**
 ```
@@ -372,7 +420,7 @@ GET /api/catalog/availability/uuid?startTime=2025-11-01T10:00:00Z&endTime=2025-1
 
 ### 13. Create Booking
 
-**POST** `/api/booking/bookings`
+**POST** `http://localhost:8080/api/booking/bookings`
 
 **Headers:**
 ```
@@ -410,7 +458,7 @@ Content-Type: application/json
 
 ### 14. Get Booking by ID
 
-**GET** `/api/booking/bookings/{bookingId}`
+**GET** `http://localhost:8080/api/booking/bookings/{bookingId}`
 
 **Headers:**
 ```
@@ -777,7 +825,7 @@ Content-Type: application/json
 
 ### 26. Health Check (Gateway)
 
-**GET** `/actuator/health`
+**GET** `http://localhost:8080/actuator/health`
 
 **Response 200 OK:**
 ```json
@@ -798,7 +846,7 @@ Content-Type: application/json
 
 ### 27. Gateway Routes
 
-**GET** `/actuator/gateway/routes`
+**GET** `http://localhost:8080/actuator/gateway/routes`
 
 **Response 200 OK:**
 ```json
@@ -822,7 +870,7 @@ Content-Type: application/json
 
 ### 28. Metrics
 
-**GET** `/actuator/metrics`
+**GET** `http://localhost:8080/actuator/metrics`
 
 **Response 200 OK:**
 ```json
@@ -840,7 +888,7 @@ Content-Type: application/json
 
 ### 29. Prometheus Metrics
 
-**GET** `/actuator/prometheus`
+**GET** `http://localhost:8080/actuator/prometheus`
 
 **Response 200 OK:**
 ```

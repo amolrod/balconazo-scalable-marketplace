@@ -14,6 +14,8 @@ public interface BookingService {
 
     BookingDTO cancelBooking(UUID bookingId, String reason);
 
+    BookingDTO completeBooking(UUID bookingId);
+
     BookingDTO getBookingById(UUID bookingId);
 
     List<BookingDTO> getBookingsByGuest(UUID guestId);

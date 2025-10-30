@@ -1,158 +1,202 @@
-# 🏠 BalconazoApp - Plataforma de Alquiler de Espacios
+# 🏢 BalconazoApp - Sistema de Reservas de Espacios
 
-[![Estado](https://img.shields.io/badge/Estado-Producción%20Ready-success)](.)
-[![Tests](https://img.shields.io/badge/Tests-27%2F27%20Passing-brightgreen)](.)
-[![Java](https://img.shields.io/badge/Java-21-orange)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.7-green)](https://spring.io/projects/spring-boot)
+Sistema de microservicios para alquiler de espacios (terrazas, balcones, etc.) desarrollado con Spring Boot, Spring Cloud y PostgreSQL.
 
-> Sistema de microservicios para alquiler de balcones, terrazas y patios. Backend completo y funcional al 100%.
+## 📋 Arquitectura
+
+### Microservicios
+- **API Gateway** (Puerto 8080): Puerta de entrada única al sistema
+- **Eureka Server** (Puerto 8761): Registro y descubrimiento de servicios
+- **Auth Service** (Puerto 8084): Autenticación y autorización con JWT
+- **Catalog Service** (Puerto 8085): Gestión de espacios
+- **Booking Service** (Puerto 8082): Gestión de reservas y reseñas
+- **Search Service** (Puerto 8083): Búsquedas geoespaciales con PostGIS
+
+### Infraestructura
+- **PostgreSQL** (Puertos 5433, 5434, 5435): Bases de datos por microservicio
+- **MySQL** (Puerto 3307): Base de datos para Auth Service
+- **Redis** (Puerto 6379): Caché distribuida
+- **Kafka** (Puerto 9092): Mensajería asíncrona
+- **Zookeeper** (Puerto 2181): Coordinación de Kafka
 
 ## 🚀 Inicio Rápido
 
+### Prerequisitos
+- Java 21
+- Maven 3.9+
+- Docker y Docker Compose
+- macOS con arquitectura ARM64 (Apple Silicon)
+
+### 1. Iniciar Infraestructura (Docker)
 ```bash
-# 1. Iniciar infraestructura (DBs, Kafka, Redis)
 ./start-infrastructure.sh
-
-# 2. Compilar y iniciar sistema completo
-./start-system-improved.sh
-
-# 3. Verificar estado
-./verify-system.sh
-
-# 4. Ejecutar tests E2E (27 tests)
-./test-e2e-completo.sh
 ```
 
-**URLs principales:**
-- API Gateway: http://localhost:8080
-- Eureka Dashboard: http://localhost:8761
-- Swagger UI: http://localhost:8080/swagger-ui.html
+Esto inicia: PostgreSQL, MySQL, Redis, Kafka y Zookeeper.
 
-## 📋 Características
-
-✅ **Autenticación JWT** - Segura con Spring Security  
-✅ **CRUD de Espacios** - Gestión completa  
-✅ **Sistema de Reservas** - Con confirmación de pago  
-✅ **Búsqueda Geoespacial** - PostGIS para ubicaciones  
-✅ **Eventos Kafka** - Comunicación asíncrona  
-✅ **API Gateway** - Spring Cloud Gateway  
-✅ **Service Discovery** - Eureka Server  
-✅ **Métricas** - Actuator + Prometheus
-
-## 🏗️ Arquitectura
-
-```
-API Gateway (8080) → [ Auth (8084) | Catalog (8085) | Booking (8082) | Search (8083) ]
-                        ↓
-                    Eureka Server (8761)
-                        ↓
-            [ MySQL | PostgreSQL | Redis | Kafka ]
-```
-
-**Microservicios:**
-- **Auth Service** (8084) - Autenticación JWT + MySQL
-- **Catalog Service** (8085) - Gestión de espacios + PostgreSQL
-- **Booking Service** (8082) - Reservas + PostgreSQL
-- **Search Service** (8083) - Búsqueda geoespacial + PostGIS
-
-## 📚 Documentación
-
-| Documento | Descripción |
-|-----------|-------------|
-| [Guía de Inicio Rápido](docs/guides/GUIA_INICIO_RAPIDO.md) | Tutorial completo paso a paso |
-| [Guía de Scripts](docs/guides/GUIA_SCRIPTS.md) | Todos los scripts disponibles |
-| [Quick Start](docs/guides/QUICKSTART.md) | Inicio en 5 minutos |
-| [Estado del Sistema](docs/technical/SISTEMA_100_FUNCIONAL.md) | Funcionalidades completas |
-| [API Gateway](docs/technical/API_GATEWAY_COMPLETADO.md) | Arquitectura del Gateway |
-| [Hoja de Ruta](docs/HOJA_DE_RUTA.md) | Roadmap del proyecto |
-| [Próximos Pasos](docs/NEXT_STEPS.md) | Plan de desarrollo |
-
-Ver [documentación completa](docs/) para más detalles.
-
-## 🛠️ Scripts Principales
-
+### 2. Iniciar Todos los Microservicios
 ```bash
-# Gestión del sistema
-./start-system-improved.sh   # Inicia todo (infraestructura + servicios)
-./stop-all.sh                # Detiene todo
-./recompile-all.sh           # Recompila todos los microservicios
-
-# Verificación
-./verify-system.sh           # Health checks completos
-./check-system.sh            # Verificación rápida
-
-# Testing
-./test-e2e-completo.sh       # Suite E2E (27 tests)
-./test-redis.sh              # Tests de Redis
-
-# Servicios individuales
-./start-eureka.sh            # Solo Eureka Server
-./start-gateway.sh           # Solo API Gateway
-./start-catalog.sh           # Solo Catalog Service
-# ... (ver docs/guides/GUIA_SCRIPTS.md)
+./start-all-services.sh
 ```
 
-## 🔧 Prerequisitos
+### 3. Verificar Estado del Sistema
+```bash
+./comprobacionmicroservicios.sh
+```
 
-- **Java 21+**
-- **Maven 3.8+**
-- **Docker 24+**
-- **Docker Compose 2.0+**
+Todos los servicios deben mostrar **200 OK**.
 
-## 📊 Estado Actual
+### 4. Insertar Datos de Prueba
+```bash
+./insert-test-data.sh
+```
+
+## 📝 Documentación
+
+- **[COMO_INICIAR_SERVICIOS.md](./COMO_INICIAR_SERVICIOS.md)**: Guía detallada de inicio
+- **[DATOS_PRUEBA_IDS.md](./DATOS_PRUEBA_IDS.md)**: IDs de usuarios y espacios de prueba
+- **[JWT_IMPLEMENTADO.md](./JWT_IMPLEMENTADO.md)**: Configuración de seguridad JWT
+- **[POSTMAN_ENDPOINTS.md](./POSTMAN_ENDPOINTS.md)**: Lista completa de endpoints
+- **[PRUEBAS_COMPLETAS_SISTEMA.md](./PRUEBAS_COMPLETAS_SISTEMA.md)**: Suite de pruebas E2E
+
+## 🔑 Credenciales de Prueba
+
+### Usuario HOST
+```
+Email: host1@balconazo.com
+Password: password123
+Role: HOST
+```
+
+### Usuario GUEST
+```
+Email: guest1@balconazo.com
+Password: password123
+Role: GUEST
+```
+
+## 🧪 Pruebas con Postman
+
+1. Importar colección: `BalconazoApp.postman_collection.json`
+2. Importar entorno: `Balconazo_Local.postman_environment.json`
+3. Ejecutar: `1. Auth > Login` para obtener el token
+4. El token se guarda automáticamente en las variables de entorno
+
+## 📊 Endpoints Principales
+
+### Autenticación (Público)
+```bash
+POST /api/auth/register
+POST /api/auth/login
+```
+
+### Catálogo (Requiere JWT)
+```bash
+GET    /api/catalog/spaces
+POST   /api/catalog/spaces
+GET    /api/catalog/spaces/{id}
+PUT    /api/catalog/spaces/{id}
+POST   /api/catalog/spaces/{id}/activate
+POST   /api/catalog/spaces/{id}/deactivate
+```
+
+### Búsqueda Geoespacial (Público)
+```bash
+GET /api/search/spaces?lat={lat}&lon={lon}&radius={km}
+```
+
+### Reservas (Requiere JWT)
+```bash
+POST   /api/booking/bookings
+GET    /api/booking/bookings/guest/{guestId}
+POST   /api/booking/bookings/{id}/confirm
+POST   /api/booking/bookings/{id}/cancel
+POST   /api/booking/bookings/{id}/complete
+```
+
+### Reseñas (Requiere JWT)
+```bash
+POST   /api/booking/reviews
+GET    /api/booking/reviews/space/{spaceId}
+```
+
+## 🛠️ Scripts Útiles
+
+| Script | Descripción |
+|--------|-------------|
+| `start-infrastructure.sh` | Inicia contenedores Docker |
+| `start-all-services.sh` | Inicia todos los microservicios |
+| `start-all-with-eureka.sh` | Inicia servicios + Eureka |
+| `comprobacionmicroservicios.sh` | Verifica estado de servicios |
+| `stop-all.sh` | Detiene todos los servicios |
+| `recompile-all.sh` | Recompila todos los módulos |
+| `insert-test-data.sh` | Inserta datos de prueba |
+| `test-e2e-completo.sh` | Suite completa de pruebas E2E |
+| `verify-system.sh` | Verificación completa del sistema |
+| `manage-pg-search.sh` | Gestión del contenedor PostGIS |
+
+## 🏗️ Estructura del Proyecto
 
 ```
-✅ Backend: 100% Funcional (27/27 tests)
-✅ Microservicios: 5/5 operativos
-✅ API Gateway: Funcionando
-✅ Eureka: Activo
-✅ Kafka: Eventos propagando
-✅ Tests E2E: 100% pasando
+BalconazoApp/
+├── api-gateway/           # Gateway (Spring Cloud Gateway)
+├── eureka-server/         # Service Discovery
+├── auth-service/          # Autenticación JWT
+├── catalog_microservice/  # Catálogo de espacios
+├── booking_microservice/  # Reservas y reseñas
+├── search_microservice/   # Búsqueda geoespacial
+├── ddl/                   # Schemas SQL
+├── docs/                  # Documentación adicional
+└── docker-compose.yml     # Infraestructura Docker
 ```
+
+## 🔧 Tecnologías
+
+- **Backend**: Spring Boot 3.x, Spring Cloud 2023.x
+- **Bases de Datos**: PostgreSQL 16, MySQL 8.0, PostGIS
+- **Mensajería**: Apache Kafka 3.5
+- **Caché**: Redis 7
+- **Service Discovery**: Netflix Eureka
+- **API Gateway**: Spring Cloud Gateway
+- **Seguridad**: Spring Security, JWT (HS512)
+- **Build**: Maven
+- **Containerización**: Docker
+
+## 📈 Monitoreo
+
+- **Eureka Dashboard**: http://localhost:8761
+- **Gateway Actuator**: http://localhost:8080/actuator
+- **Service Health**: http://localhost:{port}/actuator/health
 
 ## 🐛 Troubleshooting
 
-**Servicios no inician:**
+### Search Service no inicia
 ```bash
-./check-system.sh           # Ver estado
-tail -f /tmp/*.log          # Ver logs
-./stop-all.sh && ./start-system-improved.sh  # Reiniciar
+# Recrear contenedor PostGIS
+./manage-pg-search.sh
 ```
 
-**Tests fallan:**
+### Puertos ocupados
 ```bash
-curl http://localhost:8080/actuator/health  # Verificar gateway
-curl http://localhost:8761/eureka/apps      # Ver servicios registrados
+# Detener todos los servicios
+./stop-all.sh
+
+# Limpiar puertos manualmente
+lsof -ti:8080,8082,8083,8084,8085,8761 | xargs kill -9
 ```
 
-Ver [Diagnóstico y Solución](docs/technical/DIAGNOSTICO_Y_SOLUCION_FINAL.md) para más ayuda.
-
-## 🚦 Próximas Funcionalidades
-
-**Corto Plazo:**
-- Frontend Angular 20
-- Integración Stripe para pagos
-- Sistema de reviews
-
-**Medio Plazo:**
-- Chat en tiempo real (WebSocket)
-- Panel de administración
-- Notificaciones push
-
-Ver [NEXT_STEPS.md](docs/NEXT_STEPS.md) para plan completo.
+### Recompilar todo
+```bash
+./recompile-all.sh
+```
 
 ## 📄 Licencia
 
-MIT License - ver [LICENSE](LICENSE)
-
-## 📞 Contacto
-
-- Email: contacto@balconazo.com
-- Issues: https://github.com/tu-usuario/BalconazoApp/issues
+Este proyecto es un sistema de demostración para fines educativos.
 
 ---
 
-**Versión:** 1.1.0  
-**Última Actualización:** 29 Octubre de 2025  
-**Estado:** 🟢 Producción Ready
+**Última actualización:** 30 de Octubre de 2025  
+**Versión:** 1.0.0  
+**Estado:** ✅ Producción
 

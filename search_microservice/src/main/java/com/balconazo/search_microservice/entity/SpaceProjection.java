@@ -21,7 +21,8 @@ import java.util.UUID;
 public class SpaceProjection {
 
     @Id
-    private UUID id;
+    @Column(name = "space_id")
+    private UUID spaceId;
 
     // Datos del espacio (desde Catalog)
     @Column(name = "owner_id", nullable = false)
@@ -40,8 +41,8 @@ public class SpaceProjection {
     private String address;
 
     // Ubicación geoespacial (PostGIS)
-    @Column(name = "location", columnDefinition = "geography(Point,4326)", nullable = false)
-    private Point location;
+    @Column(name = "geo", columnDefinition = "geography(Point,4326)", nullable = false)
+    private Point geo;
 
     // Características
     @Column(nullable = false)
@@ -53,7 +54,7 @@ public class SpaceProjection {
     @Column(nullable = false, length = 50)
     private String status;
 
-    // JSONB para reglas
+    // JSONB para reglas (no existe en schema actual, puede ser null)
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> rules;
@@ -66,18 +67,12 @@ public class SpaceProjection {
     @Column(name = "base_price_cents", nullable = false)
     private Integer basePriceCents;
 
-    @Column(name = "current_price_cents", nullable = false)
-    private Integer currentPriceCents;
-
     // Datos agregados desde Booking
-    @Column(name = "average_rating")
-    private Double averageRating;
+    @Column(name = "avg_rating")
+    private Double avgRating;
 
-    @Column(name = "total_reviews")
-    private Integer totalReviews;
-
-    @Column(name = "total_bookings")
-    private Integer totalBookings;
+    @Column(name = "review_count")
+    private Integer reviewCount;
 
     @Column(name = "completed_bookings")
     private Integer completedBookings;
@@ -98,11 +93,9 @@ public class SpaceProjection {
         updatedAt = LocalDateTime.now();
 
         // Valores por defecto
-        if (averageRating == null) averageRating = 0.0;
-        if (totalReviews == null) totalReviews = 0;
-        if (totalBookings == null) totalBookings = 0;
+        if (avgRating == null) avgRating = 0.0;
+        if (reviewCount == null) reviewCount = 0;
         if (completedBookings == null) completedBookings = 0;
-        if (currentPriceCents == null) currentPriceCents = basePriceCents;
     }
 
     @PreUpdate

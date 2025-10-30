@@ -119,6 +119,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
+    public BookingDTO completeBooking(UUID bookingId) {
+        log.info("✅ Completando reserva: {}", bookingId);
+
+        BookingEntity booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + bookingId));
+
+        // Validar que esté confirmada
+        if (booking.getStatus() != BookingEntity.BookingStatus.confirmed) {
+            throw new RuntimeException("Solo se pueden completar reservas confirmadas");
+        }
+
+        // Actualizar estado
+        booking.setStatus(BookingEntity.BookingStatus.completed);
+
+        BookingEntity completedBooking = bookingRepository.save(booking);
+        log.info("✅ Reserva completada: {}", bookingId);
+
+        return bookingMapper.toDTO(completedBooking);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public BookingDTO getBookingById(UUID bookingId) {
         log.info("🔍 Buscando reserva: {}", bookingId);
@@ -284,4 +306,3 @@ public class BookingServiceImpl implements BookingService {
         outboxService.saveEvent("booking", booking.getId(), BookingConstants.EVENT_BOOKING_CANCELLED, event);
     }
 }
-

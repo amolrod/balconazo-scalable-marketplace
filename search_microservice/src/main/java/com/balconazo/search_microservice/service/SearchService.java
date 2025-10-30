@@ -87,29 +87,29 @@ public class SearchService {
     }
 
     private SpaceSearchResultDTO mapProjectionToDTO(SpaceProjection projection) {
-        var location = projection.getLocation();
+        var geo = projection.getGeo();
 
         return SpaceSearchResultDTO.builder()
-            .id(projection.getId())
+            .id(projection.getSpaceId())
             .ownerId(projection.getOwnerId())
             .ownerEmail(projection.getOwnerEmail())
             .title(projection.getTitle())
             .description(projection.getDescription())
             .address(projection.getAddress())
-            .lat(location != null ? location.getY() : null)
-            .lon(location != null ? location.getX() : null)
+            .lat(geo != null ? geo.getY() : null)
+            .lon(geo != null ? geo.getX() : null)
             .distanceKm(null) // No aplica cuando se consulta por ID
             .capacity(projection.getCapacity())
             .areaSqm(projection.getAreaSqm())
             .rules(projection.getRules())
             .amenities(projection.getAmenities())
             .basePriceCents(projection.getBasePriceCents())
-            .currentPriceCents(projection.getCurrentPriceCents())
+            .currentPriceCents(projection.getBasePriceCents()) // Usar base price como current
             .basePriceEur(centsToEur(projection.getBasePriceCents()))
-            .currentPriceEur(centsToEur(projection.getCurrentPriceCents()))
-            .averageRating(projection.getAverageRating())
-            .totalReviews(projection.getTotalReviews())
-            .totalBookings(projection.getTotalBookings())
+            .currentPriceEur(centsToEur(projection.getBasePriceCents()))
+            .averageRating(projection.getAvgRating())
+            .totalReviews(projection.getReviewCount())
+            .totalBookings(projection.getCompletedBookings())
             .status(projection.getStatus())
             .createdAt(projection.getCreatedAt())
             .updatedAt(projection.getUpdatedAt())

@@ -121,11 +121,11 @@ public class BookingEventConsumer {
 
         spaceRepository.findById(spaceId).ifPresentOrElse(
             projection -> {
-                // Incrementar totalBookings
-                projection.setTotalBookings((projection.getTotalBookings() != null ? projection.getTotalBookings() : 0) + 1);
+                // Incrementar completedBookings
+                projection.setCompletedBookings((projection.getCompletedBookings() != null ? projection.getCompletedBookings() : 0) + 1);
                 projection.setLastBookingAt(LocalDateTime.now());
                 spaceRepository.save(projection);
-                log.info("Updated space stats: totalBookings={}", projection.getTotalBookings());
+                log.info("Updated space stats: completedBookings={}", projection.getCompletedBookings());
             },
             () -> log.warn("Space {} not found in projections, skipping stats update", spaceId)
         );
@@ -140,17 +140,17 @@ public class BookingEventConsumer {
         spaceRepository.findById(spaceId).ifPresentOrElse(
             projection -> {
                 // Recalcular rating promedio
-                int currentTotal = projection.getTotalReviews() != null ? projection.getTotalReviews() : 0;
-                double currentAvg = projection.getAverageRating() != null ? projection.getAverageRating() : 0.0;
+                int currentTotal = projection.getReviewCount() != null ? projection.getReviewCount() : 0;
+                double currentAvg = projection.getAvgRating() != null ? projection.getAvgRating() : 0.0;
 
                 double newAvg = ((currentAvg * currentTotal) + rating) / (currentTotal + 1);
 
-                projection.setAverageRating(Math.round(newAvg * 100.0) / 100.0); // 2 decimales
-                projection.setTotalReviews(currentTotal + 1);
+                projection.setAvgRating(Math.round(newAvg * 100.0) / 100.0); // 2 decimales
+                projection.setReviewCount(currentTotal + 1);
 
                 spaceRepository.save(projection);
-                log.info("Updated space rating: avgRating={}, totalReviews={}",
-                    projection.getAverageRating(), projection.getTotalReviews());
+                log.info("Updated space rating: avgRating={}, reviewCount={}",
+                    projection.getAvgRating(), projection.getReviewCount());
             },
             () -> log.warn("Space {} not found in projections, skipping rating update", spaceId)
         );

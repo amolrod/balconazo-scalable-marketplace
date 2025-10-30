@@ -136,7 +136,7 @@ INSERT INTO search.spaces_projection (
 )
 VALUES
     (
-        'e5f6g7h8-9012-3456-7890-abcd12345678',
+        'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
         'Terraza con vistas al Retiro',
         'Amplia terraza de 40m² con vistas espectaculares al Parque del Retiro.',
         15,
@@ -146,14 +146,14 @@ VALUES
         ST_GeogFromText('POINT(-3.7038 40.4168)'),
         3500,
         'active',
-        'f3f2d5e0-1234-5678-90ab-cdef87654321'
+        '11111111-1111-1111-1111-111111111111'::uuid
     )
 ON CONFLICT (space_id) DO NOTHING;
 
 -- Precio inicial (sin demanda, multiplier = 1.0)
 INSERT INTO search.price_surface (space_id, timeslot_start, price_cents, multiplier, demand_score)
 SELECT
-    'e5f6g7h8-9012-3456-7890-abcd12345678',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'::uuid,
     date_trunc('hour', now() + interval '1 day' * day),
     3500,
     1.0,

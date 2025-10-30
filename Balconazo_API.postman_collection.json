@@ -1,0 +1,647 @@
+{
+  "info": {
+    "name": "Balconazo API",
+    "_postman_id": "balconazo-api-collection",
+    "description": "Colección completa de endpoints para la API de Balconazo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth Service",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@balconazo.com\",\n  \"password\": \"password123\",\n  \"role\": \"HOST\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"accessToken\", jsonData.accessToken);",
+                  "    pm.environment.set(\"refreshToken\", jsonData.refreshToken);",
+                  "    pm.environment.set(\"userId\", jsonData.userId);",
+                  "    console.log(\"Token guardado: \" + jsonData.accessToken.substring(0, 20) + \"...\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"host1@balconazo.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog Service",
+      "item": [
+        {
+          "name": "Get All Spaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces"]
+            }
+          }
+        },
+        {
+          "name": "Get Space by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"]
+            }
+          }
+        },
+        {
+          "name": "Create Space",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"spaceId\", jsonData.id);",
+                  "    console.log(\"Space ID guardado: \" + jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ático con terraza\",\n  \"description\": \"Amplio ático con vistas panorámicas al centro de Madrid\",\n  \"ownerId\": \"{{userId}}\",\n  \"address\": \"Calle Gran Vía 28, Madrid\",\n  \"lat\": 40.4168,\n  \"lon\": -3.7038,\n  \"capacity\": 8,\n  \"basePriceCents\": 2500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces"]
+            }
+          }
+        },
+        {
+          "name": "Update Space",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Ático Premium\",\n  \"description\": \"Ático renovado con nuevas amenidades\",\n  \"ownerId\": \"{{userId}}\",\n  \"address\": \"Calle Gran Vía 28, Madrid\",\n  \"lat\": 40.4168,\n  \"lon\": -3.7038,\n  \"capacity\": 10,\n  \"basePriceCents\": 3000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "{{spaceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Space",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "{{spaceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Spaces by Owner",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/spaces/owner/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "spaces", "owner", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Check Space Availability",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/catalog/availability/space/{{spaceId}}/range?start=2025-11-01T10:00:00&end=2025-11-01T12:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "catalog", "availability", "space", "{{spaceId}}", "range"],
+              "query": [
+                {
+                  "key": "start",
+                  "value": "2025-11-01T10:00:00"
+                },
+                {
+                  "key": "end",
+                  "value": "2025-11-01T12:00:00"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booking Service",
+      "item": [
+        {
+          "name": "Create Booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"bookingId\", jsonData.id);",
+                  "    console.log(\"Booking ID guardado: \" + jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"spaceId\": \"{{spaceId}}\",\n  \"guestId\": \"{{userId}}\",\n  \"startTs\": \"2025-11-01T10:00:00\",\n  \"endTs\": \"2025-11-01T12:00:00\",\n  \"numGuests\": 5,\n  \"paymentMethod\": \"CREDIT_CARD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/{{bookingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "{{bookingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Bookings by Guest",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/guest/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "guest", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Bookings by Space",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/space/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "space", "{{spaceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Confirm Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/{{bookingId}}/confirm?paymentIntentId=pi_test_123456",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "{{bookingId}}", "confirm"],
+              "query": [
+                {
+                  "key": "paymentIntentId",
+                  "value": "pi_test_123456"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/{{bookingId}}/cancel?reason=User cancelled",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "{{bookingId}}", "cancel"],
+              "query": [
+                {
+                  "key": "reason",
+                  "value": "User cancelled"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/bookings/{{bookingId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "bookings", "{{bookingId}}", "complete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"spaceId\": \"{{spaceId}}\",\n  \"reviewerId\": \"{{userId}}\",\n  \"rating\": 5,\n  \"comment\": \"Excelente espacio, muy recomendable\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Space",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/reviews/space/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "reviews", "space", "{{spaceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Reviewer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/booking/reviews/reviewer/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "booking", "reviews", "reviewer", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search Service",
+      "item": [
+        {
+          "name": "Search Spaces by Location",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/search/spaces?lat=40.4168&lon=-3.7038&radius=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "spaces"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "40.4168"
+                },
+                {
+                  "key": "lon",
+                  "value": "-3.7038"
+                },
+                {
+                  "key": "radius",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Spaces with Filters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lat\": 40.4168,\n  \"lon\": -3.7038,\n  \"radius\": 10,\n  \"minPrice\": 10.0,\n  \"maxPrice\": 50.0,\n  \"minCapacity\": 5,\n  \"startTime\": \"2025-11-01T10:00:00Z\",\n  \"endTime\": \"2025-11-01T12:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/search/spaces/filter",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "spaces", "filter"]
+            }
+          }
+        },
+        {
+          "name": "Get Space Details from Search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/search/spaces/{{spaceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "search", "spaces", "{{spaceId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actuator",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Gateway Routes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/gateway/routes",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "gateway", "routes"]
+            }
+          }
+        },
+        {
+          "name": "Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "metrics"]
+            }
+          }
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/prometheus",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "prometheus"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
+
