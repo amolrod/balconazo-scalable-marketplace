@@ -1,66 +1,85 @@
-# 📝 Índice de Documentación - BalconazoApp
+# 📚 ÍNDICE DE DOCUMENTACIÓN - BalconazoApp
 
-## 🚀 Guías de Inicio
+**Versión Backend:** 1.0.0 ✅ Completado  
+**Fecha:** Octubre 2025
+
+---
+
+## 📖 Documentos Disponibles
+
+### 🏠 Documentación Principal
 
 | Documento | Descripción | Audiencia |
 |-----------|-------------|-----------|
-| [README.md](./README.md) | Guía principal del proyecto | Todos |
-| [COMO_INICIAR_SERVICIOS.md](./COMO_INICIAR_SERVICIOS.md) | Pasos detallados para iniciar el sistema | Desarrolladores |
+| **[README.md](README.md)** | Guía de inicio rápido, arquitectura general, requisitos y comandos básicos | Todos los desarrolladores |
+| **[DOCUMENTATION.md](DOCUMENTATION.md)** | Documentación técnica completa: arquitectura, microservicios, flujos de negocio, buenas prácticas | Backend Developers, Arquitectos |
+| **[DATABASE.md](DATABASE.md)** | Esquemas de BD, relaciones, queries, backups, acceso seguro | Backend & DevOps |
+| **[FRONTEND-START.md](FRONTEND-START.md)** | Guía completa para desarrolladores frontend: stack, autenticación, endpoints, convenciones | Frontend Developers |
+| **[NEXT-STEPS.md](NEXT-STEPS.md)** | Roadmap de desarrollo, próximas fases, tareas pendientes | Product Owners, Tech Leads |
 
-## 🔐 Autenticación y Seguridad
-
-| Documento | Descripción |
-|-----------|-------------|
-| [JWT_IMPLEMENTADO.md](./JWT_IMPLEMENTADO.md) | Configuración de JWT y Spring Security |
-
-## 🧪 Testing y Pruebas
+### 🔧 Documentación Técnica Específica
 
 | Documento | Descripción |
 |-----------|-------------|
-| [PRUEBAS_COMPLETAS_SISTEMA.md](./PRUEBAS_COMPLETAS_SISTEMA.md) | Suite completa de pruebas E2E con curl |
-| [POSTMAN_ENDPOINTS.md](./POSTMAN_ENDPOINTS.md) | Lista de endpoints para Postman |
-| [POSTMAN_README.md](./POSTMAN_README.md) | Guía de uso de colecciones Postman |
+| **[POSTMAN_ENDPOINTS.md](POSTMAN_ENDPOINTS.md)** | Lista completa de todos los endpoints con ejemplos de JSON |
+| **[JWT_IMPLEMENTADO.md](JWT_IMPLEMENTADO.md)** | Detalles de implementación de autenticación JWT |
 
-## 📊 Datos de Prueba
+### 📜 Scripts y Automatización
 
-| Documento | Descripción |
-|-----------|-------------|
-| [DATOS_PRUEBA_IDS.md](./DATOS_PRUEBA_IDS.md) | IDs de usuarios y espacios para testing |
-
-## 📚 Documentación Técnica
-
-| Carpeta | Contenido |
-|---------|-----------|
-| [docs/](./docs/) | ADRs, changelog, algoritmos de pricing, wireframes |
-
-## 🗄️ Base de Datos
-
-| Carpeta | Contenido |
-|---------|-----------|
-| [ddl/](./ddl/) | Scripts SQL de creación de schemas |
-
-## 🔧 Scripts de Gestión
-
-Todos los scripts están en la raíz del proyecto. Ver README.md para descripción completa.
+| Script | Uso |
+|--------|-----|
+| `start-infrastructure.sh` | Iniciar contenedores Docker |
+| `start-all-services.sh` | Iniciar todos los microservicios |
+| `stop-all.sh` | Detener todo el sistema |
+| `recompile-all.sh` | Recompilar todos los servicios |
+| `comprobacionmicroservicios.sh` | Verificar health de servicios |
+| `insert-test-data.sh` | Insertar datos de prueba |
+| `insert-search-test-data.sh` | Insertar datos en Search Service |
+| `reset-bookings-test-data.sh` | Resetear bookings con estados limpios |
+| `test-e2e-completo.sh` | Ejecutar suite completa de tests |
 
 ---
 
-## 📋 Orden de Lectura Sugerido
+## 🚀 Flujo de Lectura Recomendado
 
-### Para Nuevos Desarrolladores:
-1. README.md
-2. COMO_INICIAR_SERVICIOS.md
-3. POSTMAN_README.md
-4. DATOS_PRUEBA_IDS.md
+### Para Nuevos Desarrolladores Backend
 
-### Para Testing:
-1. PRUEBAS_COMPLETAS_SISTEMA.md
-2. POSTMAN_ENDPOINTS.md
+1. **[README.md](README.md)** - Entender el proyecto y arrancar el sistema
+2. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Profundizar en arquitectura
+3. **[DATABASE.md](DATABASE.md)** - Conocer el modelo de datos
+4. **[POSTMAN_ENDPOINTS.md](POSTMAN_ENDPOINTS.md)** - Probar endpoints
+5. **[NEXT-STEPS.md](NEXT-STEPS.md)** - Ver qué viene después
 
-### Para Seguridad:
-1. JWT_IMPLEMENTADO.md
+### Para Desarrolladores Frontend
+
+1. **[README.md](README.md)** - Contexto general del proyecto
+2. **[FRONTEND-START.md](FRONTEND-START.md)** - ⭐ **EMPEZAR AQUÍ**
+3. **[POSTMAN_ENDPOINTS.md](POSTMAN_ENDPOINTS.md)** - Endpoints disponibles
+4. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Entender flujos de negocio
+
+### Para DevOps / SRE
+
+1. **[README.md](README.md)** - Setup inicial
+2. **[DATABASE.md](DATABASE.md)** - Configuración de BD
+3. **[DOCUMENTATION.md](DOCUMENTATION.md)** - Arquitectura de microservicios
+4. **[NEXT-STEPS.md](NEXT-STEPS.md)** - Planes de deployment
+
+### Para Product Owners
+
+1. **[README.md](README.md)** - Estado del proyecto
+2. **[NEXT-STEPS.md](NEXT-STEPS.md)** - Roadmap y prioridades
+3. **[DOCUMENTATION.md](DOCUMENTATION.md)** (secciones de flujos de negocio)
 
 ---
 
-**Última actualización:** 30 de Octubre de 2025
+## 📞 Contacto y Soporte
+
+Para dudas técnicas, consultar al equipo de backend o revisar:
+- **Issues/errores conocidos:** `SOLUCION_DETALLADA_ERRORES.md`
+- **Historial de cambios:** `RESUMEN_CORRECCIONES_FINALES.md`
+
+---
+
+**Última actualización:** Octubre 2025  
+**Mantenido por:** Equipo de Desarrollo BalconazoApp
 
