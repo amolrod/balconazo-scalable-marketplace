@@ -3,6 +3,7 @@ package com.balconazo.catalog_microservice.service.impl;
 import com.balconazo.catalog_microservice.dto.CreateSpaceDTO;
 import com.balconazo.catalog_microservice.dto.SpaceDTO;
 import com.balconazo.catalog_microservice.entity.SpaceEntity;
+import com.balconazo.catalog_microservice.entity.UserEntity;
 import com.balconazo.catalog_microservice.event.EventPublisher;
 import com.balconazo.catalog_microservice.event.SpaceCreatedEvent;
 import com.balconazo.catalog_microservice.exception.BusinessValidationException;
@@ -14,6 +15,8 @@ import com.balconazo.catalog_microservice.service.CacheService;
 import com.balconazo.catalog_microservice.service.SpaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -36,10 +39,29 @@ public class SpaceServiceImpl implements SpaceService {
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
 
     public SpaceDTO createSpace(CreateSpaceDTO dto) {
-        var owner = userRepo.findById(dto.getOwnerId())
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario", dto.getOwnerId()));
-        if (!ROLE_HOST.equals(owner.getRole()))
+        // Obtener el rol del usuario autenticado desde el JWT
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isHost = authentication.getAuthorities().stream()
+            .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST"));
+
+        if (!isHost) {
             throw new BusinessValidationException("Solo hosts pueden crear espacios");
+        }
+
+        // Obtener o crear usuario en la BD local
+        UserEntity owner = userRepo.findById(dto.getOwnerId())
+            .orElseGet(() -> {
+                // Crear usuario local si no existe
+                UserEntity newUser = UserEntity.builder()
+                    .id(dto.getOwnerId())
+                    .email("user-" + dto.getOwnerId() + "@balconazo.com") // email dummy
+                    .passwordHash("") // no se usa aquí
+                    .role("HOST")
+                    .status("active")
+                    .build();
+                return userRepo.save(newUser);
+            });
+
         var space = mapper.toEntity(dto, owner);
         space.setStatus(SPACE_STATUS_DRAFT);
         var saved = repo.save(space);

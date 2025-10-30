@@ -41,10 +41,10 @@ public final class BookingConstants {
     // ============================================
     // BUSINESS RULES
     // ============================================
-    public static final int MIN_BOOKING_HOURS = 4;
+    public static final int MIN_BOOKING_HOURS = 1;
     public static final int MAX_BOOKING_DAYS = 365;
-    public static final int MIN_ADVANCE_HOURS = 24; // Reservar con 24h de antelación
-    public static final int CANCELLATION_DEADLINE_HOURS = 48; // Cancelar con 48h de antelación
+    public static final int MIN_ADVANCE_HOURS = 0; // Permitir reservas inmediatas
+    public static final int CANCELLATION_DEADLINE_HOURS = 1; // Cancelar con 1h de antelación (para pruebas)
 
     // ============================================
     // PAYMENT

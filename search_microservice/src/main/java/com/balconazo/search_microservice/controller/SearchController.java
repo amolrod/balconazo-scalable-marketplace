@@ -60,6 +60,20 @@ public class SearchController {
     }
 
     /**
+     * Buscar espacios con filtros (POST con body JSON)
+     *
+     * POST /api/search/spaces/filter
+     */
+    @PostMapping("/spaces/filter")
+    public ResponseEntity<SearchResultDTO> searchSpacesWithFilter(@Valid @RequestBody SearchRequestDTO request) {
+        log.info("POST /api/search/spaces/filter - lat={}, lon={}, radius={}km",
+            request.getLat(), request.getLon(), request.getRadiusKm());
+
+        SearchResultDTO result = searchService.searchSpaces(request);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
      * Obtener detalle de un espacio
      *
      * GET /api/search/spaces/{id}

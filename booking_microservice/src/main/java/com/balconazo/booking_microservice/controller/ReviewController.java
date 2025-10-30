@@ -55,5 +55,12 @@ public class ReviewController {
         List<ReviewDTO> reviews = reviewService.getReviewsByGuest(guestId);
         return ResponseEntity.ok(reviews);
     }
+
+    @GetMapping("/reviewer/{reviewerId}")
+    public ResponseEntity<List<ReviewDTO>> getReviewsByReviewer(@PathVariable UUID reviewerId) {
+        log.info("📥 GET /api/booking/reviews/reviewer/{}", reviewerId);
+        List<ReviewDTO> reviews = reviewService.getReviewsByGuest(reviewerId);
+        return ResponseEntity.ok(reviews);
+    }
 }
 

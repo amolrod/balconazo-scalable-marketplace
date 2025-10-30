@@ -3,7 +3,6 @@ package com.balconazo.gateway.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +20,7 @@ import java.util.Map;
 @Slf4j
 public class FallbackController {
 
-    @GetMapping("/auth")
+    @RequestMapping("/auth")
     public ResponseEntity<Map<String, Object>> authServiceFallback() {
         log.warn("🔴 Auth Service fallback triggered - Service unavailable");
 
@@ -34,7 +33,7 @@ public class FallbackController {
             ));
     }
 
-    @GetMapping("/catalog")
+    @RequestMapping("/catalog")
     public ResponseEntity<Map<String, Object>> catalogServiceFallback() {
         log.warn("🔴 Catalog Service fallback triggered - Service unavailable");
 
@@ -47,7 +46,7 @@ public class FallbackController {
             ));
     }
 
-    @GetMapping("/booking")
+    @RequestMapping("/booking")
     public ResponseEntity<Map<String, Object>> bookingServiceFallback() {
         log.warn("🔴 Booking Service fallback triggered - Service unavailable");
 
@@ -60,7 +59,7 @@ public class FallbackController {
             ));
     }
 
-    @GetMapping("/search")
+    @RequestMapping("/search")
     public ResponseEntity<Map<String, Object>> searchServiceFallback() {
         log.warn("🔴 Search Service fallback triggered - Service unavailable");
 
