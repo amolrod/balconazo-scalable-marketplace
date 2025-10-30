@@ -1,5 +1,6 @@
 package com.balconazo.search_microservice.config;
 
+import com.balconazo.search_microservice.exception.SpaceNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,19 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(SpaceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSpaceNotFoundException(SpaceNotFoundException ex) {
+        log.warn("Space not found: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+            .status(HttpStatus.NOT_FOUND.value())
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {

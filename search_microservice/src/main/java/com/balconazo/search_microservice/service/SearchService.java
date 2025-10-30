@@ -4,6 +4,7 @@ import com.balconazo.search_microservice.dto.SearchRequestDTO;
 import com.balconazo.search_microservice.dto.SearchResultDTO;
 import com.balconazo.search_microservice.dto.SpaceSearchResultDTO;
 import com.balconazo.search_microservice.entity.SpaceProjection;
+import com.balconazo.search_microservice.exception.SpaceNotFoundException;
 import com.balconazo.search_microservice.repository.SpaceProjectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +82,7 @@ public class SearchService {
         log.info("Getting space details: spaceId={}", spaceId);
 
         SpaceProjection projection = repository.findById(spaceId)
-            .orElseThrow(() -> new RuntimeException("Space not found: " + spaceId));
+            .orElseThrow(() -> new SpaceNotFoundException(spaceId.toString()));
 
         return mapProjectionToDTO(projection);
     }

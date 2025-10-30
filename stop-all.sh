@@ -117,3 +117,5 @@ echo ""
 log_success "Sistema detenido correctamente"
 echo ""
 
+
+echo "lsof -ti:8761 | xargs kill -15 si eureka server no para"
