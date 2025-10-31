@@ -1,0 +1,90 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>🏢 BalconazoApp</h1>
+      <p>Inicia sesión para continuar</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          [class.error]="email?.invalid && email?.touched"
+          placeholder="tu@email.com"
+        />
+        @if (email?.invalid && email?.touched) {
+          <div class="error-message">
+            @if (email?.errors?.['required']) {
+              <span>El email es requerido</span>
+            }
+            @if (email?.errors?.['email']) {
+              <span>Email inválido</span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          class="form-control"
+          [class.error]="password?.invalid && password?.touched"
+          placeholder="••••••••"
+        />
+        @if (password?.invalid && password?.touched) {
+          <div class="error-message">
+            @if (password?.errors?.['required']) {
+              <span>La contraseña es requerida</span>
+            }
+            @if (password?.errors?.['minlength']) {
+              <span>Mínimo 6 caracteres</span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Error general -->
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <!-- Submit button -->
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loading || loginForm.invalid"
+      >
+        @if (loading) {
+          <span class="spinner"></span>
+          <span>Iniciando sesión...</span>
+        } @else {
+          <span>Iniciar Sesión</span>
+        }
+      </button>
+
+      <!-- Link to register -->
+      <div class="form-footer">
+        <p>¿No tienes cuenta? <a routerLink="/register">Regístrate</a></p>
+      </div>
+    </form>
+
+    <!-- Test credentials -->
+    <div class="test-credentials">
+      <p><strong>🧪 Credenciales de prueba:</strong></p>
+      <p>Email: <code>host1@balconazo.com</code></p>
+      <p>Password: <code>password123</code></p>
+    </div>
+  </div>
+</div>
+
