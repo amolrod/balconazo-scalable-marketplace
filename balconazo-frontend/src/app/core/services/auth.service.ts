@@ -26,6 +26,15 @@ export class AuthService {
   private readonly USER_ID_KEY = 'userId';
   private readonly USER_ROLE_KEY = 'userRole';
 
+  // Helper para verificar si localStorage está disponible
+  private get isLocalStorageAvailable(): boolean {
+    try {
+      return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+    } catch {
+      return false;
+    }
+  }
+
   constructor() {
     // Cargar usuario del localStorage si existe
     const userId = this.getUserId();
@@ -77,9 +86,11 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, request)
       .pipe(
         tap(response => {
-          localStorage.setItem(this.TOKEN_KEY, response.accessToken);
-          if (response.refreshToken) {
-            localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+          if (this.isLocalStorageAvailable) {
+            localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+            if (response.refreshToken) {
+              localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+            }
           }
         })
       );
@@ -89,10 +100,12 @@ export class AuthService {
    * Logout
    */
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-    localStorage.removeItem(this.USER_ID_KEY);
-    localStorage.removeItem(this.USER_ROLE_KEY);
+    if (this.isLocalStorageAvailable) {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      localStorage.removeItem(this.USER_ID_KEY);
+      localStorage.removeItem(this.USER_ROLE_KEY);
+    }
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
@@ -108,6 +121,9 @@ export class AuthService {
    * Obtener token de acceso
    */
   getToken(): string | null {
+    if (!this.isLocalStorageAvailable) {
+      return null;
+    }
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
@@ -115,6 +131,9 @@ export class AuthService {
    * Obtener refresh token
    */
   getRefreshToken(): string | null {
+    if (!this.isLocalStorageAvailable) {
+      return null;
+    }
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
@@ -122,6 +141,9 @@ export class AuthService {
    * Obtener ID del usuario
    */
   getUserId(): string | null {
+    if (!this.isLocalStorageAvailable) {
+      return null;
+    }
     return localStorage.getItem(this.USER_ID_KEY);
   }
 
@@ -129,6 +151,9 @@ export class AuthService {
    * Obtener rol del usuario
    */
   getUserRole(): string | null {
+    if (!this.isLocalStorageAvailable) {
+      return null;
+    }
     return localStorage.getItem(this.USER_ROLE_KEY);
   }
 
@@ -164,10 +189,12 @@ export class AuthService {
    * Guardar sesión en localStorage
    */
   private setSession(response: LoginResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.accessToken);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
-    localStorage.setItem(this.USER_ID_KEY, response.userId);
-    localStorage.setItem(this.USER_ROLE_KEY, response.role);
+    if (this.isLocalStorageAvailable) {
+      localStorage.setItem(this.TOKEN_KEY, response.accessToken);
+      localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+      localStorage.setItem(this.USER_ID_KEY, response.userId);
+      localStorage.setItem(this.USER_ROLE_KEY, response.role);
+    }
   }
 
   /**
