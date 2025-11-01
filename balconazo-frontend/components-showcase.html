@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BalconazoApp - Componentes de Ejemplo</title>
+    <link rel="stylesheet" href="styles.scss">
+</head>
+<body>
+
+<!-- ============================================
+     NAVBAR EXAMPLE
+     ============================================ -->
+<nav class="navbar" id="navbar">
+    <div class="container navbar-container">
+        <a href="/" class="navbar-logo">Balconazo</a>
+
+        <ul class="navbar-menu hide-mobile">
+            <li><a href="#" class="navbar-link active">Explorar</a></li>
+            <li><a href="#" class="navbar-link">Mis Reservas</a></li>
+            <li><a href="#" class="navbar-link">Convertirme en Host</a></li>
+        </ul>
+
+        <div class="flex items-center gap-4">
+            <button class="btn btn-ghost hide-mobile">Iniciar Sesión</button>
+            <button class="btn btn-primary">Registrarse</button>
+            <button class="btn-icon btn-secondary hide-desktop">
+                <!-- Icono menú hamburguesa -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================
+     HERO SECTION
+     ============================================ -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title animate-fade-in-up">
+                Descubre espacios únicos para tus eventos
+            </h1>
+            <p class="hero-subtitle animate-fade-in-up" style="animation-delay: 0.1s;">
+                Encuentra el lugar perfecto para tu próxima reunión, fiesta o celebración.
+                Más de 1,000 espacios verificados te esperan.
+            </p>
+
+            <!-- SEARCH BAR -->
+            <div class="search-bar animate-fade-in-up" style="animation-delay: 0.2s;">
+                <div class="search-input-group">
+                    <label class="search-input-label">Ubicación</label>
+                    <input type="text" class="search-input" placeholder="¿Dónde?">
+                </div>
+
+                <div class="search-input-group">
+                    <label class="search-input-label">Fecha</label>
+                    <input type="date" class="search-input" placeholder="¿Cuándo?">
+                </div>
+
+                <div class="search-input-group">
+                    <label class="search-input-label">Capacidad</label>
+                    <input type="number" class="search-input" placeholder="Personas">
+                </div>
+
+                <button class="search-btn">
+                    <!-- Icono de búsqueda -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SPACES GRID
+     ============================================ -->
+<section style="padding: 80px 0; background: var(--gray-50);">
+    <div class="container">
+        <div style="margin-bottom: 48px;">
+            <h2 style="font-size: var(--text-4xl); margin-bottom: var(--space-3);">
+                Espacios destacados
+            </h2>
+            <p style="font-size: var(--text-lg); color: var(--gray-600);">
+                Los lugares más reservados de la semana
+            </p>
+        </div>
+
+        <div class="grid grid-cols-4">
+
+            <!-- SPACE CARD 1 - Featured -->
+            <article class="space-card">
+                <div class="space-card-image-wrapper">
+                    <img
+                        src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop"
+                        alt="Ático con terraza"
+                        class="space-card-image"
+                    >
+                    <span class="space-card-badge featured">Destacado</span>
+                    <span class="space-card-rating">
+                        ⭐ 4.9
+                    </span>
+                </div>
+
+                <div class="space-card-body">
+                    <div class="space-card-location">
+                        📍 Madrid, Malasaña
+                    </div>
+
+                    <h3 class="space-card-title">
+                        Ático moderno con terraza panorámica
+                    </h3>
+
+                    <div class="space-card-features">
+                        <span class="space-card-feature">
+                            👥 8 personas
+                        </span>
+                        <span class="space-card-feature">
+                            📐 50m²
+                        </span>
+                    </div>
+
+                    <div class="space-card-footer">
+                        <div class="space-card-price">
+                            <span class="space-card-price-amount">25€</span>
+                            <span class="space-card-price-period">/hora</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary">Ver más</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SPACE CARD 2 -->
+            <article class="space-card">
+                <div class="space-card-image-wrapper">
+                    <img
+                        src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=400&fit=crop"
+                        alt="Loft industrial"
+                        class="space-card-image"
+                    >
+                    <span class="space-card-badge">Nuevo</span>
+                    <span class="space-card-rating">
+                        ⭐ 5.0
+                    </span>
+                </div>
+
+                <div class="space-card-body">
+                    <div class="space-card-location">
+                        📍 Barcelona, Gràcia
+                    </div>
+
+                    <h3 class="space-card-title">
+                        Loft industrial con cocina profesional
+                    </h3>
+
+                    <div class="space-card-features">
+                        <span class="space-card-feature">
+                            👥 12 personas
+                        </span>
+                        <span class="space-card-feature">
+                            📐 80m²
+                        </span>
+                    </div>
+
+                    <div class="space-card-footer">
+                        <div class="space-card-price">
+                            <span class="space-card-price-amount">35€</span>
+                            <span class="space-card-price-period">/hora</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary">Ver más</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SPACE CARD 3 -->
+            <article class="space-card">
+                <div class="space-card-image-wrapper">
+                    <img
+                        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop"
+                        alt="Piso con jardín"
+                        class="space-card-image"
+                    >
+                    <span class="space-card-rating">
+                        ⭐ 4.7
+                    </span>
+                </div>
+
+                <div class="space-card-body">
+                    <div class="space-card-location">
+                        📍 Valencia, Ruzafa
+                    </div>
+
+                    <h3 class="space-card-title">
+                        Apartamento luminoso con jardín privado
+                    </h3>
+
+                    <div class="space-card-features">
+                        <span class="space-card-feature">
+                            👥 10 personas
+                        </span>
+                        <span class="space-card-feature">
+                            📐 65m²
+                        </span>
+                    </div>
+
+                    <div class="space-card-footer">
+                        <div class="space-card-price">
+                            <span class="space-card-price-amount">28€</span>
+                            <span class="space-card-price-period">/hora</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary">Ver más</button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SPACE CARD 4 -->
+            <article class="space-card">
+                <div class="space-card-image-wrapper">
+                    <img
+                        src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=400&fit=crop"
+                        alt="Piso minimalista"
+                        class="space-card-image"
+                    >
+                    <span class="space-card-badge">Popular</span>
+                    <span class="space-card-rating">
+                        ⭐ 4.8
+                    </span>
+                </div>
+
+                <div class="space-card-body">
+                    <div class="space-card-location">
+                        📍 Sevilla, Centro
+                    </div>
+
+                    <h3 class="space-card-title">
+                        Estudio minimalista en pleno centro
+                    </h3>
+
+                    <div class="space-card-features">
+                        <span class="space-card-feature">
+                            👥 6 personas
+                        </span>
+                        <span class="space-card-feature">
+                            📐 40m²
+                        </span>
+                    </div>
+
+                    <div class="space-card-footer">
+                        <div class="space-card-price">
+                            <span class="space-card-price-amount">20€</span>
+                            <span class="space-card-price-period">/hora</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary">Ver más</button>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <div style="text-align: center; margin-top: 48px;">
+            <button class="btn btn-lg btn-secondary">Ver todos los espacios</button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     FEATURES SECTION - Card Examples
+     ============================================ -->
+<section style="padding: 80px 0;">
+    <div class="container">
+        <div class="text-center" style="margin-bottom: 64px;">
+            <h2 style="font-size: var(--text-4xl); margin-bottom: var(--space-3);">
+                ¿Por qué Balconazo?
+            </h2>
+            <p style="font-size: var(--text-lg); color: var(--gray-600);">
+                La plataforma más segura y sencilla para alquilar espacios
+            </p>
+        </div>
+
+        <div class="grid grid-cols-3">
+            <div class="card">
+                <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary-100), var(--primary-200)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-5); font-size: 28px;">
+                    🔒
+                </div>
+                <div class="card-header">
+                    <h3 class="card-title">Pago seguro</h3>
+                </div>
+                <div class="card-body">
+                    <p>Todas las transacciones están protegidas. Tu dinero está seguro hasta que confirmes la reserva.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--info-light), #BFDBFE); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-5); font-size: 28px;">
+                    ✓
+                </div>
+                <div class="card-header">
+                    <h3 class="card-title">Espacios verificados</h3>
+                </div>
+                <div class="card-body">
+                    <p>Todos los espacios pasan por un proceso de verificación riguroso antes de publicarse.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--success-light), #A7F3D0); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-5); font-size: 28px;">
+                    💬
+                </div>
+                <div class="card-header">
+                    <h3 class="card-title">Soporte 24/7</h3>
+                </div>
+                <div class="card-body">
+                    <p>Nuestro equipo está disponible en todo momento para ayudarte con cualquier problema.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     FORM EXAMPLE
+     ============================================ -->
+<section style="padding: 80px 0; background: var(--gray-50);">
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <div class="card-header">
+                <h2 class="card-title" style="font-size: var(--text-3xl);">Regístrate como Host</h2>
+                <p style="color: var(--gray-600);">Empieza a ganar dinero alquilando tu espacio</p>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label class="form-label" for="name">Nombre completo</label>
+                    <input type="text" id="name" class="form-input" placeholder="Juan Pérez">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="tu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Teléfono</label>
+                    <input type="tel" id="phone" class="form-input" placeholder="+34 600 000 000">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="address">Dirección del espacio</label>
+                    <input type="text" id="address" class="form-input" placeholder="Calle, número, ciudad">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                    Crear cuenta de Host
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     BADGES & STATUS EXAMPLES
+     ============================================ -->
+<section style="padding: 80px 0;">
+    <div class="container">
+        <h2 style="margin-bottom: 32px;">Badges & Estados</h2>
+
+        <div class="flex gap-4" style="flex-wrap: wrap;">
+            <span class="badge badge-primary">Destacado</span>
+            <span class="badge badge-success">Confirmado</span>
+            <span class="badge badge-warning">Pendiente</span>
+            <span class="badge badge-error">Cancelado</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     BUTTONS SHOWCASE
+     ============================================ -->
+<section style="padding: 80px 0; background: var(--gray-50);">
+    <div class="container">
+        <h2 style="margin-bottom: 32px;">Variantes de Botones</h2>
+
+        <div class="flex gap-4" style="flex-wrap: wrap; margin-bottom: 24px;">
+            <button class="btn btn-primary">Primary Button</button>
+            <button class="btn btn-secondary">Secondary Button</button>
+            <button class="btn btn-ghost">Ghost Button</button>
+            <button class="btn btn-primary" disabled>Disabled Button</button>
+        </div>
+
+        <div class="flex gap-4" style="flex-wrap: wrap; margin-bottom: 24px;">
+            <button class="btn btn-sm btn-primary">Small Button</button>
+            <button class="btn btn-primary">Regular Button</button>
+            <button class="btn btn-lg btn-primary">Large Button</button>
+        </div>
+
+        <div class="flex gap-4" style="flex-wrap: wrap;">
+            <button class="btn-icon btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </button>
+            <button class="btn-icon btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     LOADING STATES
+     ============================================ -->
+<section style="padding: 80px 0;">
+    <div class="container">
+        <h2 style="margin-bottom: 32px;">Estados de Carga</h2>
+
+        <div style="margin-bottom: 32px;">
+            <h3 style="margin-bottom: 16px; font-size: var(--text-lg);">Spinner</h3>
+            <div class="spinner"></div>
+        </div>
+
+        <div>
+            <h3 style="margin-bottom: 16px; font-size: var(--text-lg);">Skeleton Loading</h3>
+            <div class="grid grid-cols-3" style="gap: 24px;">
+                <div>
+                    <div class="skeleton" style="height: 200px; margin-bottom: 12px;"></div>
+                    <div class="skeleton" style="height: 20px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="height: 20px; width: 80%;"></div>
+                </div>
+                <div>
+                    <div class="skeleton" style="height: 200px; margin-bottom: 12px;"></div>
+                    <div class="skeleton" style="height: 20px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="height: 20px; width: 60%;"></div>
+                </div>
+                <div>
+                    <div class="skeleton" style="height: 200px; margin-bottom: 12px;"></div>
+                    <div class="skeleton" style="height: 20px; margin-bottom: 8px;"></div>
+                    <div class="skeleton" style="height: 20px; width: 70%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     JAVASCRIPT - Navbar Scroll Effect
+     ============================================ -->
+<script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
