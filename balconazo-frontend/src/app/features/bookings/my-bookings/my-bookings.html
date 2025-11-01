@@ -1,0 +1,239 @@
+<div class="my-bookings-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="container">
+      <div class="page-header-content">
+        <div>
+          <h1 class="page-title">Mis Reservas</h1>
+          <p class="page-subtitle">Gestiona todas tus reservas en un solo lugar</p>
+        </div>
+        <button class="btn btn-primary" routerLink="/">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          Buscar espacios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Filters -->
+    <div class="filters-bar">
+      <button
+        class="filter-btn"
+        [class.active]="selectedFilter === 'all'"
+        (click)="selectedFilter = 'all'"
+      >
+        Todas <span class="filter-count">{{ getBookingCount('all') }}</span>
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="selectedFilter === 'PENDING'"
+        (click)="selectedFilter = 'PENDING'"
+      >
+        Pendientes <span class="filter-count">{{ getBookingCount('PENDING') }}</span>
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="selectedFilter === 'CONFIRMED'"
+        (click)="selectedFilter = 'CONFIRMED'"
+      >
+        Confirmadas <span class="filter-count">{{ getBookingCount('CONFIRMED') }}</span>
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="selectedFilter === 'COMPLETED'"
+        (click)="selectedFilter = 'COMPLETED'"
+      >
+        Completadas <span class="filter-count">{{ getBookingCount('COMPLETED') }}</span>
+      </button>
+      <button
+        class="filter-btn"
+        [class.active]="selectedFilter === 'CANCELLED'"
+        (click)="selectedFilter = 'CANCELLED'"
+      >
+        Canceladas <span class="filter-count">{{ getBookingCount('CANCELLED') }}</span>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando reservas...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @else if (error && bookings.length === 0) {
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h3>{{ error }}</h3>
+        <button class="btn btn-primary" (click)="loadBookings()">Reintentar</button>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (filteredBookings.length === 0) {
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <h3>No tienes reservas {{ selectedFilter !== 'all' ? getStatusText(selectedFilter).toLowerCase() : '' }}</h3>
+        <p>Explora espacios increíbles y haz tu primera reserva</p>
+        <button class="btn btn-primary" routerLink="/">Explorar espacios</button>
+      </div>
+    }
+
+    <!-- Bookings List -->
+    @else {
+      <div class="bookings-grid">
+        @for (booking of filteredBookings; track booking.id) {
+          <article class="booking-card">
+            <!-- Status Badge -->
+            <div class="booking-header">
+              <span class="badge" [ngClass]="getStatusBadgeClass(booking.status)">
+                {{ getStatusText(booking.status) }}
+              </span>
+              <span class="booking-id">Reserva #{{ booking.id.substring(0, 8) }}</span>
+            </div>
+
+            <!-- Booking Info -->
+            <div class="booking-body">
+              <div class="booking-dates">
+                <div class="date-block">
+                  <span class="date-label">Inicio</span>
+                  <div class="date-info">
+                    <span class="date">{{ formatDate(booking.startTs) }}</span>
+                    <span class="time">{{ formatTime(booking.startTs) }}</span>
+                  </div>
+                </div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="arrow-icon">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <div class="date-block">
+                  <span class="date-label">Fin</span>
+                  <div class="date-info">
+                    <span class="date">{{ formatDate(booking.endTs) }}</span>
+                    <span class="time">{{ formatTime(booking.endTs) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="booking-details">
+                <div class="detail-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>{{ booking.numGuests }} invitados</span>
+                </div>
+                <div class="detail-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                  </svg>
+                  <span>{{ getPaymentStatusText(booking.paymentStatus) }}</span>
+                </div>
+              </div>
+
+              @if (booking.cancellationReason) {
+                <div class="cancellation-reason">
+                  <strong>Motivo de cancelación:</strong> {{ booking.cancellationReason }}
+                </div>
+              }
+            </div>
+
+            <!-- Booking Footer -->
+            <div class="booking-footer">
+              <div class="booking-price">
+                <span class="price-label">Total</span>
+                <span class="price-amount">{{ formatPrice(booking.totalPriceCents) }}€</span>
+              </div>
+
+              <div class="booking-actions">
+                <button class="btn btn-sm btn-secondary" (click)="viewSpace(booking.spaceId)">
+                  Ver espacio
+                </button>
+
+                @if (canCancel(booking)) {
+                  <button class="btn btn-sm btn-ghost" (click)="openCancelModal(booking)" style="color: var(--error);">
+                    Cancelar
+                  </button>
+                }
+
+                @if (canReview(booking)) {
+                  <button class="btn btn-sm btn-primary" (click)="goToReview(booking.id)">
+                    Dejar reseña
+                  </button>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+@if (showCancelModal && bookingToCancel) {
+  <div class="modal-overlay" (click)="closeCancelModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Cancelar reserva</h3>
+        <button class="modal-close" (click)="closeCancelModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>¿Estás seguro de que quieres cancelar esta reserva?</p>
+        <p class="modal-warning">Esta acción no se puede deshacer.</p>
+
+        <div class="form-group">
+          <label class="form-label">Motivo de cancelación</label>
+          <textarea
+            [(ngModel)]="cancellationReason"
+            class="form-input"
+            rows="4"
+            placeholder="Por favor, indica el motivo de la cancelación..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCancelModal()" [disabled]="cancelLoading">
+          Mantener reserva
+        </button>
+        <button
+          class="btn btn-primary"
+          (click)="confirmCancel()"
+          [disabled]="!cancellationReason.trim() || cancelLoading"
+          style="background: var(--error);"
+        >
+          @if (cancelLoading) {
+            <div class="spinner"></div>
+            <span>Cancelando...</span>
+          } @else {
+            <span>Confirmar cancelación</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
