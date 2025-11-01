@@ -50,10 +50,10 @@
           @if (email?.invalid && email?.touched) {
             <div class="form-error">
               @if (email?.errors?.['required']) {
-                <span>⚠️ El email es requerido</span>
+                <span>El email es requerido</span>
               }
               @if (email?.errors?.['email']) {
-                <span>⚠️ Introduce un email válido</span>
+                <span>Introduce un email válido</span>
               }
             </div>
           }
@@ -100,10 +100,10 @@
           @if (password?.invalid && password?.touched) {
             <div class="form-error">
               @if (password?.errors?.['required']) {
-                <span>⚠️ La contraseña es requerida</span>
+                <span>La contraseña es requerida</span>
               }
               @if (password?.errors?.['minlength']) {
-                <span>⚠️ Mínimo 6 caracteres</span>
+                <span>Mínimo 6 caracteres</span>
               }
             </div>
           }
