@@ -1,0 +1,328 @@
+<!-- Loading State -->
+@if (loading) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando espacio...</p>
+  </div>
+}
+
+<!-- Error State -->
+@else if (error && !space) {
+  <div class="error-container">
+    <div class="error-content">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <h2>{{ error }}</h2>
+      <button class="btn btn-primary" (click)="goBack()">Volver al inicio</button>
+    </div>
+  </div>
+}
+
+<!-- Space Detail Content -->
+@else if (space) {
+  <div class="space-detail">
+    <!-- Header con breadcrumb y acciones -->
+    <div class="space-header">
+      <div class="container">
+        <div class="space-header-content">
+          <div class="breadcrumb">
+            <a routerLink="/">Inicio</a>
+            <span>/</span>
+            <span>{{ space.title }}</span>
+          </div>
+
+          <div class="space-actions">
+            <button class="btn-icon btn-ghost" (click)="shareSpace()" title="Compartir">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+            <button class="btn-icon btn-ghost" (click)="toggleFavorite()" title="Guardar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Gallery -->
+    <div class="gallery-section">
+      <div class="container">
+        <div class="gallery-grid">
+          <div class="gallery-main">
+            <img [src]="getImages()[selectedImageIndex]" [alt]="space.title" class="gallery-main-image">
+          </div>
+          <div class="gallery-thumbnails">
+            @for (image of getImages(); track image; let i = $index) {
+              <div
+                class="gallery-thumbnail"
+                [class.active]="i === selectedImageIndex"
+                (click)="selectImage(i)"
+              >
+                <img [src]="image" [alt]="space.title + ' - ' + (i + 1)">
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <div class="space-content">
+        <!-- Left Column: Info -->
+        <div class="space-info">
+          <!-- Title and Rating -->
+          <div class="space-title-section">
+            <h1>{{ space.title }}</h1>
+            <div class="space-meta">
+              <span class="rating">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                {{ getAverageRating() | number:'1.1-1' }}
+              </span>
+              <span class="separator">·</span>
+              <span>{{ reviews.length }} reseñas</span>
+              <span class="separator">·</span>
+              <span class="location">📍 {{ space.address }}</span>
+            </div>
+          </div>
+
+          <!-- Space Features -->
+          <div class="space-features-grid">
+            <div class="feature-item">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <div>
+                <strong>{{ space.capacity }}</strong>
+                <span>personas</span>
+              </div>
+            </div>
+
+            @if (space.areaSqm) {
+              <div class="feature-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+                <div>
+                  <strong>{{ space.areaSqm }}m²</strong>
+                  <span>de espacio</span>
+                </div>
+              </div>
+            }
+
+            <div class="feature-item">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <div>
+                <strong>Flexible</strong>
+                <span>horarios</span>
+              </div>
+            </div>
+          </div>
+
+          <hr class="divider">
+
+          <!-- Description -->
+          <section class="space-section">
+            <h2>Sobre este espacio</h2>
+            <p class="space-description">{{ space.description }}</p>
+          </section>
+
+          <hr class="divider">
+
+          <!-- Amenities -->
+          <section class="space-section">
+            <h2>¿Qué ofrece este lugar?</h2>
+            <div class="amenities-grid">
+              @for (amenity of space.amenities; track amenity; let i = $index) {
+                @if (showAllAmenities || i < 6) {
+                  <div class="amenity-item">
+                    <span class="amenity-icon">{{ getAmenityIcon(amenity) }}</span>
+                    <span>{{ getAmenityName(amenity) }}</span>
+                  </div>
+                }
+              }
+            </div>
+            @if (space.amenities && space.amenities.length > 6) {
+              <button class="btn btn-ghost" (click)="showAllAmenities = !showAllAmenities">
+                {{ showAllAmenities ? 'Mostrar menos' : 'Mostrar todas las comodidades' }}
+              </button>
+            }
+          </section>
+
+          <hr class="divider">
+
+          <!-- Reviews -->
+          <section class="space-section">
+            <h2>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: 8px;">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              {{ getAverageRating() | number:'1.1-1' }} · {{ reviews.length }} reseñas
+            </h2>
+
+            <div class="reviews-list">
+              @for (review of reviews; track review.id) {
+                <div class="review-item">
+                  <div class="review-header">
+                    <img [src]="review.avatar" [alt]="review.guestName" class="review-avatar">
+                    <div class="review-meta">
+                      <strong>{{ review.guestName }}</strong>
+                      <span class="review-date">{{ formatDate(review.date) }}</span>
+                    </div>
+                  </div>
+                  <div class="review-rating">{{ getRatingStars(review.rating) }}</div>
+                  <p class="review-comment">{{ review.comment }}</p>
+                </div>
+              }
+            </div>
+          </section>
+
+          <hr class="divider">
+
+          <!-- Location -->
+          <section class="space-section">
+            <h2>Ubicación</h2>
+            <p class="location-address">📍 {{ space.address }}</p>
+            <div class="map-placeholder">
+              <div class="map-placeholder-content">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <p>Mapa interactivo</p>
+                <small>La ubicación exacta se mostrará después de la reserva</small>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column: Booking Form (Sticky) -->
+        <aside class="booking-sidebar">
+          <div class="booking-card">
+            <div class="booking-price">
+              <span class="price-amount">{{ space.basePriceCents / 100 }}€</span>
+              <span class="price-period">/hora</span>
+            </div>
+
+            <form [formGroup]="bookingForm" (ngSubmit)="onSubmitBooking()" class="booking-form">
+              <!-- Dates -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Fecha inicio</label>
+                  <input
+                    type="date"
+                    formControlName="startDate"
+                    class="form-input"
+                  >
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hora</label>
+                  <input type="time" formControlName="startTime" class="form-input">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Fecha fin</label>
+                  <input
+                    type="date"
+                    formControlName="endDate"
+                    class="form-input"
+                  >
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hora</label>
+                  <input type="time" formControlName="endTime" class="form-input">
+                </div>
+              </div>
+
+              <!-- Guests -->
+              <div class="form-group">
+                <label class="form-label">Número de invitados</label>
+                <input
+                  type="number"
+                  formControlName="numGuests"
+                  class="form-input"
+                  [min]="1"
+                  [max]="space.capacity"
+                  placeholder="Cantidad de personas"
+                >
+                <small class="form-hint">Máximo {{ space.capacity }} personas</small>
+              </div>
+
+              <!-- Price Estimate -->
+              @if (estimatedPrice) {
+                <div class="price-breakdown">
+                  <div class="price-row">
+                    <span>Precio estimado</span>
+                    <strong>{{ estimatedPrice }}€</strong>
+                  </div>
+                  <small class="price-note">El precio final puede variar según la temporada</small>
+                </div>
+              }
+
+              <!-- Error Message -->
+              @if (bookingError) {
+                <div class="alert alert-error">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {{ bookingError }}
+                </div>
+              }
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                [disabled]="bookingForm.invalid || bookingLoading"
+                style="width: 100%;"
+              >
+                @if (bookingLoading) {
+                  <div class="spinner"></div>
+                  <span>Procesando...</span>
+                } @else {
+                  <span>Reservar ahora</span>
+                }
+              </button>
+
+              <p class="booking-note">No se realizará ningún cargo todavía</p>
+            </form>
+
+            <!-- Host Info -->
+            <div class="host-info">
+              <div class="host-avatar">
+                <img src="https://i.pravatar.cc/100?img=12" alt="Anfitrión">
+              </div>
+              <div class="host-details">
+                <strong>Anfitrión verificado</strong>
+                <p>Responde en menos de 1 hora</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+}
+
