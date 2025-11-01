@@ -97,23 +97,21 @@
           <article class="space-card" (click)="viewSpace(space.id)">
             <div class="space-card-image-wrapper">
               <img
-                [src]="space.imageUrl || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop'"
+                [src]="getSpaceImageUrl(space)"
                 [alt]="space.title"
                 class="space-card-image"
               >
-              @if (space.isFeatured) {
+              @if (isSpaceFeatured(space)) {
                 <span class="space-card-badge featured">Destacado</span>
               }
-              @if (space.rating) {
-                <span class="space-card-rating">
-                  ⭐ {{ space.rating | number:'1.1-1' }}
-                </span>
-              }
+              <span class="space-card-rating">
+                ⭐ {{ getSpaceRating(space) | number:'1.1-1' }}
+              </span>
             </div>
 
             <div class="space-card-body">
               <div class="space-card-location">
-                📍 {{ space.location }}
+                📍 {{ getSpaceLocation(space) }}
               </div>
 
               <h3 class="space-card-title">
@@ -124,16 +122,16 @@
                 <span class="space-card-feature">
                   👥 {{ space.capacity }} personas
                 </span>
-                @if (space.area) {
+                @if (space.areaSqm) {
                   <span class="space-card-feature">
-                    📐 {{ space.area }}m²
+                    📐 {{ space.areaSqm }}m²
                   </span>
                 }
               </div>
 
               <div class="space-card-footer">
                 <div class="space-card-price">
-                  <span class="space-card-price-amount">{{ space.pricePerHour }}€</span>
+                  <span class="space-card-price-amount">{{ getSpacePricePerHour(space) }}€</span>
                   <span class="space-card-price-period">/hora</span>
                 </div>
                 <button class="btn btn-sm btn-primary" (click)="viewSpace(space.id); $event.stopPropagation()">
