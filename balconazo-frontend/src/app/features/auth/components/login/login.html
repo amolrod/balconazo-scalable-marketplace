@@ -1,89 +1,203 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>🏢 BalconazoApp</h1>
-      <p>Inicia sesión para continuar</p>
+<div class="auth-container">
+  <!-- Background decoration -->
+  <div class="auth-decoration"></div>
+
+  <div class="auth-content">
+    <!-- Logo and branding -->
+    <div class="auth-brand animate-fade-in-up">
+      <div class="brand-icon">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <rect width="56" height="56" rx="16" fill="url(#gradient)"/>
+          <path d="M28 16L40 24V38L28 46L16 38V24L28 16Z" fill="white" fill-opacity="0.9"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="56" y2="56">
+              <stop stop-color="#E11D48"/>
+              <stop offset="1" stop-color="#F43F5E"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="brand-title">Balconazo</h1>
+      <p class="brand-subtitle">Descubre espacios únicos</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- Email -->
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="form-control"
-          [class.error]="email?.invalid && email?.touched"
-          placeholder="tu@email.com"
-        />
-        @if (email?.invalid && email?.touched) {
-          <div class="error-message">
-            @if (email?.errors?.['required']) {
-              <span>El email es requerido</span>
-            }
-            @if (email?.errors?.['email']) {
-              <span>Email inválido</span>
-            }
-          </div>
-        }
+    <!-- Login card -->
+    <div class="auth-card animate-fade-in-up" style="animation-delay: 0.1s;">
+      <div class="auth-card-header">
+        <h2 class="auth-card-title">Bienvenido de nuevo</h2>
+        <p class="auth-card-subtitle">Inicia sesión para continuar tu experiencia</p>
       </div>
 
-      <!-- Password -->
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="password?.invalid && password?.touched"
-          placeholder="••••••••"
-        />
-        @if (password?.invalid && password?.touched) {
-          <div class="error-message">
-            @if (password?.errors?.['required']) {
-              <span>La contraseña es requerida</span>
-            }
-            @if (password?.errors?.['minlength']) {
-              <span>Mínimo 6 caracteres</span>
-            }
-          </div>
-        }
-      </div>
-
-      <!-- Error general -->
-      @if (errorMessage) {
-        <div class="alert alert-error">
-          {{ errorMessage }}
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <!-- Email -->
+        <div class="form-group">
+          <label class="form-label" for="email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            [class.error]="email?.invalid && email?.touched"
+            placeholder="tu@email.com"
+            autocomplete="email"
+          />
+          @if (email?.invalid && email?.touched) {
+            <div class="form-error">
+              @if (email?.errors?.['required']) {
+                <span>⚠️ El email es requerido</span>
+              }
+              @if (email?.errors?.['email']) {
+                <span>⚠️ Introduce un email válido</span>
+              }
+            </div>
+          }
         </div>
-      }
 
-      <!-- Submit button -->
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="loading || loginForm.invalid"
-      >
-        @if (loading) {
-          <span class="spinner"></span>
-          <span>Iniciando sesión...</span>
-        } @else {
-          <span>Iniciar Sesión</span>
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label" for="password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Contraseña
+          </label>
+          <div class="input-with-icon">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="form-input"
+              [class.error]="password?.invalid && password?.touched"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="input-icon-btn"
+              (click)="showPassword = !showPassword"
+              tabindex="-1"
+            >
+              @if (showPassword) {
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (password?.invalid && password?.touched) {
+            <div class="form-error">
+              @if (password?.errors?.['required']) {
+                <span>⚠️ La contraseña es requerida</span>
+              }
+              @if (password?.errors?.['minlength']) {
+                <span>⚠️ Mínimo 6 caracteres</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Remember me & Forgot password -->
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox-input">
+            <span>Recordarme</span>
+          </label>
+          <a href="#" class="link-primary">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- Error general -->
+        @if (errorMessage) {
+          <div class="alert alert-error animate-fade-in">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
         }
-      </button>
 
-      <!-- Link to register -->
-      <div class="form-footer">
-        <p>¿No tienes cuenta? <a routerLink="/register">Regístrate</a></p>
-      </div>
-    </form>
+        <!-- Submit button -->
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          [disabled]="loading || loginForm.invalid"
+          style="width: 100%;"
+        >
+          @if (loading) {
+            <div class="spinner"></div>
+            <span>Iniciando sesión...</span>
+          } @else {
+            <span>Iniciar Sesión</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          }
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>o continúa con</span>
+        </div>
+
+        <!-- Social login buttons -->
+        <div class="social-buttons">
+          <button type="button" class="btn btn-secondary social-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google
+          </button>
+          <button type="button" class="btn btn-secondary social-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Facebook
+          </button>
+        </div>
+
+        <!-- Link to register -->
+        <div class="form-footer">
+          <p>¿No tienes una cuenta? <a routerLink="/register" class="link-primary font-semibold">Regístrate gratis</a></p>
+        </div>
+      </form>
+    </div>
 
     <!-- Test credentials -->
-    <div class="test-credentials">
-      <p><strong>🧪 Credenciales de prueba:</strong></p>
-      <p>Email: <code>host1@balconazo.com</code></p>
-      <p>Password: <code>password123</code></p>
+    <div class="test-credentials animate-fade-in-up" style="animation-delay: 0.2s;">
+      <div class="test-credentials-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>
+        <strong>Credenciales de prueba</strong>
+      </div>
+      <div class="test-credentials-content">
+        <div class="credential-item">
+          <span class="credential-label">Email:</span>
+          <code class="credential-value">host1@balconazo.com</code>
+        </div>
+        <div class="credential-item">
+          <span class="credential-label">Password:</span>
+          <code class="credential-value">password123</code>
+        </div>
+      </div>
     </div>
   </div>
 </div>

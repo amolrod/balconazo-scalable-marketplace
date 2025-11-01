@@ -18,6 +18,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
   errorMessage = '';
+  showPassword = false;
 
   constructor() {
     this.loginForm = this.fb.group({

@@ -1,0 +1,291 @@
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+  <div class="container navbar-container">
+    <a routerLink="/" class="navbar-logo">Balconazo</a>
+
+    <ul class="navbar-menu hide-mobile">
+      <li><a routerLink="/" class="navbar-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Explorar</a></li>
+      <li><a routerLink="/my-bookings" class="navbar-link" routerLinkActive="active">Mis Reservas</a></li>
+      <li><a routerLink="/become-host" class="navbar-link" routerLinkActive="active">Ser Anfitrión</a></li>
+    </ul>
+
+    <div class="flex items-center gap-4">
+      @if (isAuthenticated) {
+        <button class="btn btn-ghost hide-mobile" (click)="logout()">Cerrar Sesión</button>
+        <button class="btn btn-primary" routerLink="/my-spaces">Mi Perfil</button>
+      } @else {
+        <button class="btn btn-ghost hide-mobile" routerLink="/login">Iniciar Sesión</button>
+        <button class="btn btn-primary" routerLink="/login">Registrarse</button>
+      }
+      <button class="btn-icon btn-secondary hide-desktop" (click)="toggleMobileMenu()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title animate-fade-in-up">
+        Descubre espacios únicos para tus eventos
+      </h1>
+      <p class="hero-subtitle animate-fade-in-up" style="animation-delay: 0.1s;">
+        Encuentra el lugar perfecto para tu próxima reunión, fiesta o celebración.
+        Más de 1,000 espacios verificados te esperan.
+      </p>
+
+      <!-- Search Bar -->
+      <div class="search-bar animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="search-input-group">
+          <label class="search-input-label">Ubicación</label>
+          <input type="text" class="search-input" placeholder="¿Dónde?" [(ngModel)]="searchParams.location">
+        </div>
+
+        <div class="search-input-group">
+          <label class="search-input-label">Fecha</label>
+          <input type="date" class="search-input" [(ngModel)]="searchParams.date">
+        </div>
+
+        <div class="search-input-group">
+          <label class="search-input-label">Capacidad</label>
+          <input type="number" class="search-input" placeholder="Personas" [(ngModel)]="searchParams.capacity">
+        </div>
+
+        <button class="search-btn" (click)="onSearch()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Spaces Section -->
+<section style="padding: 80px 0; background: var(--gray-50);">
+  <div class="container">
+    <div style="margin-bottom: 48px;">
+      <h2 style="font-size: var(--text-4xl); margin-bottom: var(--space-3);">
+        Espacios destacados
+      </h2>
+      <p style="font-size: var(--text-lg); color: var(--gray-600);">
+        Los lugares más reservados de la semana
+      </p>
+    </div>
+
+    @if (loading) {
+      <!-- Skeleton loading -->
+      <div class="grid grid-cols-4">
+        @for (item of [1,2,3,4]; track item) {
+          <div>
+            <div class="skeleton" style="height: 240px; margin-bottom: 12px; border-radius: var(--radius-xl);"></div>
+            <div class="skeleton" style="height: 20px; margin-bottom: 8px;"></div>
+            <div class="skeleton" style="height: 20px; width: 80%;"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="grid grid-cols-4">
+        @for (space of featuredSpaces; track space.id) {
+          <article class="space-card" (click)="viewSpace(space.id)">
+            <div class="space-card-image-wrapper">
+              <img
+                [src]="space.imageUrl || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop'"
+                [alt]="space.title"
+                class="space-card-image"
+              >
+              @if (space.isFeatured) {
+                <span class="space-card-badge featured">Destacado</span>
+              }
+              @if (space.rating) {
+                <span class="space-card-rating">
+                  ⭐ {{ space.rating | number:'1.1-1' }}
+                </span>
+              }
+            </div>
+
+            <div class="space-card-body">
+              <div class="space-card-location">
+                📍 {{ space.location }}
+              </div>
+
+              <h3 class="space-card-title">
+                {{ space.title }}
+              </h3>
+
+              <div class="space-card-features">
+                <span class="space-card-feature">
+                  👥 {{ space.capacity }} personas
+                </span>
+                @if (space.area) {
+                  <span class="space-card-feature">
+                    📐 {{ space.area }}m²
+                  </span>
+                }
+              </div>
+
+              <div class="space-card-footer">
+                <div class="space-card-price">
+                  <span class="space-card-price-amount">{{ space.pricePerHour }}€</span>
+                  <span class="space-card-price-period">/hora</span>
+                </div>
+                <button class="btn btn-sm btn-primary" (click)="viewSpace(space.id); $event.stopPropagation()">
+                  Ver más
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (featuredSpaces.length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <h3 class="empty-state-title">No hay espacios disponibles</h3>
+          <p class="empty-state-text">Vuelve pronto para ver nuevos espacios</p>
+        </div>
+      }
+    }
+
+    <div style="text-align: center; margin-top: 48px;">
+      <button class="btn btn-lg btn-secondary" routerLink="/spaces">
+        Ver todos los espacios
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section style="padding: 80px 0;">
+  <div class="container">
+    <div class="text-center" style="margin-bottom: 64px;">
+      <h2 style="font-size: var(--text-4xl); margin-bottom: var(--space-3);">
+        ¿Por qué Balconazo?
+      </h2>
+      <p style="font-size: var(--text-lg); color: var(--gray-600);">
+        La plataforma más segura y sencilla para alquilar espacios
+      </p>
+    </div>
+
+    <div class="grid grid-cols-3">
+      <div class="card">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="card-header">
+          <h3 class="card-title">Pago seguro</h3>
+        </div>
+        <div class="card-body">
+          <p>Todas las transacciones están protegidas. Tu dinero está seguro hasta que confirmes la reserva.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="feature-icon feature-icon-info">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <div class="card-header">
+          <h3 class="card-title">Espacios verificados</h3>
+        </div>
+        <div class="card-body">
+          <p>Todos los espacios pasan por un proceso de verificación riguroso antes de publicarse.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="feature-icon feature-icon-success">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div class="card-header">
+          <h3 class="card-title">Soporte 24/7</h3>
+        </div>
+        <div class="card-body">
+          <p>Nuestro equipo está disponible en todo momento para ayudarte con cualquier problema.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section style="padding: 80px 0; background: linear-gradient(135deg, var(--primary-600), var(--primary-500)); color: white;">
+  <div class="container text-center">
+    <h2 style="font-size: var(--text-4xl); color: white; margin-bottom: var(--space-4);">
+      ¿Tienes un espacio que alquilar?
+    </h2>
+    <p style="font-size: var(--text-xl); color: rgba(255,255,255,0.9); margin-bottom: var(--space-8); max-width: 600px; margin-left: auto; margin-right: auto;">
+      Únete a miles de anfitriones que ya están ganando dinero extra con sus espacios
+    </p>
+    <button class="btn btn-lg" style="background: white; color: var(--primary-600); font-weight: var(--font-bold);" routerLink="/become-host">
+      Convertirme en Anfitrión
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="background: var(--gray-900); color: white; padding: 60px 0 30px;">
+  <div class="container">
+    <div class="grid grid-cols-4" style="margin-bottom: 40px;">
+      <div>
+        <h4 style="color: white; margin-bottom: 20px;">Balconazo</h4>
+        <p style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">
+          La plataforma líder para alquilar espacios únicos
+        </p>
+      </div>
+      <div>
+        <h5 style="color: white; font-size: var(--text-sm); margin-bottom: 16px;">Empresa</h5>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Sobre nosotros</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Blog</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Carreras</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 style="color: white; font-size: var(--text-sm); margin-bottom: 16px;">Soporte</h5>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Centro de ayuda</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Contacto</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 style="color: white; font-size: var(--text-sm); margin-bottom: 16px;">Legal</h5>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Términos</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Privacidad</a></li>
+          <li style="margin-bottom: 8px;"><a href="#" style="color: rgba(255,255,255,0.7); font-size: var(--text-sm);">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
+      <p style="color: rgba(255,255,255,0.5); font-size: var(--text-sm);">
+        © 2025 Balconazo. Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+</footer>
+

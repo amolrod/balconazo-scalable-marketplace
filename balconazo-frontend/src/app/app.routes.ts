@@ -1,19 +1,18 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/components/login/login';
-import { authGuard } from './core/guards/auth.guard';
+import { HomeComponent } from './features/home/home';
 
 export const routes: Routes = [
+  {
+    path: '',
+    component: HomeComponent
+  },
   {
     path: 'login',
     component: LoginComponent
   },
   {
-    path: '',
-    redirectTo: '/login',
-    pathMatch: 'full'
-  },
-  {
     path: '**',
-    redirectTo: '/login'
+    redirectTo: '/'
   }
 ];
