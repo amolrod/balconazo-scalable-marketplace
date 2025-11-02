@@ -49,6 +49,11 @@ public class SpaceController {
         return service.snoozeSpace(id);
     }
 
+    @PostMapping("/{id}/archive")
+    public SpaceDTO archive(@PathVariable UUID id) {
+        return service.archiveSpace(id);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.deleteSpace(id);

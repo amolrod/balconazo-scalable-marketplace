@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/components/login/login';
 import { HomeComponent } from './features/home/home';
 import { SpaceDetailComponent } from './features/spaces/space-detail/space-detail';
 import { MyBookingsComponent } from './features/bookings/my-bookings/my-bookings';
+import { HostDashboardComponent } from './features/host/host-dashboard/host-dashboard';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,10 @@ export const routes: Routes = [
   {
     path: 'my-bookings',
     component: MyBookingsComponent
+  },
+  {
+    path: 'host/dashboard',
+    component: HostDashboardComponent
   },
   {
     path: '**',

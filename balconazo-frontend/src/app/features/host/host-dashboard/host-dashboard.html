@@ -1,0 +1,643 @@
+<div class="host-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="container">
+      <div class="header-content">
+        <div>
+          <h1>Dashboard del Anfitrión</h1>
+          <p>Gestiona tus espacios y reservas</p>
+        </div>
+        <button class="btn btn-primary" routerLink="/">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+          Volver al inicio
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+          <button
+            class="nav-item"
+            [class.active]="currentView === 'overview'"
+            (click)="changeView('overview')"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Resumen</span>
+          </button>
+
+          <button
+            class="nav-item"
+            [class.active]="currentView === 'spaces'"
+            (click)="changeView('spaces')"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            </svg>
+            <span>Mis Espacios</span>
+            <span class="badge-count">{{ mySpaces.length }}</span>
+          </button>
+
+          <button
+            class="nav-item"
+            [class.active]="currentView === 'bookings'"
+            (click)="changeView('bookings')"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Reservas Recibidas</span>
+          </button>
+
+          <button
+            class="nav-item btn-create"
+            (click)="changeView('create-space')"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Crear Espacio</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="dashboard-main">
+        <!-- Loading State -->
+        @if (loading) {
+          <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Cargando dashboard...</p>
+          </div>
+        }
+
+        <!-- Overview -->
+        @else if (currentView === 'overview') {
+          <div class="dashboard-content">
+            <h2>Resumen</h2>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--primary-50); color: var(--primary-600);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div class="stat-content">
+                  <p class="stat-label">Total Espacios</p>
+                  <p class="stat-value">{{ stats.totalSpaces }}</p>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+                <div class="stat-content">
+                  <p class="stat-label">Espacios Activos</p>
+                  <p class="stat-value">{{ stats.activeSpaces }}</p>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--info-light); color: var(--info);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+                <div class="stat-content">
+                  <p class="stat-label">Reservas Totales</p>
+                  <p class="stat-value">{{ stats.totalBookings }}</p>
+                  <small style="color: var(--gray-500);">Pendiente implementar</small>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+                <div class="stat-content">
+                  <p class="stat-label">Ingresos Totales</p>
+                  <p class="stat-value">{{ stats.totalEarnings }}€</p>
+                  <small style="color: var(--gray-500);">Pendiente implementar</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+              <h3>Acciones Rápidas</h3>
+              <div class="actions-grid">
+                <button class="action-card" (click)="changeView('create-space')">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <h4>Crear Espacio</h4>
+                  <p>Añade un nuevo espacio a tu catálogo</p>
+                </button>
+
+                <button class="action-card" (click)="changeView('spaces')">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  <h4>Gestionar Espacios</h4>
+                  <p>Edita o desactiva tus espacios</p>
+                </button>
+
+                <button class="action-card" (click)="changeView('bookings')">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <h4>Ver Reservas</h4>
+                  <p>Gestiona las reservas recibidas</p>
+                </button>
+              </div>
+            </div>
+
+            <!-- Recent Spaces -->
+            @if (mySpaces.length > 0) {
+              <div class="recent-spaces">
+                <h3>Espacios Recientes</h3>
+                <div class="spaces-list-compact">
+                  @for (space of mySpaces.slice(0, 5); track space.id) {
+                    <div class="space-item-compact">
+                      <div class="space-info-compact">
+                        <h4>{{ space.title }}</h4>
+                        <p>{{ space.address }}</p>
+                      </div>
+                      <span class="badge" [ngClass]="getStatusBadgeClass(space.status)">
+                        {{ getStatusText(space.status) }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- My Spaces View -->
+        @else if (currentView === 'spaces') {
+          <div class="dashboard-content">
+            <div class="content-header">
+              <h2>Mis Espacios</h2>
+              <button class="btn btn-primary" (click)="changeView('create-space')">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Crear Espacio
+              </button>
+            </div>
+
+            <!-- Filtros de espacios (estilo Airbnb) -->
+            <div class="spaces-filters">
+              <button
+                class="filter-btn"
+                [class.active]="spacesFilter === 'active'"
+                (click)="changeSpacesFilter('active')"
+              >
+                Activos ({{ getSpacesCountByStatus('ACTIVE') }})
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="spacesFilter === 'snoozed'"
+                (click)="changeSpacesFilter('snoozed')"
+              >
+                Pausados ({{ getSpacesCountByStatus('SNOOZED') }})
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="spacesFilter === 'archived'"
+                (click)="changeSpacesFilter('archived')"
+              >
+                Archivados ({{ getSpacesCountByStatus('ARCHIVED') }})
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="spacesFilter === 'deleted'"
+                (click)="changeSpacesFilter('deleted')"
+              >
+                Eliminados ({{ getSpacesCountByStatus('DELETED') }})
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="spacesFilter === 'all'"
+                (click)="changeSpacesFilter('all')"
+              >
+                Todos ({{ mySpaces.length }})
+              </button>
+            </div>
+
+            @if (filteredSpaces.length === 0) {
+              <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                </svg>
+                @if (spacesFilter === 'active') {
+                  <h3>No tienes espacios activos</h3>
+                  <p>Activa alguno de tus espacios para empezar a recibir reservas</p>
+                } @else if (spacesFilter === 'archived') {
+                  <h3>No tienes espacios archivados</h3>
+                  <p>Los espacios archivados aparecerán aquí</p>
+                } @else if (spacesFilter === 'deleted') {
+                  <h3>No tienes espacios eliminados</h3>
+                  <p>Los espacios eliminados aparecerán aquí</p>
+                } @else {
+                  <h3>No tienes espacios {{ spacesFilter }}</h3>
+                }
+              </div>
+            } @else {
+              <div class="spaces-grid">
+                @for (space of filteredSpaces; track space.id) {
+                  <div class="space-card-dashboard">
+                    <div class="space-card-header">
+                      <span class="badge" [ngClass]="getStatusBadgeClass(space.status)">
+                        {{ getStatusText(space.status) }}
+                      </span>
+                      <div class="space-card-actions">
+                        <button class="btn-icon" (click)="viewSpaceDetail(space.id)" title="Ver detalle">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </button>
+                        <button class="btn-icon" (click)="editSpace(space)" title="Editar">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                        </button>
+                        @if (space.status !== 'ARCHIVED' && space.status !== 'DELETED') {
+                          <button class="btn-icon btn-warning" (click)="archiveSpace(space)" title="Archivar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                              <rect x="1" y="3" width="22" height="5"></rect>
+                              <line x1="10" y1="12" x2="14" y2="12"></line>
+                            </svg>
+                          </button>
+                        }
+                        <button class="btn-icon btn-danger" (click)="openDeleteModal(space)" title="Eliminar">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="space-card-body">
+                      <h3>{{ space.title }}</h3>
+                      <p class="space-address">📍 {{ space.address }}</p>
+
+                      <div class="space-features">
+                        <span>👥 {{ space.capacity }} personas</span>
+                        @if (space.areaSqm) {
+                          <span>📐 {{ space.areaSqm }}m²</span>
+                        }
+                      </div>
+
+                      <div class="space-price">
+                        <strong>{{ formatPrice(space.basePriceCents) }}€</strong>
+                        <span>/hora</span>
+                      </div>
+
+                      <button
+                        class="btn btn-sm"
+                        [class.btn-secondary]="space.status === 'ACTIVE'"
+                        [class.btn-primary]="space.status !== 'ACTIVE'"
+                        (click)="toggleSpaceStatus(space)"
+                        style="width: 100%; margin-top: 12px;"
+                      >
+                        @if (space.status === 'ACTIVE') {
+                          <span>Pausar</span>
+                        } @else {
+                          <span>Activar</span>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Create/Edit Space Form -->
+        @else if (currentView === 'create-space' || currentView === 'edit-space') {
+          <div class="dashboard-content">
+            <div class="content-header">
+              <h2>{{ editingSpaceId ? 'Editar Espacio' : 'Crear Nuevo Espacio' }}</h2>
+              <button class="btn btn-secondary" (click)="changeView('spaces')">
+                Cancelar
+              </button>
+            </div>
+
+            <form [formGroup]="spaceForm" (ngSubmit)="editingSpaceId ? updateSpace() : createSpace()" class="space-form">
+              <!-- Error Message -->
+              @if (formError) {
+                <div class="alert alert-error">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  {{ formError }}
+                </div>
+              }
+
+              <!-- Información Básica -->
+              <div class="form-section">
+                <h3>Información Básica</h3>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    Título del Espacio *
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="title"
+                    class="form-input"
+                    placeholder="Ej: Ático con terraza panorámica"
+                  >
+                  @if (spaceForm.get('title')?.touched && spaceForm.get('title')?.errors) {
+                    <small class="form-error">El título es requerido (mínimo 5 caracteres)</small>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <line x1="16" y1="13" x2="8" y2="13"></line>
+                      <line x1="16" y1="17" x2="8" y2="17"></line>
+                      <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    Descripción *
+                  </label>
+                  <textarea
+                    formControlName="description"
+                    class="form-input"
+                    rows="4"
+                    placeholder="Describe tu espacio, qué lo hace único y qué actividades son ideales para celebrar aquí..."
+                  ></textarea>
+                  @if (spaceForm.get('description')?.touched && spaceForm.get('description')?.errors) {
+                    <small class="form-error">La descripción es requerida (mínimo 20 caracteres)</small>
+                  }
+                </div>
+              </div>
+
+              <!-- Ubicación -->
+              <div class="form-section">
+                <h3>Ubicación</h3>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    Dirección Completa *
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="address"
+                    class="form-input"
+                    placeholder="Ej: Calle Gran Vía 28, 28013 Madrid, España"
+                  >
+                  @if (spaceForm.get('address')?.touched && spaceForm.get('address')?.errors) {
+                    <small class="form-error">La dirección es requerida</small>
+                  }
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Latitud *</label>
+                    <input
+                      type="number"
+                      formControlName="lat"
+                      class="form-input"
+                      step="0.0001"
+                      placeholder="40.4168"
+                    >
+                    @if (spaceForm.get('lat')?.touched && spaceForm.get('lat')?.errors) {
+                      <small class="form-error">Latitud requerida (-90 a 90)</small>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Longitud *</label>
+                    <input
+                      type="number"
+                      formControlName="lon"
+                      class="form-input"
+                      step="0.0001"
+                      placeholder="-3.7038"
+                    >
+                    @if (spaceForm.get('lon')?.touched && spaceForm.get('lon')?.errors) {
+                      <small class="form-error">Longitud requerida (-180 a 180)</small>
+                    }
+                  </div>
+                </div>
+
+                <small class="form-hint">
+                  💡 Puedes obtener las coordenadas desde Google Maps haciendo clic derecho en el mapa
+                </small>
+              </div>
+
+              <!-- Características -->
+              <div class="form-section">
+                <h3>Características</h3>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                      </svg>
+                      Capacidad (personas) *
+                    </label>
+                    <input
+                      type="number"
+                      formControlName="capacity"
+                      class="form-input"
+                      min="1"
+                      placeholder="10"
+                    >
+                    @if (spaceForm.get('capacity')?.touched && spaceForm.get('capacity')?.errors) {
+                      <small class="form-error">La capacidad es requerida (mínimo 1)</small>
+                    }
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      </svg>
+                      Área (m²)
+                    </label>
+                    <input
+                      type="number"
+                      formControlName="areaSqm"
+                      class="form-input"
+                      min="1"
+                      placeholder="50"
+                    >
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="12" y1="1" x2="12" y2="23"></line>
+                      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Precio por Hora (€) *
+                  </label>
+                  <input
+                    type="number"
+                    formControlName="basePriceCents"
+                    class="form-input"
+                    min="1"
+                    step="0.01"
+                    placeholder="25.00"
+                  >
+                  @if (spaceForm.get('basePriceCents')?.touched && spaceForm.get('basePriceCents')?.errors) {
+                    <small class="form-error">El precio es requerido (mínimo 1€)</small>
+                  }
+                  <small class="form-hint">El precio se cobrará por hora de uso</small>
+                </div>
+              </div>
+
+              <!-- Amenidades -->
+              <div class="form-section">
+                <h3>Comodidades y Servicios</h3>
+                <p class="form-hint" style="margin-bottom: 16px;">
+                  Selecciona las comodidades disponibles en tu espacio
+                </p>
+
+                <div class="amenities-selector">
+                  @for (amenity of ['wifi', 'terraza', 'cocina', 'proyector', 'sonido', 'aire_acondicionado', 'calefaccion', 'parking', 'jardin', 'pizarra']; track amenity) {
+                    <label class="amenity-checkbox">
+                      <input
+                        type="checkbox"
+                        [checked]="spaceForm.value.amenities?.includes(amenity)"
+                        (change)="toggleAmenity(amenity)"
+                      >
+                      <span class="amenity-label">
+                        {{ getAmenityLabel(amenity) }}
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="changeView('spaces')" [disabled]="formLoading">
+                  Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="formLoading || spaceForm.invalid">
+                  @if (formLoading) {
+                    <div class="spinner"></div>
+                    <span>{{ editingSpaceId ? 'Actualizando...' : 'Creando...' }}</span>
+                  } @else {
+                    <span>{{ editingSpaceId ? 'Actualizar Espacio' : 'Crear Espacio' }}</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- Bookings View -->
+        @else if (currentView === 'bookings') {
+          <div class="dashboard-content">
+            <h2>Reservas Recibidas</h2>
+
+            <div class="empty-state">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <h3>Gestión de reservas</h3>
+              <p>Esta funcionalidad estará disponible próximamente</p>
+              <small style="color: var(--gray-500);">
+                Aquí podrás ver y gestionar las reservas que recibas en tus espacios
+              </small>
+            </div>
+          </div>
+        }
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal && spaceToDelete) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Eliminar Espacio</h3>
+        <button class="modal-close" (click)="closeDeleteModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>¿Estás seguro de que quieres eliminar el espacio <strong>{{ spaceToDelete.title }}</strong>?</p>
+        <p class="modal-warning">⚠️ Esta acción no se puede deshacer. Se eliminarán también todas las reservas asociadas.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="confirmDelete()" style="background: var(--error);">
+          Eliminar Espacio
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

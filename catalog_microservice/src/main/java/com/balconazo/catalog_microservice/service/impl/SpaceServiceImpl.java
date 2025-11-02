@@ -148,6 +148,12 @@ public class SpaceServiceImpl implements SpaceService {
         return mapper.toDTO(repo.save(space));
     }
 
+    public SpaceDTO archiveSpace(UUID id) {
+        var space = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Espacio", id));
+        space.setStatus("ARCHIVED");
+        return mapper.toDTO(repo.save(space));
+    }
+
     public void deleteSpace(UUID id) {
         var space = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Espacio", id));
         space.setStatus(SPACE_STATUS_DELETED);

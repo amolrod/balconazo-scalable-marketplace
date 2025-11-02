@@ -109,15 +109,22 @@ export class SpacesService {
   /**
    * Activar espacio
    */
-  activateSpace(id: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${id}/activate`, {});
+  activateSpace(id: string): Observable<Space> {
+    return this.http.post<Space>(`${this.baseUrl}/${id}/activate`, {});
   }
 
   /**
-   * Desactivar espacio
+   * Pausar/Snooze espacio (desactivar temporalmente)
    */
-  deactivateSpace(id: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/${id}/deactivate`, {});
+  snoozeSpace(id: string): Observable<Space> {
+    return this.http.post<Space>(`${this.baseUrl}/${id}/snooze`, {});
+  }
+
+  /**
+   * Archivar espacio
+   */
+  archiveSpace(id: string): Observable<Space> {
+    return this.http.post<Space>(`${this.baseUrl}/${id}/archive`, {});
   }
 
   /**

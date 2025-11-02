@@ -103,11 +103,20 @@ export class HomeComponent implements OnInit {
   }
 
   logout(): void {
+    // Limpiar TODO el localStorage
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+
+    // Actualizar estado
     this.isAuthenticated = false;
-    this.router.navigate(['/']);
+
+    // Redirigir al login
+    this.router.navigate(['/login']).then(() => {
+      // Recargar para limpiar cualquier estado en memoria
+      window.location.reload();
+    });
   }
 
   private setupNavbarScroll(): void {

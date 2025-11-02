@@ -13,6 +13,7 @@ public interface SpaceService {
     SpaceDTO updateSpace(UUID id, CreateSpaceDTO dto);
     SpaceDTO activateSpace(UUID id);
     SpaceDTO snoozeSpace(UUID id);
+    SpaceDTO archiveSpace(UUID id);
     void deleteSpace(UUID id);
 }
 
