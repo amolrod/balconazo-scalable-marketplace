@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SpacesService, Space } from '../../core/services/spaces.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,7 @@ import { SpacesService, Space } from '../../core/services/spaces.service';
 export class HomeComponent implements OnInit {
   private router = inject(Router);
   private spacesService = inject(SpacesService);
+  private authService = inject(AuthService);
 
   loading = false;
   isAuthenticated = false;
@@ -34,8 +36,8 @@ export class HomeComponent implements OnInit {
   }
 
   checkAuthentication(): void {
-    const token = localStorage.getItem('accessToken');
-    this.isAuthenticated = !!token;
+    this.isAuthenticated = this.authService.isAuthenticated();
+    console.log('🔐 Estado de autenticación:', this.isAuthenticated);
   }
 
   loadFeaturedSpaces(): void {
@@ -103,20 +105,8 @@ export class HomeComponent implements OnInit {
   }
 
   logout(): void {
-    // Limpiar TODO el localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userRole');
-
-    // Actualizar estado
-    this.isAuthenticated = false;
-
-    // Redirigir al login
-    this.router.navigate(['/login']).then(() => {
-      // Recargar para limpiar cualquier estado en memoria
-      window.location.reload();
-    });
+    // Usar el servicio de autenticación
+    this.authService.logout();
   }
 
   private setupNavbarScroll(): void {

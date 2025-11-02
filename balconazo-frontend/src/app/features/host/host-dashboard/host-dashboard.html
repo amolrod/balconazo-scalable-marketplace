@@ -88,7 +88,22 @@
         <!-- Overview -->
         @else if (currentView === 'overview') {
           <div class="dashboard-content">
-            <h2>Resumen</h2>
+            <h2>Bienvenido de nuevo</h2>
+
+            <!-- Profile Completeness (Airbnb style) -->
+            @if (stats.activeSpaces === 0 && stats.totalSpaces > 0) {
+              <div class="alert alert-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <div>
+                  <strong>Activa tus espacios para recibir reservas</strong>
+                  <p style="margin: 0; margin-top: 4px; font-size: 14px;">Tienes {{ stats.totalSpaces }} espacio(s) pausado(s) o en borrador que necesitan ser activados.</p>
+                </div>
+              </div>
+            }
 
             <!-- Stats Cards -->
             <div class="stats-grid">
@@ -104,7 +119,7 @@
                 </div>
               </div>
 
-              <div class="stat-card">
+              <div class="stat-card stat-card-clickable" (click)="changeView('spaces')">
                 <div class="stat-icon" style="background: var(--success-light); color: var(--success);">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -128,11 +143,11 @@
                 <div class="stat-content">
                   <p class="stat-label">Reservas Totales</p>
                   <p class="stat-value">{{ stats.totalBookings }}</p>
-                  <small style="color: var(--gray-500);">Pendiente implementar</small>
+                  <small style="color: var(--gray-500);">Próximamente</small>
                 </div>
               </div>
 
-              <div class="stat-card">
+              <div class="stat-card stat-card-earnings">
                 <div class="stat-icon" style="background: var(--warning-light); color: var(--warning);">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -140,9 +155,9 @@
                   </svg>
                 </div>
                 <div class="stat-content">
-                  <p class="stat-label">Ingresos Totales</p>
-                  <p class="stat-value">{{ stats.totalEarnings }}€</p>
-                  <small style="color: var(--gray-500);">Pendiente implementar</small>
+                  <p class="stat-label">Ingresos Este Mes</p>
+                  <p class="stat-value">{{ stats.monthlyEarnings }}€</p>
+                  <small style="color: var(--gray-500);">Próximamente</small>
                 </div>
               </div>
             </div>
@@ -236,13 +251,6 @@
               </button>
               <button
                 class="filter-btn"
-                [class.active]="spacesFilter === 'archived'"
-                (click)="changeSpacesFilter('archived')"
-              >
-                Archivados ({{ getSpacesCountByStatus('ARCHIVED') }})
-              </button>
-              <button
-                class="filter-btn"
                 [class.active]="spacesFilter === 'deleted'"
                 (click)="changeSpacesFilter('deleted')"
               >
@@ -264,15 +272,16 @@
                 </svg>
                 @if (spacesFilter === 'active') {
                   <h3>No tienes espacios activos</h3>
-                  <p>Activa alguno de tus espacios para empezar a recibir reservas</p>
-                } @else if (spacesFilter === 'archived') {
-                  <h3>No tienes espacios archivados</h3>
-                  <p>Los espacios archivados aparecerán aquí</p>
+                  <p>Activa alguno de tus espacios pausados para empezar a recibir reservas</p>
+                } @else if (spacesFilter === 'snoozed') {
+                  <h3>No tienes espacios pausados</h3>
+                  <p>Los espacios pausados temporalmente aparecerán aquí</p>
                 } @else if (spacesFilter === 'deleted') {
                   <h3>No tienes espacios eliminados</h3>
                   <p>Los espacios eliminados aparecerán aquí</p>
                 } @else {
-                  <h3>No tienes espacios {{ spacesFilter }}</h3>
+                  <h3>No tienes espacios</h3>
+                  <p>Crea tu primer espacio para empezar</p>
                 }
               </div>
             } @else {
@@ -284,33 +293,33 @@
                         {{ getStatusText(space.status) }}
                       </span>
                       <div class="space-card-actions">
+                        <!-- Ver siempre disponible -->
                         <button class="btn-icon" (click)="viewSpaceDetail(space.id)" title="Ver detalle">
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                           </svg>
                         </button>
-                        <button class="btn-icon" (click)="editSpace(space)" title="Editar">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                          </svg>
-                        </button>
-                        @if (space.status !== 'ARCHIVED' && space.status !== 'DELETED') {
-                          <button class="btn-icon btn-warning" (click)="openArchiveModal(space)" title="Archivar">
+
+                        <!-- Editar: Solo si NO está eliminado -->
+                        @if (space.status.toUpperCase() !== 'DELETED') {
+                          <button class="btn-icon" (click)="editSpace(space)" title="Editar">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <polyline points="21 8 21 21 3 21 3 8"></polyline>
-                              <rect x="1" y="3" width="22" height="5"></rect>
-                              <line x1="10" y1="12" x2="14" y2="12"></line>
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
                           </button>
                         }
-                        <button class="btn-icon btn-danger" (click)="openDeleteModal(space)" title="Eliminar">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                        </button>
+
+                        <!-- Eliminar: Solo si NO está eliminado -->
+                        @if (space.status.toUpperCase() !== 'DELETED') {
+                          <button class="btn-icon btn-danger" (click)="openDeleteModal(space)" title="Eliminar">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                          </button>
+                        }
                       </div>
                     </div>
 
@@ -330,9 +339,10 @@
                         <span>/hora</span>
                       </div>
 
-                      <!-- Solo mostrar botones de estado si NO está eliminado ni archivado -->
-                      @if (space.status !== 'DELETED' && space.status !== 'ARCHIVED') {
-                        @if (space.status === 'ACTIVE') {
+                      <!-- Botones de estado: Solo si NO está eliminado ni archivado -->
+                      @if (space.status.toUpperCase() !== 'DELETED' && space.status.toUpperCase() !== 'ARCHIVED') {
+                        @if (space.status.toUpperCase() === 'ACTIVE') {
+                          <!-- Si está ACTIVE, mostrar solo Pausar -->
                           <button
                             class="btn btn-sm btn-secondary"
                             (click)="toggleSpaceStatus(space)"
@@ -340,7 +350,8 @@
                           >
                             Pausar
                           </button>
-                        } @else {
+                        } @else if (space.status.toUpperCase() === 'SNOOZED') {
+                          <!-- Si está SNOOZED, mostrar solo Activar -->
                           <button
                             class="btn btn-sm btn-primary"
                             (click)="toggleSpaceStatus(space)"
@@ -633,7 +644,8 @@
 
       <div class="modal-body">
         <p>¿Estás seguro de que quieres eliminar el espacio <strong>{{ spaceToDelete.title }}</strong>?</p>
-        <p class="modal-warning">⚠️ Esta acción marcará el espacio como eliminado. Podrás verlo en la sección "Eliminados".</p>
+        <p class="modal-warning">⚠️ El espacio será marcado como eliminado y no será visible para los usuarios. Podrás verlo en la sección "Eliminados".</p>
+        <p style="color: var(--gray-600); font-size: 14px; margin-top: 12px;">💡 Tip: Si solo quieres pausarlo temporalmente, usa el botón "Pausar" en lugar de eliminar.</p>
       </div>
 
       <div class="modal-footer">
@@ -642,37 +654,6 @@
         </button>
         <button class="btn btn-primary" (click)="confirmDelete()" style="background: var(--error);">
           Eliminar Espacio
-        </button>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Archive Confirmation Modal -->
-@if (showArchiveModal && spaceToArchive) {
-  <div class="modal-overlay" (click)="closeArchiveModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Archivar Espacio</h3>
-        <button class="modal-close" (click)="closeArchiveModal()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <p>¿Estás seguro de que quieres archivar el espacio <strong>{{ spaceToArchive.title }}</strong>?</p>
-        <p class="modal-info">ℹ️ Los espacios archivados no serán visibles para los usuarios, pero podrás reactivarlos cuando quieras.</p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeArchiveModal()">
-          Cancelar
-        </button>
-        <button class="btn btn-primary" (click)="confirmArchive()">
-          Archivar Espacio
         </button>
       </div>
     </div>

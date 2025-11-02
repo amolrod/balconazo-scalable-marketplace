@@ -63,9 +63,9 @@ public class SpaceServiceImpl implements SpaceService {
             });
 
         var space = mapper.toEntity(dto, owner);
-        space.setStatus(SPACE_STATUS_DRAFT);
+        space.setStatus(SPACE_STATUS_ACTIVE); // Crear espacios directamente como ACTIVE
         var saved = repo.save(space);
-        log.info("Espacio creado: {}", saved.getId());
+        log.info("Espacio creado con estado ACTIVE: {}", saved.getId());
 
         // Publicar evento a Kafka para que Search Service lo indexe
         SpaceCreatedEvent event = SpaceCreatedEvent.builder()

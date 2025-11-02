@@ -1,0 +1,100 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2025-11-02T22:58:33.826+01:00  INFO 44998 --- [search-service] [           main] c.b.s.SearchMicroserviceApplication      : Starting SearchMicroserviceApplication v0.0.1-SNAPSHOT using Java 21.0.6 with PID 44998 (/Users/angel/Desktop/BalconazoApp/search_microservice/target/search_microservice-0.0.1-SNAPSHOT.jar started by angel in /Users/angel/Desktop/BalconazoApp/search_microservice)
+2025-11-02T22:58:33.828+01:00  INFO 44998 --- [search-service] [           main] c.b.s.SearchMicroserviceApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-11-02T22:58:34.632+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-11-02T22:58:34.634+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-11-02T22:58:34.733+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 93 ms. Found 2 JPA repository interfaces.
+2025-11-02T22:58:34.744+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-11-02T22:58:34.744+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-11-02T22:58:34.753+01:00  INFO 44998 --- [search-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.balconazo.search_microservice.repository.ProcessedEventRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-11-02T22:58:34.753+01:00  INFO 44998 --- [search-service] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.balconazo.search_microservice.repository.SpaceProjectionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-11-02T22:58:34.753+01:00  INFO 44998 --- [search-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 Redis repository interfaces.
+2025-11-02T22:58:34.934+01:00  INFO 44998 --- [search-service] [           main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=bc1283e3-6ee3-3a3e-b9f6-3560740188a3
+2025-11-02T22:58:35.238+01:00  INFO 44998 --- [search-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2025-11-02T22:58:35.248+01:00  INFO 44998 --- [search-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-11-02T22:58:35.248+01:00  INFO 44998 --- [search-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.48]
+2025-11-02T22:58:35.264+01:00  INFO 44998 --- [search-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-11-02T22:58:35.265+01:00  INFO 44998 --- [search-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1406 ms
+2025-11-02T22:58:35.462+01:00  INFO 44998 --- [search-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-11-02T22:58:35.498+01:00  INFO 44998 --- [search-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+2025-11-02T22:58:35.504+01:00  INFO 44998 --- [search-service] [           main] o.h.spatial.integration.SpatialService   : HHH80000001: hibernate-spatial integration enabled : true
+2025-11-02T22:58:35.520+01:00  INFO 44998 --- [search-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-11-02T22:58:35.587+01:00  INFO 44998 --- [search-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-11-02T22:58:35.853+01:00  INFO 44998 --- [search-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@52efb338
+2025-11-02T22:58:35.854+01:00  INFO 44998 --- [search-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-11-02T22:58:35.887+01:00  WARN 44998 --- [search-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-11-02T22:58:35.899+01:00  INFO 44998 --- [search-service] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 16.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-11-02T22:58:35.907+01:00  INFO 44998 --- [search-service] [           main] org.hibernate.spatial                    : HHH80000003: hibernate-spatial adding type contributions from : org.hibernate.spatial.dialect.postgis.PostgisDialectContributor
+2025-11-02T22:58:36.038+01:00  INFO 44998 --- [search-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-11-02T22:58:36.051+01:00  INFO 44998 --- [search-service] [           main] org.hibernate.spatial                    : HHH80000003: hibernate-spatial adding type contributions from : org.hibernate.spatial.dialect.postgis.PostgisDialectContributor
+2025-11-02T22:58:36.241+01:00  INFO 44998 --- [search-service] [           main] org.hibernate.spatial                    : HHH80000004: hibernate-spatial adding function contributions from : org.hibernate.spatial.dialect.postgis.PostgisDialectContributor
+2025-11-02T22:58:36.748+01:00  INFO 44998 --- [search-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-11-02T22:58:37.102+01:00  INFO 44998 --- [search-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-11-02T22:58:37.320+01:00  INFO 44998 --- [search-service] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-11-02T22:58:37.386+01:00  WARN 44998 --- [search-service] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-11-02T22:58:38.170+01:00  INFO 44998 --- [search-service] [           main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2025-11-02T22:58:38.207+01:00  WARN 44998 --- [search-service] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2025-11-02T22:58:38.212+01:00  INFO 44998 --- [search-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoints beneath base path '/actuator'
+2025-11-02T22:58:38.283+01:00  INFO 44998 --- [search-service] [           main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2025-11-02T22:58:38.301+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2025-11-02T22:58:38.304+01:00  INFO 44998 --- [search-service] [           main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2025-11-02T22:58:38.310+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2025-11-02T22:58:38.311+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2025-11-02T22:58:38.630+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2025-11-02T22:58:38.632+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2025-11-02T22:58:38.634+01:00  INFO 44998 --- [search-service] [           main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2025-11-02T22:58:38.636+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1762120718635 with initial instances count: 5
+2025-11-02T22:58:38.639+01:00  INFO 44998 --- [search-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application SEARCH-SERVICE with eureka with status UP
+2025-11-02T22:58:38.640+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1762120718640, current=UP, previous=STARTING]
+2025-11-02T22:58:38.642+01:00  INFO 44998 --- [search-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SEARCH-SERVICE/192.168.1.39:search-service:8083: registering service...
+2025-11-02T22:58:38.652+01:00  INFO 44998 --- [search-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application SEARCH-SERVICE with eureka with status DOWN
+2025-11-02T22:58:38.652+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1762120718652, current=DOWN, previous=UP]
+2025-11-02T22:58:38.653+01:00  WARN 44998 --- [search-service] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-11-02T22:58:38.660+01:00  INFO 44998 --- [search-service] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-11-02T22:58:38.662+01:00  INFO 44998 --- [search-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-11-02T22:58:38.706+01:00  INFO 44998 --- [search-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-11-02T22:58:38.708+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2025-11-02T22:58:38.825+01:00  INFO 44998 --- [search-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SEARCH-SERVICE/192.168.1.39:search-service:8083 - registration status: 204
+2025-11-02T22:58:38.825+01:00  INFO 44998 --- [search-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SEARCH-SERVICE/192.168.1.39:search-service:8083: registering service...
+2025-11-02T22:58:38.834+01:00  INFO 44998 --- [search-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SEARCH-SERVICE/192.168.1.39:search-service:8083 - registration status: 204
+2025-11-02T22:58:38.835+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Unregistering ...
+2025-11-02T22:58:39.027+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_SEARCH-SERVICE/192.168.1.39:search-service:8083 - deregister  status: 200
+2025-11-02T22:58:39.027+01:00  INFO 44998 --- [search-service] [           main] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
+2025-11-02T22:58:39.060+01:00  INFO 44998 --- [search-service] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-11-02T22:58:39.101+01:00 ERROR 44998 --- [search-service] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8083 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8083 or configure this application to listen on another port.
+

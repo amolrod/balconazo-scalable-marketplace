@@ -24,7 +24,7 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
         WHERE ST_DWithin(s.geo::geography, 
                         ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, 
                         :radiusMeters)
-          AND s.status = 'active'
+          AND UPPER(s.status) = 'ACTIVE'
           AND (:minCapacity IS NULL OR s.capacity >= :minCapacity)
           AND (:minPrice IS NULL OR s.base_price_cents >= :minPrice)
           AND (:maxPrice IS NULL OR s.base_price_cents <= :maxPrice)
@@ -59,7 +59,7 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
         WHERE ST_DWithin(s.geo::geography, 
                         ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, 
                         :radiusMeters)
-          AND s.status = 'active'
+          AND UPPER(s.status) = 'ACTIVE'
           AND (:minCapacity IS NULL OR s.capacity >= :minCapacity)
           AND (:minPrice IS NULL OR s.base_price_cents >= :minPrice)
           AND (:maxPrice IS NULL OR s.base_price_cents <= :maxPrice)
@@ -80,7 +80,7 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
      */
     @Query(value = """
         SELECT s.* FROM search.spaces_projection s
-        WHERE s.status = 'active'
+        WHERE UPPER(s.status) = 'ACTIVE'
           AND s.amenities @> CAST(:amenities AS text[])
         """, nativeQuery = true)
     List<SpaceProjection> findByAmenities(@Param("amenities") String[] amenities);

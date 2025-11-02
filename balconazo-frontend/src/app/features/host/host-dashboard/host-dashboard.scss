@@ -179,6 +179,28 @@
   }
 }
 
+.stat-card-clickable {
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary-500);
+    transform: translateY(-6px);
+
+    .stat-action {
+      color: var(--primary-600);
+    }
+  }
+}
+
+.stat-action {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--text-xs);
+  color: var(--gray-500);
+  font-weight: var(--font-semibold);
+  transition: color var(--transition-fast);
+}
+
 .stat-icon {
   width: 56px;
   height: 56px;
@@ -521,6 +543,27 @@ textarea.form-input {
   background: var(--error-light);
   color: var(--error);
   border: 2px solid var(--error);
+}
+
+.alert-info {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--info-light);
+  border: 2px solid var(--info);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-6);
+
+  svg {
+    flex-shrink: 0;
+    color: var(--info);
+  }
+
+  strong {
+    color: var(--info);
+    font-size: var(--text-base);
+  }
 }
 
 /* Empty State */

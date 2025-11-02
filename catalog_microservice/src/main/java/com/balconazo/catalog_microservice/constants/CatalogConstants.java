@@ -11,10 +11,10 @@ public final class CatalogConstants {
     public static final String STATUS_SUSPENDED = "suspended";
     public static final String STATUS_DELETED = "deleted";
 
-    public static final String SPACE_STATUS_DRAFT = "draft";
-    public static final String SPACE_STATUS_ACTIVE = "active";
-    public static final String SPACE_STATUS_SNOOZED = "snoozed";
-    public static final String SPACE_STATUS_DELETED = "deleted";
+    public static final String SPACE_STATUS_DRAFT = "DRAFT";
+    public static final String SPACE_STATUS_ACTIVE = "ACTIVE";
+    public static final String SPACE_STATUS_SNOOZED = "SNOOZED";
+    public static final String SPACE_STATUS_DELETED = "DELETED";
 
     public static final String TOPIC_SPACE_EVENTS = "space-events-v1";
     public static final String TOPIC_AVAILABILITY_EVENTS = "availability-events-v1";

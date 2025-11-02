@@ -207,8 +207,7 @@ export class AuthService {
       },
       error: (error) => {
         console.error('❌ Error al cargar perfil:', error);
-        // Si falla, hacer logout
-        this.logout();
+        // NO hacer logout automático - el usuario sigue autenticado con el token
       }
     });
   }

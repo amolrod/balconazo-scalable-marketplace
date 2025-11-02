@@ -31,7 +31,7 @@ export class HostDashboardComponent implements OnInit {
   // Estado
   loading = true;
   currentView: 'overview' | 'spaces' | 'bookings' | 'create-space' | 'edit-space' = 'overview';
-  spacesFilter: 'all' | 'active' | 'snoozed' | 'archived' | 'deleted' = 'active'; // Filtro de espacios
+  spacesFilter: 'all' | 'active' | 'snoozed' | 'deleted' = 'active'; // Filtro de espacios (eliminado ARCHIVED)
 
   // Datos
   mySpaces: Space[] = [];
@@ -54,8 +54,6 @@ export class HostDashboardComponent implements OnInit {
   // Modal de confirmación
   showDeleteModal = false;
   spaceToDelete: Space | null = null;
-  showArchiveModal = false;
-  spaceToArchive: Space | null = null;
 
   constructor() {
     this.spaceForm = this.fb.group({
@@ -105,7 +103,12 @@ export class HostDashboardComponent implements OnInit {
 
   calculateStats(): void {
     this.stats.totalSpaces = this.mySpaces.length;
-    this.stats.activeSpaces = this.mySpaces.filter(s => s.status === 'ACTIVE').length;
+    this.stats.activeSpaces = this.mySpaces.filter(s => s.status.toUpperCase() === 'ACTIVE').length;
+    console.log('📊 Stats calculadas:', {
+      total: this.stats.totalSpaces,
+      activos: this.stats.activeSpaces,
+      espacios: this.mySpaces.map(s => ({ title: s.title, status: s.status }))
+    });
     // TODO: Calcular bookings y earnings cuando estén disponibles
   }
 
@@ -113,6 +116,10 @@ export class HostDashboardComponent implements OnInit {
 
   changeView(view: 'overview' | 'spaces' | 'bookings' | 'create-space' | 'edit-space'): void {
     this.currentView = view;
+
+    // Scroll al top cuando cambia la vista
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (view === 'create-space') {
       this.resetForm();
     }
@@ -184,10 +191,27 @@ export class HostDashboardComponent implements OnInit {
     this.formError = null;
 
     const formValue = this.spaceForm.value;
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      this.formError = 'Usuario no autenticado';
+      this.toastService.error('Usuario no autenticado');
+      this.formLoading = false;
+      return;
+    }
+
+    // Solo enviar los campos permitidos por el DTO
     const spaceData = {
-      ...formValue,
+      title: formValue.title,
+      description: formValue.description,
+      address: formValue.address,
+      lat: formValue.lat,
+      lon: formValue.lon,
+      capacity: formValue.capacity,
       basePriceCents: Math.round(formValue.basePriceCents * 100),
-      amenities: formValue.amenities || []
+      areaSqm: formValue.areaSqm,
+      amenities: formValue.amenities || [],
+      ownerId: userId
     };
 
     this.spacesService.updateSpace(this.editingSpaceId, spaceData).subscribe({
@@ -252,7 +276,7 @@ export class HostDashboardComponent implements OnInit {
   }
 
   toggleSpaceStatus(space: Space): void {
-    const action = space.status === 'ACTIVE' ? 'snooze' : 'activate';
+    const action = space.status.toUpperCase() === 'ACTIVE' ? 'snooze' : 'activate';
 
     const request = action === 'activate'
       ? this.spacesService.activateSpace(space.id)
@@ -261,7 +285,7 @@ export class HostDashboardComponent implements OnInit {
     request.subscribe({
       next: (updatedSpace) => {
         const actionText = action === 'activate' ? 'activado' : 'pausado';
-        console.log(`✅ Espacio ${actionText}`);
+        console.log(`✅ Espacio ${actionText}:`, updatedSpace);
         const index = this.mySpaces.findIndex(s => s.id === space.id);
         if (index !== -1) {
           this.mySpaces[index] = updatedSpace;
@@ -290,8 +314,6 @@ export class HostDashboardComponent implements OnInit {
           return status === 'ACTIVE';
         case 'snoozed':
           return status === 'SNOOZED';
-        case 'archived':
-          return status === 'ARCHIVED';
         case 'deleted':
           return status === 'DELETED';
         default:
@@ -300,7 +322,7 @@ export class HostDashboardComponent implements OnInit {
     });
   }
 
-  changeSpacesFilter(filter: 'all' | 'active' | 'snoozed' | 'archived' | 'deleted'): void {
+  changeSpacesFilter(filter: 'all' | 'active' | 'snoozed' | 'deleted'): void {
     this.spacesFilter = filter;
   }
 
@@ -309,40 +331,7 @@ export class HostDashboardComponent implements OnInit {
     return this.mySpaces.filter(s => s.status.toUpperCase() === status.toUpperCase()).length;
   }
 
-  // === ARCHIVAR ESPACIO ===
-
-  openArchiveModal(space: Space): void {
-    this.spaceToArchive = space;
-    this.showArchiveModal = true;
-  }
-
-  closeArchiveModal(): void {
-    this.showArchiveModal = false;
-    this.spaceToArchive = null;
-  }
-
-  confirmArchive(): void {
-    if (!this.spaceToArchive) return;
-
-    this.spacesService.archiveSpace(this.spaceToArchive.id).subscribe({
-      next: (updatedSpace) => {
-        console.log('✅ Espacio archivado');
-        const index = this.mySpaces.findIndex(s => s.id === this.spaceToArchive!.id);
-        if (index !== -1) {
-          this.mySpaces[index] = updatedSpace;
-        }
-        this.calculateStats();
-        this.toastService.success('✓ Espacio archivado exitosamente');
-        this.changeSpacesFilter('archived');
-        this.closeArchiveModal();
-      },
-      error: (error) => {
-        console.error('❌ Error al archivar espacio:', error);
-        this.toastService.error('Error al archivar el espacio');
-        this.closeArchiveModal();
-      }
-    });
-  }
+  // === FORM HELPERS ===
 
   resetForm(): void {
     this.spaceForm.reset({
@@ -357,25 +346,25 @@ export class HostDashboardComponent implements OnInit {
   // === UTILIDADES ===
 
   getStatusBadgeClass(status: string): string {
+    const upperStatus = status.toUpperCase();
     const classes: { [key: string]: string } = {
       'ACTIVE': 'badge-success',
       'DRAFT': 'badge-warning',
       'SNOOZED': 'badge-info',
-      'ARCHIVED': 'badge-secondary',
       'DELETED': 'badge-danger'
     };
-    return classes[status] || 'badge-default';
+    return classes[upperStatus] || 'badge-default';
   }
 
   getStatusText(status: string): string {
+    const upperStatus = status.toUpperCase();
     const texts: { [key: string]: string } = {
       'ACTIVE': 'Activo',
       'DRAFT': 'Borrador',
       'SNOOZED': 'Pausado',
-      'ARCHIVED': 'Archivado',
       'DELETED': 'Eliminado'
     };
-    return texts[status] || status;
+    return texts[upperStatus] || status;
   }
 
   formatPrice(cents: number): string {
