@@ -30,25 +30,8 @@ export class SpaceDetailComponent implements OnInit {
   selectedImageIndex = 0;
   showAllAmenities = false;
 
-  // Mock reviews (TODO: cargar desde backend)
-  reviews = [
-    {
-      id: '1',
-      guestName: 'María García',
-      rating: 5,
-      comment: 'Espacio increíble, perfecto para nuestro evento. El anfitrión fue muy atento.',
-      date: '2025-10-15',
-      avatar: 'https://i.pravatar.cc/150?img=1'
-    },
-    {
-      id: '2',
-      guestName: 'Carlos Rodríguez',
-      rating: 4,
-      comment: 'Muy buena ubicación y el espacio está muy bien cuidado. Recomendable.',
-      date: '2025-10-10',
-      avatar: 'https://i.pravatar.cc/150?img=2'
-    }
-  ];
+  // Reviews reales - se cargarán del backend cuando se implemente
+  reviews: any[] = [];
 
   constructor() {
     this.bookingForm = this.fb.group({
@@ -93,12 +76,14 @@ export class SpaceDetailComponent implements OnInit {
   }
 
   getImages(): string[] {
-    // TODO: Cargar imágenes reales del backend
+    // TODO: Cargar imágenes reales del backend cuando se implemente upload
+    // Por ahora, placeholder genérico
+    if (!this.space) return [];
     return [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&h=800&fit=crop'
+      `https://via.placeholder.com/1200x800/E5E7EB/6B7280?text=${encodeURIComponent(this.space.title)}`,
+      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+1`,
+      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+2`,
+      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+3`
     ];
   }
 
@@ -200,19 +185,16 @@ export class SpaceDetailComponent implements OnInit {
       'mascotas': 'Se admiten mascotas',
       'proyector': 'Proyector',
       'sonido': 'Sistema de sonido',
-      'wifi_pro': 'WiFi profesional'
+      'wifi_pro': 'WiFi profesional',
+      'vistas': 'Vistas',
+      'iluminacion': 'Iluminación profesional',
+      'pizarra': 'Pizarra',
+      'cafe': 'Café',
+      'jardin': 'Jardín',
+      'bao': 'Baño',
+      'cocina_exterior': 'Cocina exterior'
     };
     return names[amenity] || amenity;
-  }
-
-  getAverageRating(): number {
-    if (this.reviews.length === 0) return 0;
-    const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
-    return sum / this.reviews.length;
-  }
-
-  getRatingStars(rating: number): string {
-    return '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
   }
 
   formatDate(dateString: string): string {

@@ -143,11 +143,8 @@
                 [alt]="space.title"
                 class="space-card-image"
               >
-              @if (isSpaceFeatured(space)) {
-                <span class="space-card-badge featured">Destacado</span>
-              }
-              <span class="space-card-rating">
-                ⭐ {{ getSpaceRating(space) | number:'1.1-1' }}
+              <span class="space-card-badge" style="background: var(--gray-700); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                Sin imagen
               </span>
             </div>
 

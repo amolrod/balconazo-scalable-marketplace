@@ -85,15 +85,6 @@
           <div class="space-title-section">
             <h1>{{ space.title }}</h1>
             <div class="space-meta">
-              <span class="rating">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                {{ getAverageRating() | number:'1.1-1' }}
-              </span>
-              <span class="separator">·</span>
-              <span>{{ reviews.length }} reseñas</span>
-              <span class="separator">·</span>
               <span class="location">📍 {{ space.address }}</span>
             </div>
           </div>
@@ -171,28 +162,35 @@
 
           <!-- Reviews -->
           <section class="space-section">
-            <h2>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: inline; margin-right: 8px;">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              {{ getAverageRating() | number:'1.1-1' }} · {{ reviews.length }} reseñas
-            </h2>
+            <h2>Reseñas</h2>
 
-            <div class="reviews-list">
-              @for (review of reviews; track review.id) {
-                <div class="review-item">
-                  <div class="review-header">
-                    <img [src]="review.avatar" [alt]="review.guestName" class="review-avatar">
-                    <div class="review-meta">
-                      <strong>{{ review.guestName }}</strong>
-                      <span class="review-date">{{ formatDate(review.date) }}</span>
+            @if (reviews.length === 0) {
+              <div style="text-align: center; padding: 40px 20px; background: var(--gray-50); border-radius: var(--radius-xl);">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 16px; color: var(--gray-400);">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <h3 style="color: var(--gray-700); margin-bottom: 8px;">Sin reseñas aún</h3>
+                <p style="color: var(--gray-600); font-size: var(--text-sm);">
+                  Este espacio aún no tiene reseñas. ¡Sé el primero en reservar y dejar tu opinión!
+                </p>
+              </div>
+            } @else {
+              <div class="reviews-list">
+                @for (review of reviews; track review.id) {
+                  <div class="review-item">
+                    <div class="review-header">
+                      <img [src]="review.avatar" [alt]="review.guestName" class="review-avatar">
+                      <div class="review-meta">
+                        <strong>{{ review.guestName }}</strong>
+                        <span class="review-date">{{ formatDate(review.date) }}</span>
+                      </div>
                     </div>
+                    <div class="review-rating">⭐ {{ review.rating }}/5</div>
+                    <p class="review-comment">{{ review.comment }}</p>
                   </div>
-                  <div class="review-rating">{{ getRatingStars(review.rating) }}</div>
-                  <p class="review-comment">{{ review.comment }}</p>
-                </div>
-              }
-            </div>
+                }
+              </div>
+            }
           </section>
 
           <hr class="divider">
@@ -207,8 +205,8 @@
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <p>Mapa interactivo</p>
-                <small>La ubicación exacta se mostrará después de la reserva</small>
+                <p>Mapa pendiente de implementación</p>
+                <small>Coordenadas: {{ space.lat }}, {{ space.lon }}</small>
               </div>
             </div>
           </section>
@@ -348,11 +346,14 @@
             <!-- Host Info -->
             <div class="host-info">
               <div class="host-avatar">
-                <img src="https://i.pravatar.cc/100?img=12" alt="Anfitrión">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--gray-400);">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
               </div>
               <div class="host-details">
-                <strong>Anfitrión verificado</strong>
-                <p>Responde en menos de 1 hora</p>
+                <strong>Anfitrión ID: {{ space.ownerId.substring(0, 8) }}</strong>
+                <p style="font-size: var(--text-xs); color: var(--gray-500);">Sistema de perfiles pendiente</p>
               </div>
             </div>
           </div>

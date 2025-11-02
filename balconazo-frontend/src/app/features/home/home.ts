@@ -127,15 +127,9 @@ export class HomeComponent implements OnInit {
 
   // Helper methods para el template
   getSpaceImageUrl(space: Space): string {
-    // TODO: Implementar cuando tengamos sistema de imágenes
-    const images = [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=400&fit=crop'
-    ];
-    const hash = space.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return images[hash % images.length];
+    // TODO: Implementar sistema de imágenes real
+    // Por ahora, placeholder genérico hasta que se suba imagen real
+    return 'https://via.placeholder.com/600x400/E5E7EB/6B7280?text=' + encodeURIComponent(space.title);
   }
 
   getSpaceLocation(space: Space): string {
@@ -146,17 +140,6 @@ export class HomeComponent implements OnInit {
 
   getSpacePricePerHour(space: Space): number {
     return Math.round(space.basePriceCents / 100);
-  }
-
-  getSpaceRating(space: Space): number {
-    // TODO: Implementar cuando tengamos sistema de ratings
-    return 4.5 + Math.random() * 0.5; // Mock entre 4.5 y 5.0
-  }
-
-  isSpaceFeatured(space: Space): boolean {
-    // TODO: Implementar lógica real de espacios destacados
-    const hash = space.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return hash % 3 === 0; // ~33% de espacios destacados
   }
 }
 
