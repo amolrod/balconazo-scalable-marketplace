@@ -43,56 +43,11 @@ export class MyBookingsComponent implements OnInit {
       },
       error: (error) => {
         console.error('❌ Error cargando reservas:', error);
-        this.error = 'No se pudieron cargar las reservas';
+        this.error = 'No se pudieron cargar las reservas. Verifica que estés autenticado y el backend esté corriendo.';
+        this.bookings = [];
         this.loading = false;
-
-        // Fallback a datos mock
-        this.loadMockBookings();
       }
     });
-  }
-
-  private loadMockBookings(): void {
-    console.log('⚠️ Usando reservas mock');
-    this.bookings = [
-      {
-        id: '1',
-        spaceId: '550e8400-e29b-41d4-a716-446655440001',
-        guestId: '11111111-1111-1111-1111-111111111111',
-        startTs: '2025-11-05T10:00:00Z',
-        endTs: '2025-11-05T18:00:00Z',
-        numGuests: 6,
-        totalPriceCents: 20000,
-        status: 'CONFIRMED',
-        paymentStatus: 'succeeded',
-        createdAt: '2025-10-28T10:00:00Z'
-      },
-      {
-        id: '2',
-        spaceId: '550e8400-e29b-41d4-a716-446655440002',
-        guestId: '11111111-1111-1111-1111-111111111111',
-        startTs: '2025-10-25T14:00:00Z',
-        endTs: '2025-10-25T20:00:00Z',
-        numGuests: 4,
-        totalPriceCents: 15000,
-        status: 'COMPLETED',
-        paymentStatus: 'succeeded',
-        createdAt: '2025-10-20T09:00:00Z'
-      },
-      {
-        id: '3',
-        spaceId: '550e8400-e29b-41d4-a716-446655440003',
-        guestId: '11111111-1111-1111-1111-111111111111',
-        startTs: '2025-11-15T12:00:00Z',
-        endTs: '2025-11-15T22:00:00Z',
-        numGuests: 8,
-        totalPriceCents: 30000,
-        status: 'PENDING',
-        paymentStatus: 'pending',
-        createdAt: '2025-10-29T15:00:00Z'
-      }
-    ];
-    this.loading = false;
   }
 
   get filteredBookings(): Booking[] {

@@ -86,32 +86,10 @@ export class SpaceDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('❌ Error cargando espacio:', error);
-        this.error = 'No se pudo cargar el espacio';
+        this.error = 'No se pudo cargar el espacio. Verifica que exista y el backend esté corriendo.';
         this.loading = false;
-
-        // Fallback a datos mock
-        this.loadMockSpace(id);
       }
     });
-  }
-
-  private loadMockSpace(id: string): void {
-    console.log('⚠️ Usando espacio mock');
-    this.space = {
-      id: id,
-      title: 'Ático moderno con terraza panorámica',
-      description: 'Espacio único en el corazón de Madrid, perfecto para eventos corporativos, celebraciones privadas o sesiones de fotos. Cuenta con una amplia terraza con vistas panorámicas a la ciudad, cocina totalmente equipada y zona de estar confortable.',
-      address: 'Calle Gran Vía 28, 28013 Madrid, España',
-      lat: 40.4168,
-      lon: -3.7038,
-      capacity: 8,
-      basePriceCents: 2500,
-      areaSqm: 50,
-      amenities: ['wifi', 'cocina', 'aire_acondicionado', 'calefaccion', 'terraza', 'parking'],
-      status: 'ACTIVE',
-      ownerId: '11111111-1111-1111-1111-111111111111'
-    };
-    this.loading = false;
   }
 
   getImages(): string[] {

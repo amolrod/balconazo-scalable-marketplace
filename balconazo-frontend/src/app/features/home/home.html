@@ -113,6 +113,26 @@
           </div>
         }
       </div>
+    } @else if (error && featuredSpaces.length === 0) {
+      <!-- Error State -->
+      <div style="text-align: center; padding: 80px 20px;">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 24px; color: var(--error);">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h3 style="margin-bottom: 16px; font-size: var(--text-2xl);">{{ error }}</h3>
+        <p style="color: var(--gray-600); margin-bottom: 32px;">
+          Asegúrate de que todos los microservicios estén corriendo con <code>./start-all-services.sh</code>
+        </p>
+        <button class="btn btn-primary" (click)="loadFeaturedSpaces()">Reintentar</button>
+      </div>
+    } @else if (featuredSpaces.length === 0) {
+      <!-- Empty State -->
+      <div style="text-align: center; padding: 80px 20px;">
+        <h3 style="margin-bottom: 16px; font-size: var(--text-2xl);">No hay espacios disponibles</h3>
+        <p style="color: var(--gray-600);">No se encontraron espacios activos en este momento.</p>
+      </div>
     } @else {
       <div class="grid grid-cols-4">
         @for (space of featuredSpaces; track space.id) {

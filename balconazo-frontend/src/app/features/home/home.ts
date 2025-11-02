@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   loading = false;
   isAuthenticated = false;
   showMobileMenu = false;
+  error: string | null = null;
 
   featuredSpaces: Space[] = [];
 
@@ -40,7 +41,7 @@ export class HomeComponent implements OnInit {
   loadFeaturedSpaces(): void {
     this.loading = true;
 
-    // Intentar obtener espacios activos del backend
+    // SOLO cargar desde el backend - sin fallback a mock
     this.spacesService.getActiveSpaces().subscribe({
       next: (spaces) => {
         console.log('✅ Espacios cargados desde el backend:', spaces);
@@ -49,70 +50,13 @@ export class HomeComponent implements OnInit {
       },
       error: (error) => {
         console.error('❌ Error cargando espacios:', error);
-        // Fallback a datos mock si el backend no está disponible
-        this.loadMockSpaces();
+        this.error = 'No se pudieron cargar los espacios. Verifica que el backend esté corriendo.';
+        this.featuredSpaces = [];
         this.loading = false;
       }
     });
   }
 
-  private loadMockSpaces(): void {
-    console.log('⚠️ Usando datos mock (backend no disponible)');
-    this.featuredSpaces = [
-      {
-        id: '1',
-        title: 'Ático moderno con terraza panorámica',
-        description: 'Amplio ático con vistas',
-        address: 'Calle Gran Vía 28, Madrid',
-        lat: 40.4168,
-        lon: -3.7038,
-        capacity: 8,
-        basePriceCents: 2500,
-        areaSqm: 50,
-        status: 'ACTIVE',
-        ownerId: '11111111-1111-1111-1111-111111111111'
-      },
-      {
-        id: '2',
-        title: 'Loft industrial con cocina profesional',
-        description: 'Loft en zona Gràcia',
-        address: 'Carrer de Verdi 12, Barcelona',
-        lat: 41.4036,
-        lon: 2.1544,
-        capacity: 12,
-        basePriceCents: 3500,
-        areaSqm: 80,
-        status: 'ACTIVE',
-        ownerId: '11111111-1111-1111-1111-111111111111'
-      },
-      {
-        id: '3',
-        title: 'Apartamento luminoso con jardín privado',
-        description: 'Apartamento en Ruzafa',
-        address: 'Calle Sueca 15, Valencia',
-        lat: 39.4633,
-        lon: -0.3707,
-        capacity: 10,
-        basePriceCents: 2800,
-        areaSqm: 65,
-        status: 'ACTIVE',
-        ownerId: '11111111-1111-1111-1111-111111111111'
-      },
-      {
-        id: '4',
-        title: 'Estudio minimalista en pleno centro',
-        description: 'Estudio moderno',
-        address: 'Plaza Nueva 3, Sevilla',
-        lat: 37.3886,
-        lon: -5.9945,
-        capacity: 6,
-        basePriceCents: 2000,
-        areaSqm: 40,
-        status: 'ACTIVE',
-        ownerId: '11111111-1111-1111-1111-111111111111'
-      }
-    ];
-  }
 
   onSearch(): void {
     console.log('🔍 Buscando con:', this.searchParams);

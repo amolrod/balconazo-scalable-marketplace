@@ -63,7 +63,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
                 .requestMatchers("/actuator/**").permitAll()
-                // Todas las rutas de API requieren autenticación
+                // Permitir GET público para listar y ver espacios (sin autenticación)
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/catalog/spaces/**").permitAll()
+                // Todas las demás rutas de API requieren autenticación (POST, PUT, DELETE)
                 .requestMatchers("/api/catalog/**").authenticated()
                 .anyRequest().permitAll()
             )

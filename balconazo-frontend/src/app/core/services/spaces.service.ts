@@ -159,10 +159,11 @@ export class SpacesService {
   }
 
   /**
-   * Obtener espacios activos (públicos)
+   * Obtener espacios activos (públicos, no requiere autenticación)
+   * Endpoint correcto: GET /api/catalog/spaces (devuelve solo activos por defecto)
    */
   getActiveSpaces(): Observable<Space[]> {
-    return this.http.get<Space[]>(`${this.baseUrl}/active`);
+    return this.http.get<Space[]>(this.baseUrl);
   }
 }
 
