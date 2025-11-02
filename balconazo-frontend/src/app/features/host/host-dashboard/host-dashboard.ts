@@ -54,6 +54,8 @@ export class HostDashboardComponent implements OnInit {
   // Modal de confirmación
   showDeleteModal = false;
   spaceToDelete: Space | null = null;
+  showArchiveModal = false;
+  spaceToArchive: Space | null = null;
 
   constructor() {
     this.spaceForm = this.fb.group({
@@ -227,9 +229,18 @@ export class HostDashboardComponent implements OnInit {
     this.spacesService.deleteSpace(spaceId).subscribe({
       next: () => {
         console.log('✅ Espacio eliminado');
-        this.mySpaces = this.mySpaces.filter(s => s.id !== spaceId);
+        // NO eliminamos del array, solo actualizamos el estado a DELETED
+        const index = this.mySpaces.findIndex(s => s.id === spaceId);
+        if (index !== -1) {
+          this.mySpaces[index] = {
+            ...this.mySpaces[index],
+            status: 'DELETED'
+          };
+        }
         this.calculateStats();
         this.toastService.success('✓ Espacio eliminado exitosamente');
+        // Cambiar automáticamente al filtro de eliminados para ver el espacio
+        this.changeSpacesFilter('deleted');
         this.closeDeleteModal();
       },
       error: (error) => {
@@ -300,24 +311,37 @@ export class HostDashboardComponent implements OnInit {
 
   // === ARCHIVAR ESPACIO ===
 
-  archiveSpace(space: Space): void {
-    if (confirm(`¿Archivar el espacio "${space.title}"?\n\nLos espacios archivados no serán visibles para los usuarios pero podrás reactivarlos cuando quieras.`)) {
-      this.spacesService.archiveSpace(space.id).subscribe({
-        next: (updatedSpace) => {
-          console.log('✅ Espacio archivado');
-          const index = this.mySpaces.findIndex(s => s.id === space.id);
-          if (index !== -1) {
-            this.mySpaces[index] = updatedSpace;
-          }
-          this.calculateStats();
-          this.toastService.success('✓ Espacio archivado exitosamente');
-        },
-        error: (error) => {
-          console.error('❌ Error al archivar espacio:', error);
-          this.toastService.error('Error al archivar el espacio');
+  openArchiveModal(space: Space): void {
+    this.spaceToArchive = space;
+    this.showArchiveModal = true;
+  }
+
+  closeArchiveModal(): void {
+    this.showArchiveModal = false;
+    this.spaceToArchive = null;
+  }
+
+  confirmArchive(): void {
+    if (!this.spaceToArchive) return;
+
+    this.spacesService.archiveSpace(this.spaceToArchive.id).subscribe({
+      next: (updatedSpace) => {
+        console.log('✅ Espacio archivado');
+        const index = this.mySpaces.findIndex(s => s.id === this.spaceToArchive!.id);
+        if (index !== -1) {
+          this.mySpaces[index] = updatedSpace;
         }
-      });
-    }
+        this.calculateStats();
+        this.toastService.success('✓ Espacio archivado exitosamente');
+        this.changeSpacesFilter('archived');
+        this.closeArchiveModal();
+      },
+      error: (error) => {
+        console.error('❌ Error al archivar espacio:', error);
+        this.toastService.error('Error al archivar el espacio');
+        this.closeArchiveModal();
+      }
+    });
   }
 
   resetForm(): void {
@@ -336,7 +360,9 @@ export class HostDashboardComponent implements OnInit {
     const classes: { [key: string]: string } = {
       'ACTIVE': 'badge-success',
       'DRAFT': 'badge-warning',
-      'SNOOZED': 'badge-info'
+      'SNOOZED': 'badge-info',
+      'ARCHIVED': 'badge-secondary',
+      'DELETED': 'badge-danger'
     };
     return classes[status] || 'badge-default';
   }
@@ -345,7 +371,9 @@ export class HostDashboardComponent implements OnInit {
     const texts: { [key: string]: string } = {
       'ACTIVE': 'Activo',
       'DRAFT': 'Borrador',
-      'SNOOZED': 'Pausado'
+      'SNOOZED': 'Pausado',
+      'ARCHIVED': 'Archivado',
+      'DELETED': 'Eliminado'
     };
     return texts[status] || status;
   }

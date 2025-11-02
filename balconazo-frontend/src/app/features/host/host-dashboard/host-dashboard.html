@@ -297,7 +297,7 @@
                           </svg>
                         </button>
                         @if (space.status !== 'ARCHIVED' && space.status !== 'DELETED') {
-                          <button class="btn-icon btn-warning" (click)="archiveSpace(space)" title="Archivar">
+                          <button class="btn-icon btn-warning" (click)="openArchiveModal(space)" title="Archivar">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                               <polyline points="21 8 21 21 3 21 3 8"></polyline>
                               <rect x="1" y="3" width="22" height="5"></rect>
@@ -330,19 +330,26 @@
                         <span>/hora</span>
                       </div>
 
-                      <button
-                        class="btn btn-sm"
-                        [class.btn-secondary]="space.status === 'ACTIVE'"
-                        [class.btn-primary]="space.status !== 'ACTIVE'"
-                        (click)="toggleSpaceStatus(space)"
-                        style="width: 100%; margin-top: 12px;"
-                      >
+                      <!-- Solo mostrar botones de estado si NO está eliminado ni archivado -->
+                      @if (space.status !== 'DELETED' && space.status !== 'ARCHIVED') {
                         @if (space.status === 'ACTIVE') {
-                          <span>Pausar</span>
+                          <button
+                            class="btn btn-sm btn-secondary"
+                            (click)="toggleSpaceStatus(space)"
+                            style="width: 100%; margin-top: 12px;"
+                          >
+                            Pausar
+                          </button>
                         } @else {
-                          <span>Activar</span>
+                          <button
+                            class="btn btn-sm btn-primary"
+                            (click)="toggleSpaceStatus(space)"
+                            style="width: 100%; margin-top: 12px;"
+                          >
+                            Activar
+                          </button>
                         }
-                      </button>
+                      }
                     </div>
                   </div>
                 }
@@ -626,7 +633,7 @@
 
       <div class="modal-body">
         <p>¿Estás seguro de que quieres eliminar el espacio <strong>{{ spaceToDelete.title }}</strong>?</p>
-        <p class="modal-warning">⚠️ Esta acción no se puede deshacer. Se eliminarán también todas las reservas asociadas.</p>
+        <p class="modal-warning">⚠️ Esta acción marcará el espacio como eliminado. Podrás verlo en la sección "Eliminados".</p>
       </div>
 
       <div class="modal-footer">
@@ -635,6 +642,37 @@
         </button>
         <button class="btn btn-primary" (click)="confirmDelete()" style="background: var(--error);">
           Eliminar Espacio
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Archive Confirmation Modal -->
+@if (showArchiveModal && spaceToArchive) {
+  <div class="modal-overlay" (click)="closeArchiveModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Archivar Espacio</h3>
+        <button class="modal-close" (click)="closeArchiveModal()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>¿Estás seguro de que quieres archivar el espacio <strong>{{ spaceToArchive.title }}</strong>?</p>
+        <p class="modal-info">ℹ️ Los espacios archivados no serán visibles para los usuarios, pero podrás reactivarlos cuando quieras.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeArchiveModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="confirmArchive()">
+          Archivar Espacio
         </button>
       </div>
     </div>
