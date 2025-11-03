@@ -14,6 +14,16 @@ export interface Space {
   status: 'draft' | 'active' | 'inactive';
   createdAt: string;
   updatedAt?: string;
+  images?: SpaceImage[]; // Añadido
+}
+
+export interface SpaceImage {
+  id: string;
+  url: string;
+  displayOrder: number;
+  isPrimary: boolean;
+  altText?: string;
+  createdAt: string;
 }
 
 export interface CreateSpaceRequest {

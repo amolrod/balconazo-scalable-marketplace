@@ -1,0 +1,83 @@
+<div class="image-gallery-manager">
+  <!-- Upload Zone -->
+  @if (canUploadMore) {
+    <div
+      class="upload-zone"
+      [class.drag-over]="dragOver"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (click)="fileInput.click()">
+
+      <input
+        #fileInput
+        type="file"
+        multiple
+        accept="image/*"
+        (change)="onFileSelected($event)"
+        style="display: none">
+
+      @if (uploading) {
+        <div class="uploading">
+          <div class="spinner"></div>
+          <p>Subiendo imágenes...</p>
+        </div>
+      } @else {
+        <div class="upload-content">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <p class="upload-title">Arrastra imágenes aquí o haz click</p>
+          <p class="upload-subtitle">JPG, PNG o WEBP (máx. 5MB cada una)</p>
+          <p class="upload-count">{{ images.length }} / {{ maxImages }} imágenes</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Images Grid -->
+  @if (images.length > 0) {
+    <div class="images-grid">
+      @for (image of images; track image.id) {
+        <div class="image-card" [class.primary]="image.isPrimary">
+          <img [src]="image.url" [alt]="image.altText || 'Imagen del espacio'">
+
+          @if (image.isPrimary) {
+            <div class="primary-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Principal
+            </div>
+          }
+
+          <div class="image-actions">
+            @if (!image.isPrimary) {
+              <button
+                class="btn-icon btn-primary-small"
+                (click)="setPrimary(image)"
+                title="Marcar como principal">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            }
+
+            <button
+              class="btn-icon btn-danger-small"
+              (click)="deleteImage(image)"
+              title="Eliminar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+

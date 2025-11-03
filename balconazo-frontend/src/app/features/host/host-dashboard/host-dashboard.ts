@@ -5,6 +5,9 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } 
 import { SpacesService, Space } from '../../../core/services/spaces.service';
 import { BookingsService, Booking } from '../../../core/services/bookings.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { SpaceImagesService } from '../../../core/services/space-images.service';
+import { SpaceImage } from '../../../core/models/space.model';
+import { ImageGalleryManagerComponent } from '../../../shared/image-gallery-manager/image-gallery-manager';
 
 interface DashboardStats {
   totalSpaces: number;
@@ -17,7 +20,7 @@ interface DashboardStats {
 
 @Component({
   selector: 'app-host-dashboard',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, ImageGalleryManagerComponent],
   templateUrl: './host-dashboard.html',
   styleUrl: './host-dashboard.scss'
 })
@@ -27,11 +30,12 @@ export class HostDashboardComponent implements OnInit {
   private spacesService = inject(SpacesService);
   private bookingsService = inject(BookingsService);
   private toastService = inject(ToastService);
+  private imagesService = inject(SpaceImagesService);
 
   // Estado
   loading = true;
   currentView: 'overview' | 'spaces' | 'bookings' | 'create-space' | 'edit-space' = 'overview';
-  spacesFilter: 'all' | 'active' | 'snoozed' | 'deleted' = 'active'; // Filtro de espacios (eliminado ARCHIVED)
+  spacesFilter: 'all' | 'active' | 'snoozed' | 'deleted' = 'active';
 
   // Datos
   mySpaces: Space[] = [];
@@ -50,6 +54,9 @@ export class HostDashboardComponent implements OnInit {
   editingSpaceId: string | null = null;
   formLoading = false;
   formError: string | null = null;
+
+  // Imágenes del espacio en edición
+  spaceImages: SpaceImage[] = [];
 
   // Modal de confirmación
   showDeleteModal = false;
@@ -178,7 +185,27 @@ export class HostDashboardComponent implements OnInit {
       areaSqm: space.areaSqm,
       amenities: space.amenities || []
     });
+
+    // Cargar imágenes del espacio
+    this.loadSpaceImages(space.id);
+
     this.changeView('edit-space');
+  }
+
+  loadSpaceImages(spaceId: string): void {
+    this.imagesService.getImages(spaceId).subscribe({
+      next: (images) => {
+        this.spaceImages = images;
+      },
+      error: (error) => {
+        console.error('Error cargando imágenes:', error);
+        this.spaceImages = [];
+      }
+    });
+  }
+
+  onImagesChange(images: SpaceImage[]): void {
+    this.spaceImages = images;
   }
 
   updateSpace(): void {

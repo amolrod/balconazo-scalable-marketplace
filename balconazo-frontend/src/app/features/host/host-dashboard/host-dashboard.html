@@ -585,6 +585,22 @@
                 </div>
               </div>
 
+              <!-- Galería de Imágenes (solo en edición) -->
+              @if (editingSpaceId) {
+                <div class="form-section">
+                  <h3>Imágenes del Espacio</h3>
+                  <p class="form-hint" style="margin-bottom: 16px;">
+                    Sube hasta 10 imágenes. La primera o la marcada como principal se mostrará en las búsquedas.
+                  </p>
+
+                  <app-image-gallery-manager
+                    [spaceId]="editingSpaceId"
+                    [images]="spaceImages"
+                    (imagesChange)="onImagesChange($event)">
+                  </app-image-gallery-manager>
+                </div>
+              }
+
               <!-- Actions -->
               <div class="form-actions">
                 <button type="button" class="btn btn-secondary" (click)="changeView('spaces')" [disabled]="formLoading">
