@@ -126,8 +126,17 @@ export class HomeComponent implements OnInit {
 
   // Helper methods para el template
   getSpaceImageUrl(space: Space): string {
-    // TODO: Implementar sistema de imágenes real
-    // Por ahora, placeholder genérico hasta que se suba imagen real
+    // Si tiene imágenes, usar la principal o la primera
+    if (space.images && space.images.length > 0) {
+      const primaryImage = space.images.find(img => img.isPrimary);
+      if (primaryImage) {
+        return primaryImage.url;
+      }
+      // Si no hay principal, usar la primera
+      return space.images[0].url;
+    }
+
+    // Placeholder si no hay imágenes
     return 'https://via.placeholder.com/600x400/E5E7EB/6B7280?text=' + encodeURIComponent(space.title);
   }
 

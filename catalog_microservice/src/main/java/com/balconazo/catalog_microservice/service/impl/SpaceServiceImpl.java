@@ -132,7 +132,12 @@ public class SpaceServiceImpl implements SpaceService {
     @Transactional(readOnly = true)
     public List<SpaceDTO> getActiveSpaces() {
         return repo.findByStatus(SPACE_STATUS_ACTIVE).stream()
-            .map(mapper::toDTO).collect(Collectors.toList());
+            .map(entity -> {
+                SpaceDTO dto = mapper.toDTO(entity);
+                dto.setImages(imageService.getSpaceImages(entity.getId()));
+                return dto;
+            })
+            .collect(Collectors.toList());
     }
 
     public SpaceDTO updateSpace(UUID id, CreateSpaceDTO dto) {

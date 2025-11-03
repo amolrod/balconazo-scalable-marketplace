@@ -143,9 +143,11 @@
                 [alt]="space.title"
                 class="space-card-image"
               >
-              <span class="space-card-badge" style="background: var(--gray-700); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
-                Sin imagen
-              </span>
+              @if (!space.images || space.images.length === 0) {
+                <span class="space-card-badge" style="background: var(--gray-700); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
+                  Sin imagen
+                </span>
+              }
             </div>
 
             <div class="space-card-body">
@@ -173,9 +175,6 @@
                   <span class="space-card-price-amount">{{ getSpacePricePerHour(space) }}€</span>
                   <span class="space-card-price-period">/hora</span>
                 </div>
-                <button class="btn btn-sm btn-primary" (click)="viewSpace(space.id); $event.stopPropagation()">
-                  Ver más
-                </button>
               </div>
             </div>
           </article>
