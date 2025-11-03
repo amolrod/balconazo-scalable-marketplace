@@ -2,23 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Space } from '../models/space.model';
 
-export interface Space {
-  id: string;
-  title: string;
-  description: string;
-  address: string;
-  lat: number;
-  lon: number;
-  capacity: number;
-  basePriceCents: number;
-  areaSqm?: number;
-  amenities?: string[];
-  status: string;
-  ownerId: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Re-exportar Space para mantener compatibilidad con imports existentes
+export type { Space } from '../models/space.model';
 
 export interface CreateSpaceDTO {
   title: string;

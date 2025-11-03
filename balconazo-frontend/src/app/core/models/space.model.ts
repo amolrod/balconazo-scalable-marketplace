@@ -11,7 +11,7 @@ export interface Space {
   areaSqm?: number;
   amenities?: string[];
   rules?: Record<string, any>;
-  status: 'draft' | 'active' | 'inactive';
+  status: 'DRAFT' | 'ACTIVE' | 'SNOOZED' | 'DELETED' | 'draft' | 'active' | 'inactive'; // Soportar ambos formatos
   createdAt: string;
   updatedAt?: string;
   images?: SpaceImage[]; // Añadido

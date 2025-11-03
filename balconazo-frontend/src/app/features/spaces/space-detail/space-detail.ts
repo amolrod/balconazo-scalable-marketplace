@@ -76,15 +76,21 @@ export class SpaceDetailComponent implements OnInit {
   }
 
   getImages(): string[] {
-    // TODO: Cargar imágenes reales del backend cuando se implemente upload
-    // Por ahora, placeholder genérico
-    if (!this.space) return [];
-    return [
-      `https://via.placeholder.com/1200x800/E5E7EB/6B7280?text=${encodeURIComponent(this.space.title)}`,
-      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+1`,
-      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+2`,
-      `https://via.placeholder.com/1200x800/D1D5DB/4B5563?text=Sin+imagen+3`
-    ];
+    if (!this.space || !this.space.images || this.space.images.length === 0) {
+      // Placeholder si no hay imágenes
+      return [
+        `https://via.placeholder.com/1200x800/E5E7EB/6B7280?text=${encodeURIComponent(this.space?.title || 'Sin imagen')}`
+      ];
+    }
+
+    // Retornar las URLs de las imágenes reales, ordenadas (principal primero)
+    const sorted = [...this.space.images].sort((a, b) => {
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return a.displayOrder - b.displayOrder;
+    });
+
+    return sorted.map(img => img.url);
   }
 
   selectImage(index: number): void {

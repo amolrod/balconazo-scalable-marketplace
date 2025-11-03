@@ -25,4 +25,5 @@ public class SpaceDTO {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<SpaceImageDTO> images; // Añadido para mostrar imágenes
 }

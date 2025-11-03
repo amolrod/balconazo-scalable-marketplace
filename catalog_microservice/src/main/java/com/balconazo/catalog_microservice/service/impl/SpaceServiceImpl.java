@@ -13,6 +13,7 @@ import com.balconazo.catalog_microservice.repository.SpaceRepository;
 import com.balconazo.catalog_microservice.repository.UserRepository;
 import com.balconazo.catalog_microservice.service.CacheService;
 import com.balconazo.catalog_microservice.service.SpaceService;
+import com.balconazo.catalog_microservice.service.SpaceImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -33,7 +34,8 @@ public class SpaceServiceImpl implements SpaceService {
     private final UserRepository userRepo;
     private final SpaceMapper mapper;
     private final CacheService cacheService;
-    private final EventPublisher eventPublisher; // ← NUEVO
+    private final EventPublisher eventPublisher;
+    private final SpaceImageService imageService;
 
     private static final String CACHE_KEY_SPACE = "space:";
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
@@ -104,6 +106,9 @@ public class SpaceServiceImpl implements SpaceService {
         SpaceDTO space = mapper.toDTO(repo.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Espacio", id)));
 
+        // Cargar imágenes del espacio
+        space.setImages(imageService.getSpaceImages(id));
+
         // Guardar en caché
         cacheService.put(cacheKey, space, CACHE_TTL_SECONDS);
 
@@ -114,7 +119,14 @@ public class SpaceServiceImpl implements SpaceService {
     public List<SpaceDTO> getSpacesByOwner(UUID ownerId) {
         var owner = userRepo.findById(ownerId)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario", ownerId));
-        return repo.findByOwner(owner).stream().map(mapper::toDTO).collect(Collectors.toList());
+
+        return repo.findByOwner(owner).stream()
+            .map(entity -> {
+                SpaceDTO dto = mapper.toDTO(entity);
+                dto.setImages(imageService.getSpaceImages(entity.getId()));
+                return dto;
+            })
+            .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
