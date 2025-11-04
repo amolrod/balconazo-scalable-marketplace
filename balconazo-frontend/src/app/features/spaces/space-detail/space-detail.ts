@@ -4,10 +4,20 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SpacesService, Space } from '../../../core/services/spaces.service';
 import { BookingsService, CreateBookingDTO } from '../../../core/services/bookings.service';
+import { RatingStarsComponent } from '../../../shared/components/rating-stars/rating-stars';
+import { PricePipe } from '../../../shared/pipes/price.pipe';
 
 @Component({
   selector: 'app-space-detail',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    RatingStarsComponent,
+    PricePipe
+  ],
   templateUrl: './space-detail.html',
   styleUrl: './space-detail.scss'
 })
@@ -27,11 +37,34 @@ export class SpaceDetailComponent implements OnInit {
   bookingError: string | null = null;
   estimatedPrice: number | null = null;
 
+  // Gallery
   selectedImageIndex = 0;
+  showGalleryModal = false;
+
+  // Amenities
   showAllAmenities = false;
 
-  // Reviews reales - se cargarán del backend cuando se implemente
-  reviews: any[] = [];
+  // Reviews (mock para este PR, se implementarán con backend)
+  reviews: any[] = [
+    {
+      id: 1,
+      guestName: 'María García',
+      rating: 5,
+      comment: 'Espacio increíble, perfecto para nuestra reunión. El anfitrión fue muy atento.',
+      date: '2025-10-15',
+      guestAvatar: 'M'
+    },
+    {
+      id: 2,
+      guestName: 'Carlos Ruiz',
+      rating: 4,
+      comment: 'Muy buen lugar, cómodo y bien ubicado. Solo faltaba un poco más de iluminación.',
+      date: '2025-10-08',
+      guestAvatar: 'C'
+    }
+  ];
+  averageRating = 4.5;
+  totalReviews = 2;
 
   constructor() {
     this.bookingForm = this.fb.group({
@@ -42,7 +75,6 @@ export class SpaceDetailComponent implements OnInit {
       numGuests: [1, [Validators.required, Validators.min(1)]]
     });
 
-    // Calcular precio cuando cambian los valores
     this.bookingForm.valueChanges.subscribe(() => {
       this.calculatePrice();
     });
@@ -234,5 +266,39 @@ export class SpaceDetailComponent implements OnInit {
     // TODO: Implementar sistema de favoritos
     console.log('Toggle favorite');
   }
-}
 
+  // Gallery methods
+  openGallery(index: number): void {
+    this.selectedImageIndex = index;
+    this.showGalleryModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeGallery(): void {
+    this.showGalleryModal = false;
+    document.body.style.overflow = '';
+  }
+
+  nextImage(): void {
+    const images = this.getImages();
+    this.selectedImageIndex = (this.selectedImageIndex + 1) % images.length;
+  }
+
+  prevImage(): void {
+    const images = this.getImages();
+    this.selectedImageIndex = (this.selectedImageIndex - 1 + images.length) % images.length;
+  }
+
+  get displayedAmenities(): string[] {
+    if (!this.space?.amenities) return [];
+    return this.showAllAmenities ? this.space.amenities : this.space.amenities.slice(0, 8);
+  }
+
+  get hasMoreAmenities(): boolean {
+    return (this.space?.amenities?.length || 0) > 8;
+  }
+
+  toggleAmenities(): void {
+    this.showAllAmenities = !this.showAllAmenities;
+  }
+}
