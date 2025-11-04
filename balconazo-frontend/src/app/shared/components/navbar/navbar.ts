@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,12 +9,10 @@ import { User } from '../../../core/models/auth.model';
  * Barra de navegación profesional con menú por rol
  *
  * Features:
- * - Sticky navbar con backdrop blur
- * - Logo con gradient
  * - Menú dinámico por rol (HOST/GUEST/No auth)
  * - User dropdown menu
  * - Mobile hamburger menu
- * - Buscador compacto (opcional)
+ * - Logo con gradient
  * - CTA "Publica tu espacio" (solo HOST)
  */
 @Component({
@@ -48,6 +46,19 @@ export class NavbarComponent implements OnInit {
       if (userId) {
         this.authService.getProfile().subscribe();
       }
+    }
+  }
+
+  /**
+   * Close menus when clicking outside
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedInside = target.closest('.user-menu-wrapper');
+
+    if (!clickedInside && this.showUserMenu) {
+      this.showUserMenu = false;
     }
   }
 

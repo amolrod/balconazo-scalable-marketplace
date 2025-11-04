@@ -9,6 +9,8 @@
   background: var(--white);
   border-bottom: 1px solid var(--gray-200);
   transition: all var(--transition-base);
+  overflow: visible;
+  z-index: 100;
 }
 
 .navbar-container {
@@ -17,6 +19,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
+  overflow: visible;
 }
 
 .navbar-logo {
@@ -75,6 +78,7 @@
 /* User Menu */
 .user-menu-wrapper {
   position: relative;
+  z-index: 100;
 }
 
 .user-menu-trigger {
@@ -126,8 +130,8 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-2xl);
   border: 1px solid var(--gray-200);
-  overflow: hidden;
-  z-index: var(--z-dropdown);
+  overflow: visible;
+  z-index: 9999;
 }
 
 .user-dropdown-header {

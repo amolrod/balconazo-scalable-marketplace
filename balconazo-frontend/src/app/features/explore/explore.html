@@ -1,0 +1,213 @@
+<div class="explore-page">
+  <!-- Search Header -->
+  <div class="explore-header">
+    <div class="container">
+      <div class="explore-search-bar">
+        <div class="search-input-group">
+          <label class="search-input-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Ubicación
+          </label>
+          <input type="text" class="search-input" placeholder="¿Dónde?" [(ngModel)]="searchLocation">
+        </div>
+
+        <div class="search-input-group">
+          <label class="search-input-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Fecha
+          </label>
+          <input type="date" class="search-input" [(ngModel)]="searchDate">
+        </div>
+
+        <div class="search-input-group">
+          <label class="search-input-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg>
+            Personas
+          </label>
+          <input type="number" class="search-input" placeholder="Cantidad" [(ngModel)]="searchCapacity">
+        </div>
+
+        <button class="search-btn" (click)="applyFilters()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="explore-content">
+    <div class="container-fluid">
+      <div class="explore-layout">
+        <!-- Sidebar Filters -->
+        <aside class="explore-sidebar" [class.hidden]="!showFilters">
+          <div class="filters-header">
+            <h3>Filtros</h3>
+            <button class="btn-ghost btn-sm" (click)="clearFilters()">Limpiar</button>
+          </div>
+
+          <!-- Price Filter -->
+          <div class="filter-group">
+            <h4 class="filter-title">Precio por hora</h4>
+            <div class="filter-inputs">
+              <input
+                type="number"
+                class="form-input"
+                placeholder="Min €"
+                [(ngModel)]="filters.price!.min"
+                (change)="applyFilters()">
+              <span>-</span>
+              <input
+                type="number"
+                class="form-input"
+                placeholder="Max €"
+                [(ngModel)]="filters.price!.max"
+                (change)="applyFilters()">
+            </div>
+          </div>
+
+          <!-- Capacity Filter -->
+          <div class="filter-group">
+            <h4 class="filter-title">Capacidad</h4>
+            <input
+              type="number"
+              class="form-input"
+              placeholder="Mínimo de personas"
+              [(ngModel)]="filters.capacity!.min"
+              (change)="applyFilters()">
+          </div>
+
+          <!-- Amenities Filter -->
+          <div class="filter-group">
+            <h4 class="filter-title">Servicios</h4>
+            <div class="amenities-grid">
+              @for (amenity of amenitiesOptions; track amenity.value) {
+                <button
+                  class="amenity-chip"
+                  [class.selected]="isAmenitySelected(amenity.value)"
+                  (click)="toggleAmenity(amenity.value)">
+                  <span class="amenity-icon">{{ amenity.icon }}</span>
+                  <span class="amenity-label">{{ amenity.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+        </aside>
+
+        <!-- Results -->
+        <main class="explore-results">
+          <!-- Toolbar -->
+          <div class="results-toolbar">
+            <div class="results-info">
+              @if (!loading) {
+                <p><strong>{{ spaces.length }}</strong> espacios encontrados</p>
+              }
+            </div>
+
+            <div class="toolbar-actions">
+              <!-- Sort -->
+              <div class="sort-dropdown">
+                <select class="form-select" [(ngModel)]="sortBy" (change)="applyFilters()">
+                  <option value="distance">Distancia</option>
+                  <option value="price">Precio</option>
+                  <option value="rating">Valoración</option>
+                </select>
+              </div>
+
+              <!-- View Mode -->
+              <button class="btn-icon btn-ghost" (click)="toggleViewMode()" title="Cambiar vista">
+                @if (viewMode === 'grid') {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                } @else {
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                  </svg>
+                }
+              </button>
+
+              <!-- Toggle Filters (Mobile) -->
+              <button class="btn-icon btn-ghost hide-desktop" (click)="toggleFilters()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          @if (loading) {
+            <app-skeleton-list [count]="8" [type]="'card'"></app-skeleton-list>
+          }
+
+          <!-- Error -->
+          @else if (error) {
+            <app-empty-state
+              icon="alert"
+              [title]="'Error al cargar espacios'"
+              [message]="error"
+              ctaText="Reintentar"
+              (ctaClick)="loadSpaces()">
+            </app-empty-state>
+          }
+
+          <!-- Empty -->
+          @else if (spaces.length === 0) {
+            <app-empty-state
+              icon="search"
+              title="No se encontraron espacios"
+              message="Intenta ajustar los filtros o buscar en otra ubicación"
+              ctaText="Limpiar filtros"
+              (ctaClick)="clearFilters()">
+            </app-empty-state>
+          }
+
+          <!-- Results Grid/List -->
+          @else {
+            <div class="results-grid" [class.grid-view]="viewMode === 'grid'" [class.list-view]="viewMode === 'list'">
+              @for (space of spaces; track space.id) {
+                <app-space-card
+                  [space]="space"
+                  [showDistance]="false"
+                  (clicked)="viewSpace($event)">
+                </app-space-card>
+              }
+            </div>
+
+            <!-- Load More -->
+            @if (hasMore && spaces.length >= pageSize) {
+              <div class="load-more">
+                <button class="btn btn-secondary btn-lg" (click)="loadMore()">
+                  Cargar más espacios
+                </button>
+              </div>
+            }
+          }
+        </main>
+      </div>
+    </div>
+  </div>
+</div>
+

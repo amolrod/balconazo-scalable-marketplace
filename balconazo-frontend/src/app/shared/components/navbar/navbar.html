@@ -40,12 +40,13 @@
 
       <!-- User Menu (Autenticado) -->
       @if (isAuthenticated) {
-        <div class="user-menu-wrapper" (click)="toggleUserMenu()">
+        <div class="user-menu-wrapper">
           <button
             class="user-menu-trigger"
             [class.active]="showUserMenu"
             aria-haspopup="true"
             [attr.aria-expanded]="showUserMenu"
+            (click)="toggleUserMenu()"
           >
             <div class="user-avatar">
               {{ userInitials }}
@@ -57,7 +58,7 @@
 
           <!-- Dropdown Menu -->
           @if (showUserMenu) {
-            <div class="user-dropdown animate-scale-in">
+            <div class="user-dropdown animate-scale-in" (click)="$event.stopPropagation()">
               <!-- User Info -->
               <div class="user-dropdown-header">
                 <div class="user-avatar-large">

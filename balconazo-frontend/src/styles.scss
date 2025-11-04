@@ -143,64 +143,7 @@ img {
 
 /* ========== COMPONENT STYLES (legacy from existing app, kept for compatibility) ========== */
 
-/* Navbar - will be replaced by new Navbar component in PR#4 */
-.navbar {
-  position: sticky;
-  top: 0;
-  height: var(--navbar-height);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--gray-200);
-  z-index: var(--z-sticky);
-  transition: all var(--transition-base);
-}
-
-.navbar-container {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.navbar-logo {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-extrabold);
-  background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: var(--tracking-tight);
-}
-
-.navbar-menu {
-  display: flex;
-  gap: var(--space-8);
-  list-style: none;
-  margin: 0;
-}
-
-.navbar-link {
-  color: var(--gray-700);
-  font-weight: var(--font-medium);
-  transition: color var(--transition-fast);
-  padding: var(--space-2) 0;
-  position: relative;
-}
-
-.navbar-link:hover {
-  color: var(--primary-600);
-}
-
-.navbar-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--primary-600);
-  border-radius: var(--radius-full);
-}
+/* ========== COMPONENT STYLES ========== */
 
 /* Buttons - Enhanced */
 .btn {
@@ -525,14 +468,6 @@ img {
 
   .search-btn {
     width: 100%;
-  }
-
-  .navbar {
-    height: 64px;
-  }
-
-  .navbar-logo {
-    font-size: var(--text-xl);
   }
 }
 
