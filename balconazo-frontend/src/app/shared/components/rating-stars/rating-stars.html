@@ -1,0 +1,61 @@
+<div
+  class="rating-stars"
+  [ngClass]="'rating-stars--' + size"
+  (mouseleave)="onStarsLeave()"
+  [attr.aria-label]="'Rating: ' + formattedRating + ' de 5'"
+>
+  <!-- Estrellas -->
+  <div class="stars-container" [class.interactive]="interactive">
+    @for (star of stars; track star) {
+      <button
+        type="button"
+        class="star"
+        [class.star--full]="getStarType(star) === 'full'"
+        [class.star--half]="getStarType(star) === 'half'"
+        [class.star--empty]="getStarType(star) === 'empty'"
+        [disabled]="!interactive"
+        (mouseenter)="onStarHover(star)"
+        (click)="onStarClick(star)"
+        [attr.aria-label]="'Calificar con ' + star + ' estrellas'"
+      >
+        <!-- Estrella llena -->
+        @if (getStarType(star) === 'full') {
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        }
+
+        <!-- Media estrella -->
+        @if (getStarType(star) === 'half') {
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient [attr.id]="'half-fill-' + star">
+                <stop offset="50%" stop-color="currentColor" />
+                <stop offset="50%" stop-color="transparent" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              [attr.fill]="'url(#half-fill-' + star + ')'"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+          </svg>
+        }
+
+        <!-- Estrella vacía -->
+        @if (getStarType(star) === 'empty') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        }
+      </button>
+    }
+  </div>
+
+  <!-- Número de rating -->
+  @if (showNumber && rating > 0) {
+    <span class="rating-number">{{ formattedRating }}</span>
+  }
+</div>
+

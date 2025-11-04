@@ -1,0 +1,105 @@
+/**
+ * RatingStars Styles
+ */
+
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stars-container {
+  display: flex;
+  gap: var(--space-1);
+
+  &.interactive {
+    cursor: pointer;
+
+    .star {
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+.star {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+
+  &:disabled {
+    cursor: default;
+  }
+
+  svg {
+    display: block;
+  }
+
+  &--full {
+    color: #FBBF24; /* Yellow-400 */
+  }
+
+  &--half {
+    color: #FBBF24;
+  }
+
+  &--empty {
+    color: var(--gray-300);
+  }
+}
+
+.rating-number {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+}
+
+/* Sizes */
+.rating-stars--sm {
+  .star svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rating-number {
+    font-size: var(--text-xs);
+  }
+}
+
+.rating-stars--md {
+  .star svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .rating-number {
+    font-size: var(--text-sm);
+  }
+}
+
+.rating-stars--lg {
+  .star svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .rating-number {
+    font-size: var(--text-base);
+  }
+}
+
+/* Focus states for accessibility */
+.star:focus-visible {
+  outline: 2px solid var(--primary-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+

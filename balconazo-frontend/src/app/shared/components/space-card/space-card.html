@@ -1,0 +1,77 @@
+<div class="space-card hover-lift" (click)="onCardClick()" [attr.aria-label]="'Espacio: ' + space.title">
+  <!-- Badge de estado (si aplica) -->
+  @if (statusBadge) {
+    <div class="space-card-badge" [ngClass]="statusBadge.class">
+      {{ statusBadge.label }}
+    </div>
+  }
+
+  <!-- Imagen -->
+  <div class="space-card-image-wrapper">
+    <img
+      [src]="primaryImage"
+      [alt]="space.title"
+      class="space-card-image"
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Contenido -->
+  <div class="space-card-body">
+    <!-- Ubicación y distancia -->
+    <div class="space-card-location">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-location">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+      <span class="space-card-address">{{ space.address }}</span>
+      @if (showDistance && distance) {
+        <span class="space-card-distance">· {{ distance | distance }}</span>
+      }
+    </div>
+
+    <!-- Título -->
+    <h3 class="space-card-title">{{ space.title }}</h3>
+
+    <!-- Descripción (truncada) -->
+    <p class="space-card-description line-clamp-2">{{ space.description }}</p>
+
+    <!-- Amenities principales -->
+    @if (topAmenities.length > 0) {
+      <div class="space-card-amenities">
+        @for (amenity of topAmenities; track amenity) {
+          <span class="amenity-chip">{{ amenity }}</span>
+        }
+        @if (space.amenities && space.amenities.length > 3) {
+          <span class="amenity-chip">+{{ space.amenities.length - 3 }}</span>
+        }
+      </div>
+    }
+
+    <!-- Capacidad -->
+    <div class="space-card-capacity">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span>Hasta {{ space.capacity }} personas</span>
+    </div>
+
+    <!-- Footer: Precio -->
+    <div class="space-card-footer">
+      <div class="space-card-price">
+        <span class="price-amount">{{ space.basePriceCents | price }}</span>
+        <span class="price-unit">/ hora</span>
+      </div>
+
+      <!-- Rating (placeholder - se implementará en PR #7) -->
+      <!-- <div class="space-card-rating">
+        <app-rating-stars [rating]="space.rating" [size]="'sm'"></app-rating-stars>
+        <span class="rating-count">({{ space.reviewCount }})</span>
+      </div> -->
+    </div>
+  </div>
+</div>
+
