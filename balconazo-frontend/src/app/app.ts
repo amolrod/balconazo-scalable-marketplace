@@ -1,13 +1,13 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
 import { ToastComponent } from './shared/toast/toast';
+import { AppShellComponent } from './shared/components/app-shell/app-shell';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastComponent],
+  imports: [AppShellComponent, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('balconazo-frontend');
+  title = 'Balconazo';
 }

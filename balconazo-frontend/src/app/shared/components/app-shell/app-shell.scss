@@ -1,0 +1,130 @@
+/**
+ * AppShell Styles
+ */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  padding-top: 0; /* Navbar is sticky, no need for padding */
+}
+
+/* Footer */
+.app-footer {
+  background: var(--gray-900);
+  color: var(--gray-300);
+  padding: var(--space-20) 0 var(--space-8);
+  margin-top: var(--space-20);
+}
+
+.footer-container {
+  max-width: var(--container-xl);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-extrabold);
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-300));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.footer-text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--gray-400);
+  margin: 0;
+}
+
+.footer-heading {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  margin: 0;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  a {
+    color: var(--gray-400);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast);
+
+    &:hover {
+      color: var(--white);
+    }
+  }
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--gray-800);
+}
+
+.footer-copyright {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.footer-social {
+  display: flex;
+  gap: var(--space-4);
+}
+
+/* Responsive */
+@media (max-width: 1023px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .app-footer {
+    padding: var(--space-12) 0 var(--space-6);
+    margin-top: var(--space-12);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+  }
+}
+
