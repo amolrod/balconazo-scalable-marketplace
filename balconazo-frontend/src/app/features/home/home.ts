@@ -1,24 +1,31 @@
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SpacesService, Space } from '../../core/services/spaces.service';
-import { AuthService } from '../../core/services/auth.service';
+import { SpaceCardComponent } from '../../shared/components/space-card/space-card';
+import { SkeletonListComponent } from '../../shared/components/skeleton-list/skeleton-list';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    SpaceCardComponent,
+    SkeletonListComponent,
+    EmptyStateComponent
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
 export class HomeComponent implements OnInit {
   private router = inject(Router);
   private spacesService = inject(SpacesService);
-  private authService = inject(AuthService);
-  isAuthenticated = false;
-  error: string | null = null;
 
+  loading = false;
+  error: string | null = null;
   featuredSpaces: Space[] = [];
 
   searchParams = {
@@ -28,17 +35,16 @@ export class HomeComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.checkAuthentication();
+    this.loadFeaturedSpaces();
   }
 
   loadFeaturedSpaces(): void {
     this.loading = true;
 
-    // SOLO cargar desde el backend - sin fallback a mock
     this.spacesService.getActiveSpaces().subscribe({
       next: (spaces) => {
         console.log('✅ Espacios cargados desde el backend:', spaces);
-        this.featuredSpaces = spaces.slice(0, 8); // Mostrar máximo 8
+        this.featuredSpaces = spaces.slice(0, 8);
         this.loading = false;
       },
       error: (error) => {
@@ -50,20 +56,17 @@ export class HomeComponent implements OnInit {
     });
   }
 
-
   onSearch(): void {
     console.log('🔍 Buscando con:', this.searchParams);
 
     if (this.searchParams.location) {
-      // TODO: Geocodificar la ubicación a lat/lon
-      // Por ahora usar coordenadas por defecto de Madrid
       const madridLat = 40.4168;
       const madridLon = -3.7038;
 
       this.spacesService.searchSpaces({
         lat: madridLat,
         lon: madridLon,
-        radius: 5000, // 5km
+        radius: 5000,
         minCapacity: this.searchParams.capacity || undefined
       }).subscribe({
         next: (results) => {
@@ -91,25 +94,18 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/spaces', id]);
   }
 
-  toggleMobileMenu(): void {
-  // Helper methods para el template
   getSpaceImageUrl(space: Space): string {
-    // Si tiene imágenes, usar la principal o la primera
     if (space.images && space.images.length > 0) {
       const primaryImage = space.images.find(img => img.isPrimary);
       if (primaryImage) {
         return primaryImage.url;
       }
-      // Si no hay principal, usar la primera
       return space.images[0].url;
     }
-
-    // Placeholder si no hay imágenes
     return 'https://via.placeholder.com/600x400/E5E7EB/6B7280?text=' + encodeURIComponent(space.title);
   }
 
   getSpaceLocation(space: Space): string {
-    // Extraer ciudad del address
     const parts = space.address.split(',');
     return parts.length > 1 ? parts[parts.length - 1].trim() : space.address;
   }

@@ -73,104 +73,48 @@
       </p>
     </div>
 
+    <!-- Loading State -->
     @if (loading) {
-      <!-- Skeleton loading -->
-      <div class="grid grid-cols-4">
-        @for (item of [1,2,3,4]; track item) {
-          <div>
-            <div class="skeleton" style="height: 240px; margin-bottom: 12px; border-radius: var(--radius-xl);"></div>
-            <div class="skeleton" style="height: 20px; margin-bottom: 8px;"></div>
-            <div class="skeleton" style="height: 20px; width: 80%;"></div>
-          </div>
-        }
-      </div>
-    } @else if (error && featuredSpaces.length === 0) {
-      <!-- Error State -->
-      <div style="text-align: center; padding: 80px 20px;">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 24px; color: var(--error);">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <h3 style="margin-bottom: 16px; font-size: var(--text-2xl);">{{ error }}</h3>
-        <p style="color: var(--gray-600); margin-bottom: 32px;">
-          Asegúrate de que todos los microservicios estén corriendo con <code>./start-all-services.sh</code>
-        </p>
-        <button class="btn btn-primary" (click)="loadFeaturedSpaces()">Reintentar</button>
-      </div>
-    } @else if (featuredSpaces.length === 0) {
-      <!-- Empty State -->
-      <div style="text-align: center; padding: 80px 20px;">
-        <h3 style="margin-bottom: 16px; font-size: var(--text-2xl);">No hay espacios disponibles</h3>
-        <p style="color: var(--gray-600);">No se encontraron espacios activos en este momento.</p>
-      </div>
-    } @else {
-      <div class="grid grid-cols-4">
-        @for (space of featuredSpaces; track space.id) {
-          <article class="space-card" (click)="viewSpace(space.id)">
-            <div class="space-card-image-wrapper">
-              <img
-                [src]="getSpaceImageUrl(space)"
-                [alt]="space.title"
-                class="space-card-image"
-              >
-              @if (!space.images || space.images.length === 0) {
-                <span class="space-card-badge" style="background: var(--gray-700); color: white; padding: 8px 12px; border-radius: 8px; font-size: 12px;">
-                  Sin imagen
-                </span>
-              }
-            </div>
-
-            <div class="space-card-body">
-              <div class="space-card-location">
-                📍 {{ getSpaceLocation(space) }}
-              </div>
-
-              <h3 class="space-card-title">
-                {{ space.title }}
-              </h3>
-
-              <div class="space-card-features">
-                <span class="space-card-feature">
-                  👥 {{ space.capacity }} personas
-                </span>
-                @if (space.areaSqm) {
-                  <span class="space-card-feature">
-                    📐 {{ space.areaSqm }}m²
-                  </span>
-                }
-              </div>
-
-              <div class="space-card-footer">
-                <div class="space-card-price">
-                  <span class="space-card-price-amount">{{ getSpacePricePerHour(space) }}€</span>
-                  <span class="space-card-price-period">/hora</span>
-                </div>
-              </div>
-            </div>
-          </article>
-        }
-      </div>
-
-      @if (featuredSpaces.length === 0) {
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </div>
-          <h3 class="empty-state-title">No hay espacios disponibles</h3>
-          <p class="empty-state-text">Vuelve pronto para ver nuevos espacios</p>
-        </div>
-      }
+      <app-skeleton-list [count]="8" [type]="'card'"></app-skeleton-list>
     }
 
-    <div style="text-align: center; margin-top: 48px;">
-      <button class="btn btn-lg btn-secondary" routerLink="/spaces">
-        Ver todos los espacios
-      </button>
-    </div>
+    <!-- Error State -->
+    @else if (error && featuredSpaces.length === 0) {
+      <app-empty-state
+        icon="alert"
+        [title]="'Error al cargar espacios'"
+        [message]="error"
+        ctaText="Reintentar"
+        (ctaClick)="loadFeaturedSpaces()">
+      </app-empty-state>
+    }
+
+    <!-- Empty State -->
+    @else if (featuredSpaces.length === 0) {
+      <app-empty-state
+        icon="home"
+        title="No hay espacios disponibles"
+        message="No se encontraron espacios activos en este momento.">
+      </app-empty-state>
+    }
+
+    <!-- Results Grid -->
+    @else {
+      <div class="grid grid-cols-4 gap-6">
+        @for (space of featuredSpaces; track space.id) {
+          <app-space-card
+            [space]="space"
+            (clicked)="viewSpace($event.id)">
+          </app-space-card>
+        }
+      </div>
+
+      <div style="text-align: center; margin-top: 48px;">
+        <button class="btn btn-lg btn-secondary" routerLink="/spaces">
+          Ver todos los espacios
+        </button>
+      </div>
+    }
   </div>
 </section>
 
