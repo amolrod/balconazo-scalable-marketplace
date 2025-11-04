@@ -1,3 +1,4 @@
+
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,10 +16,7 @@ export class HomeComponent implements OnInit {
   private router = inject(Router);
   private spacesService = inject(SpacesService);
   private authService = inject(AuthService);
-
-  loading = false;
   isAuthenticated = false;
-  showMobileMenu = false;
   error: string | null = null;
 
   featuredSpaces: Space[] = [];
@@ -30,14 +28,7 @@ export class HomeComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.loadFeaturedSpaces();
     this.checkAuthentication();
-    this.setupNavbarScroll();
-  }
-
-  checkAuthentication(): void {
-    this.isAuthenticated = this.authService.isAuthenticated();
-    console.log('🔐 Estado de autenticación:', this.isAuthenticated);
   }
 
   loadFeaturedSpaces(): void {
@@ -101,29 +92,6 @@ export class HomeComponent implements OnInit {
   }
 
   toggleMobileMenu(): void {
-    this.showMobileMenu = !this.showMobileMenu;
-  }
-
-  logout(): void {
-    // Usar el servicio de autenticación
-    this.authService.logout();
-  }
-
-  private setupNavbarScroll(): void {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('scroll', () => {
-        const navbar = document.getElementById('navbar');
-        if (navbar) {
-          if (window.pageYOffset > 50) {
-            navbar.classList.add('scrolled');
-          } else {
-            navbar.classList.remove('scrolled');
-          }
-        }
-      });
-    }
-  }
-
   // Helper methods para el template
   getSpaceImageUrl(space: Space): string {
     // Si tiene imágenes, usar la principal o la primera
