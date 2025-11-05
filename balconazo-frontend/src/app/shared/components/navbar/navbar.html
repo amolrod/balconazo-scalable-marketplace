@@ -9,11 +9,9 @@
     <ul class="navbar-menu hide-mobile">
       <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="navbar-link">Explorar</a></li>
 
-      @if (isHost) {
+      <!-- Mis Espacios: visible para todos los usuarios autenticados -->
+      @if (isAuthenticated) {
         <li><a routerLink="/host/dashboard" routerLinkActive="active" class="navbar-link">Mis Espacios</a></li>
-      }
-
-      @if (isGuest) {
         <li><a routerLink="/my-bookings" routerLinkActive="active" class="navbar-link">Mis Reservas</a></li>
         <li><a routerLink="/favorites" routerLinkActive="active" class="navbar-link">Favoritos</a></li>
       }
@@ -21,21 +19,77 @@
 
     <!-- Actions -->
     <div class="navbar-actions">
-      <!-- CTA "Publica tu espacio" (solo para HOST) -->
-      @if (isHost) {
-        <a routerLink="/host/spaces/new" class="btn btn-primary btn-sm hide-mobile">
+      <!-- CTA "Publica tu espacio" (visible para autenticados) -->
+      @if (isAuthenticated) {
+        <a routerLink="/host/dashboard" class="btn btn-primary btn-sm hide-mobile">
           Publica tu espacio
         </a>
       }
 
-      <!-- Auth Buttons (No autenticado) -->
+      <!-- Guest Menu (No autenticado) - Estilo Airbnb -->
       @if (!isAuthenticated) {
-        <button class="btn btn-ghost btn-sm hide-mobile" (click)="navigateTo('/login')">
-          Iniciar Sesión
-        </button>
-        <button class="btn btn-primary btn-sm" (click)="navigateTo('/login')">
-          Registrarse
-        </button>
+        <div class="user-menu-wrapper">
+          <button
+            class="user-menu-trigger"
+            [class.active]="showUserMenu"
+            aria-haspopup="true"
+            [attr.aria-expanded]="showUserMenu"
+            (click)="toggleUserMenu()"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <div class="user-avatar user-avatar--guest">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Dropdown Menu para invitados -->
+          @if (showUserMenu) {
+            <div class="user-dropdown animate-scale-in" (click)="$event.stopPropagation()">
+              <ul class="user-dropdown-menu">
+                <li>
+                  <a (click)="navigateTo('/')" class="dropdown-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    Explorar
+                  </a>
+                </li>
+                <li>
+                  <a (click)="navigateTo('/become-host')" class="dropdown-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Hazte host
+                  </a>
+                </li>
+              </ul>
+
+              <div class="dropdown-divider"></div>
+
+              <ul class="user-dropdown-menu">
+                <li>
+                  <a (click)="navigateTo('/login')" class="dropdown-item dropdown-item--primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                      <polyline points="10 17 15 12 10 7"></polyline>
+                      <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    Inicia sesión o regístrate
+                  </a>
+                </li>
+              </ul>
+            </div>
+          }
+        </div>
       }
 
       <!-- User Menu (Autenticado) -->
@@ -66,9 +120,6 @@
                 </div>
                 <div class="user-info">
                   <p class="user-email">{{ currentUser?.email }}</p>
-                  <span class="user-role-badge" [ngClass]="isHost ? 'badge-success' : 'badge-info'">
-                    {{ isHost ? 'Host' : 'Invitado' }}
-                  </span>
                 </div>
               </div>
 
@@ -86,50 +137,39 @@
                   </a>
                 </li>
 
-                @if (isHost) {
-                  <li>
-                    <a (click)="navigateTo('/host/dashboard')" class="dropdown-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                      </svg>
-                      Mis Espacios
-                    </a>
-                  </li>
-                  <li>
-                    <a (click)="navigateTo('/host/bookings')" class="dropdown-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      Reservas Recibidas
-                    </a>
-                  </li>
-                }
+                <!-- Mis Espacios: visible para todos -->
+                <li>
+                  <a (click)="navigateTo('/host/dashboard')" class="dropdown-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Mis Espacios
+                  </a>
+                </li>
 
-                @if (isGuest) {
-                  <li>
-                    <a (click)="navigateTo('/my-bookings')" class="dropdown-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      Mis Reservas
-                    </a>
-                  </li>
-                  <li>
-                    <a (click)="navigateTo('/favorites')" class="dropdown-item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                      </svg>
-                      Favoritos
-                    </a>
-                  </li>
-                }
+                <!-- Mis Reservas: visible para todos -->
+                <li>
+                  <a (click)="navigateTo('/my-bookings')" class="dropdown-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    Mis Reservas
+                  </a>
+                </li>
+
+                <!-- Favoritos: visible para todos -->
+                <li>
+                  <a (click)="navigateTo('/favorites')" class="dropdown-item">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    Favoritos
+                  </a>
+                </li>
 
                 <li>
                   <a (click)="navigateTo('/notifications')" class="dropdown-item">

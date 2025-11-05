@@ -118,6 +118,11 @@
   justify-content: center;
   font-weight: var(--font-bold);
   font-size: var(--text-sm);
+
+  &--guest {
+    background: var(--gray-200);
+    color: var(--gray-700);
+  }
 }
 
 /* User Dropdown */
@@ -227,6 +232,20 @@
 
     &:hover {
       background: var(--error-light);
+    }
+  }
+
+  &--primary {
+    color: var(--primary-600);
+    font-weight: var(--font-semibold);
+
+    svg {
+      color: var(--primary-600);
+    }
+
+    &:hover {
+      background: var(--primary-50);
+      color: var(--primary-700);
     }
   }
 }

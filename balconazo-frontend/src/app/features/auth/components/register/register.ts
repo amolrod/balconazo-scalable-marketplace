@@ -57,7 +57,15 @@ export class RegisterComponent {
 
     const { confirmPassword, acceptsTerms, ...registerData } = this.registerForm.value;
 
-    this.authService.register(registerData).subscribe({
+    // Añadir role GUEST por defecto (todos empiezan como guests)
+    const payload = {
+      ...registerData,
+      role: 'GUEST'
+    };
+
+    console.log('📤 Enviando registro:', payload);
+
+    this.authService.register(payload).subscribe({
       next: () => {
         console.log('✅ Registro exitoso');
         // Después de registrarse, hacer login automáticamente

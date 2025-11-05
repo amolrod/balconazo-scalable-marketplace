@@ -35,7 +35,7 @@ export interface RegisterRequest {
   password: string;
   firstName?: string;
   lastName?: string;
-  // Ya no pedimos role al registrarse - todos empiezan como GUEST
+  role?: 'HOST' | 'GUEST';  // Backend actual requiere role
 }
 
 export interface LoginResponse {
