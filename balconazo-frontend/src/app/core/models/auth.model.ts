@@ -1,9 +1,26 @@
 export interface User {
   id: string;
   email: string;
-  role: 'HOST' | 'GUEST' | 'ADMIN';
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  avatar?: string;
+  bio?: string;
+
+  // Roles dinámicos - un usuario puede ser ambos
+  isHost: boolean;        // Puede publicar espacios
+  isGuest: boolean;       // Puede hacer reservas (siempre true por defecto)
+
+  // Verificaciones
+  emailVerified: boolean;
+  phoneVerified: boolean;
+
+  // Estadísticas
   status: string;
   trustScore?: number;
+  totalBookings?: number;    // Como guest
+  totalSpaces?: number;      // Como host
+
   createdAt: string;
   updatedAt?: string;
 }
@@ -16,7 +33,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  role: 'HOST' | 'GUEST';
+  firstName?: string;
+  lastName?: string;
+  // Ya no pedimos role al registrarse - todos empiezan como GUEST
 }
 
 export interface LoginResponse {
@@ -26,10 +45,17 @@ export interface LoginResponse {
   expiresIn: number;
   userId: string;
   email: string;
-  role: string;
+  isHost: boolean;
+  isGuest: boolean;
 }
 
 export interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+export interface BecomeHostRequest {
+  // Datos adicionales para convertirse en host
+  phone?: string;
+  bio?: string;
+  acceptsTerms: boolean;
+}

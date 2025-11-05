@@ -1,0 +1,242 @@
+<div class="auth-container">
+  <!--Background decoration -->
+  <div class="auth-decoration"></div>
+
+  <div class="auth-content">
+    <!-- Logo and branding -->
+    <div class="auth-brand animate-fade-in-up">
+      <div class="brand-icon">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <rect width="56" height="56" rx="16" fill="url(#gradient)"/>
+          <path d="M28 16L40 24V38L28 46L16 38V24L28 16Z" fill="white" fill-opacity="0.9"/>
+          <defs>
+            <linearGradient id="gradient" x1="0" y1="0" x2="56" y2="56">
+              <stop stop-color="#E11D48"/>
+              <stop offset="1" stop-color="#F43F5E"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h1 class="brand-title">Balconazo</h1>
+      <p class="brand-subtitle">Únete y empieza tu aventura</p>
+    </div>
+
+    <!-- Register card -->
+    <div class="auth-card animate-fade-in-up" style="animation-delay: 0.1s;">
+      <div class="auth-card-header">
+        <h2 class="auth-card-title">Crea tu cuenta</h2>
+        <p class="auth-card-subtitle">Empieza a descubrir espacios únicos</p>
+      </div>
+
+      <!-- Register Form -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Nombre -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName" class="form-label">Nombre *</label>
+          <input
+            id="firstName"
+            type="text"
+            class="form-input"
+            formControlName="firstName"
+            placeholder="Tu nombre"
+            [class.error]="firstName?.invalid && firstName?.touched">
+          @if (firstName?.invalid && firstName?.touched) {
+            <span class="error-message">
+              @if (firstName?.errors?.['required']) {
+                El nombre es obligatorio
+              } @else if (firstName?.errors?.['minlength']) {
+                Mínimo 2 caracteres
+              }
+            </span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="lastName" class="form-label">Apellidos *</label>
+          <input
+            id="lastName"
+            type="text"
+            class="form-input"
+            formControlName="lastName"
+            placeholder="Tus apellidos"
+            [class.error]="lastName?.invalid && lastName?.touched">
+          @if (lastName?.invalid && lastName?.touched) {
+            <span class="error-message">
+              @if (lastName?.errors?.['required']) {
+                Los apellidos son obligatorios
+              } @else if (lastName?.errors?.['minlength']) {
+                Mínimo 2 caracteres
+              }
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Correo electrónico *</label>
+        <input
+          id="email"
+          type="email"
+          class="form-input"
+          formControlName="email"
+          placeholder="tu@email.com"
+          [class.error]="email?.invalid && email?.touched">
+        @if (email?.invalid && email?.touched) {
+          <span class="error-message">
+            @if (email?.errors?.['required']) {
+              El email es obligatorio
+            } @else if (email?.errors?.['email']) {
+              Email inválido
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="password" class="form-label">Contraseña *</label>
+        <div class="input-with-icon">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-input"
+            formControlName="password"
+            placeholder="Mínimo 8 caracteres"
+            [class.error]="password?.invalid && password?.touched">
+          <button
+            type="button"
+            class="input-icon-btn"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            @if (showPassword) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            } @else {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (password?.invalid && password?.touched) {
+          <span class="error-message">
+            @if (password?.errors?.['required']) {
+              La contraseña es obligatoria
+            } @else if (password?.errors?.['minlength']) {
+              Mínimo 8 caracteres
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Confirmar Contraseña -->
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirmar contraseña *</label>
+        <div class="input-with-icon">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            class="form-input"
+            formControlName="confirmPassword"
+            placeholder="Repite tu contraseña"
+            [class.error]="(confirmPassword?.invalid && confirmPassword?.touched) || (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched)">
+          <button
+            type="button"
+            class="input-icon-btn"
+            (click)="showConfirmPassword = !showConfirmPassword"
+            [attr.aria-label]="showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            @if (showConfirmPassword) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            } @else {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            }
+          </button>
+        </div>
+        @if (confirmPassword?.invalid && confirmPassword?.touched) {
+          <span class="error-message">
+            Por favor confirma tu contraseña
+          </span>
+        } @else if (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched) {
+          <span class="error-message">
+            Las contraseñas no coinciden
+          </span>
+        }
+      </div>
+
+      <!-- Términos y Condiciones -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            formControlName="acceptsTerms"
+            class="checkbox-input">
+          <span>
+            Acepto los <a href="/terms" target="_blank" class="link">Términos y Condiciones</a>
+            y la <a href="/privacy" target="_blank" class="link">Política de Privacidad</a>
+          </span>
+        </label>
+        @if (acceptsTerms?.invalid && acceptsTerms?.touched) {
+          <span class="error-message">
+            Debes aceptar los términos para continuar
+          </span>
+        }
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg"
+        [disabled]="loading || registerForm.invalid"
+        style="width: 100%;">
+        @if (loading) {
+          <div class="spinner"></div>
+          <span>Creando cuenta...</span>
+        } @else {
+          <span>Crear cuenta</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        }
+      </button>
+
+      <!-- Info -->
+      <div class="auth-info">
+        <p>
+          💡 <strong>Todos empiezan como viajeros</strong><br>
+          Podrás publicar tu espacio más adelante cuando quieras
+        </p>
+      </div>
+
+      <!-- Link to login -->
+      <div class="form-footer">
+        <p>¿Ya tienes cuenta? <a routerLink="/login" class="link-primary font-semibold">Inicia sesión</a></p>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+

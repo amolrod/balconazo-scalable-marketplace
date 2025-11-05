@@ -8,7 +8,8 @@ import {
   LoginRequest,
   RegisterRequest,
   LoginResponse,
-  RefreshTokenRequest
+  RefreshTokenRequest,
+  BecomeHostRequest
 } from '../models/auth.model';
 
 @Injectable({
@@ -156,23 +157,44 @@ export class AuthService {
 
   /**
    * Verificar si el usuario tiene un rol específico
+   * DEPRECATED - usar isHost() o isGuest() directamente
    */
   hasRole(role: string): boolean {
-    return this.getUserRole() === role;
+    const user = this.getCurrentUser();
+    if (!user) return false;
+
+    if (role === 'HOST') return user.isHost;
+    if (role === 'GUEST') return user.isGuest;
+    return false;
   }
 
   /**
-   * Verificar si el usuario es HOST
+   * Verificar si el usuario es HOST (puede publicar espacios)
    */
   isHost(): boolean {
-    return this.hasRole('HOST');
+    const user = this.getCurrentUser();
+    return user?.isHost || false;
   }
 
   /**
-   * Verificar si el usuario es GUEST
+   * Verificar si el usuario es GUEST (puede hacer reservas)
    */
   isGuest(): boolean {
-    return this.hasRole('GUEST');
+    const user = this.getCurrentUser();
+    return user?.isGuest !== false; // Por defecto true
+  }
+
+  /**
+   * Convertirse en Host - cualquier usuario puede hacerlo
+   */
+  becomeHost(data: BecomeHostRequest): Observable<User> {
+    return this.http.post<User>(`${environment.apiUrl}/auth/become-host`, data)
+      .pipe(
+        tap(user => {
+          this.currentUserSubject.next(user);
+          console.log('✅ Usuario ahora es HOST:', user);
+        })
+      );
   }
 
   /**
@@ -190,7 +212,7 @@ export class AuthService {
       localStorage.setItem(this.TOKEN_KEY, response.accessToken);
       localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
       localStorage.setItem(this.USER_ID_KEY, response.userId);
-      localStorage.setItem(this.USER_ROLE_KEY, response.role);
+      // Ya no guardamos role fijo - los roles vienen del user profile
     }
   }
 
