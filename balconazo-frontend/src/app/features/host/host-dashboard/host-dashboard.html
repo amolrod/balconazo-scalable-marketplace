@@ -364,22 +364,65 @@
               </div>
 
               <!-- Galería de Imágenes -->
-              @if (editingSpaceId) {
-                <div class="images-section">
-                  <h3>Imágenes del espacio</h3>
+              <div class="images-section">
+                <h3>Imágenes del espacio</h3>
+                @if (editingSpaceId) {
                   <app-image-gallery-manager
                     [spaceId]="editingSpaceId"
                     [images]="spaceImages"
                     (imagesChange)="onImagesChanged($event)">
                   </app-image-gallery-manager>
-                </div>
-              } @else {
-                <div class="form-group">
-                  <p class="text-sm text-gray-600">
-                    💡 Tip: Después de crear el espacio, podrás añadir fotos en la página de edición.
-                  </p>
-                </div>
-              }
+                } @else {
+                  <!-- Preview de imágenes durante creación -->
+                  <div class="image-upload-preview">
+                    <div class="upload-zone" (click)="fileInput.click()">
+                      <input
+                        #fileInput
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        (change)="onCreateSpaceFilesSelected($event)"
+                        style="display: none">
+
+                      <div class="upload-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                          <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <p class="upload-title">Selecciona imágenes</p>
+                        <p class="upload-subtitle">JPG, PNG o WEBP (máx. 5MB cada una)</p>
+                        @if (pendingImages.length > 0) {
+                          <p class="upload-count">{{ pendingImages.length }} imagen(es) seleccionada(s)</p>
+                        }
+                      </div>
+                    </div>
+
+                    @if (pendingImages.length > 0) {
+                      <div class="preview-grid">
+                        @for (preview of pendingImages; track preview.name; let idx = $index) {
+                          <div class="preview-card">
+                            <img [src]="preview.url" [alt]="preview.name">
+                            <button
+                              type="button"
+                              class="btn-remove-preview"
+                              (click)="removePendingImage(idx)"
+                              title="Eliminar">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                              </svg>
+                            </button>
+                            @if (idx === 0) {
+                              <span class="primary-badge-small">Principal</span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
 
               @if (formError) {
                 <div class="error-message">{{ formError }}</div>

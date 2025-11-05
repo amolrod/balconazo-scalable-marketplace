@@ -8,16 +8,17 @@ import { Space } from '../models/space.model';
 export type { Space } from '../models/space.model';
 
 export interface CreateSpaceDTO {
-  title: string;
-  description: string;
-  ownerId: string;
-  address: string;
-  lat: number;
-  lon: number;
-  capacity: number;
-  basePriceCents: number;
-  areaSqm?: number;
-  amenities?: string[];
+  ownerId: string;        // UUID (backend: UUID)
+  title: string;          // @NotBlank @Size(max=200)
+  description: string;    // @Size(max=2000)
+  capacity: number;       // @NotNull @Min(1) @Max(1000) Integer
+  areaSqm?: number;       // @DecimalMin("0.0") BigDecimal
+  rules?: Record<string, any>;  // Map<String, Object>
+  amenities?: string[];   // List<String>
+  address: string;        // @NotBlank @Size(max=500)
+  lat: number;            // @NotNull @DecimalMin("-90") @DecimalMax("90") Double
+  lon: number;            // @NotNull @DecimalMin("-180") @DecimalMax("180") Double
+  basePriceCents: number; // @NotNull @Min(0) Integer
 }
 
 export interface SpaceSearchParams {
@@ -62,7 +63,9 @@ export class SpacesService {
    * Obtener espacio por ID
    */
   getSpaceById(id: string): Observable<Space> {
-    return this.http.get<Space>(`${this.baseUrl}/${id}`);
+    const url = `${this.baseUrl}/${id}`;
+    console.log('🔍 GET Space by ID:', { id, url });
+    return this.http.get<Space>(url);
   }
 
   /**
@@ -80,7 +83,7 @@ export class SpacesService {
   }
 
   /**
-   * Crear nuevo espacio (solo HOST)
+   * Crear nuevo espacio
    */
   createSpace(data: CreateSpaceDTO): Observable<Space> {
     return this.http.post<Space>(this.baseUrl, data);

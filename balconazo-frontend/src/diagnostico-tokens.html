@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnóstico de Tokens</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #ce9178; }
+        button { padding: 10px 20px; margin: 10px 0; background: #007acc; color: white; border: none; cursor: pointer; }
+        pre { background: #252526; padding: 10px; border-left: 3px solid #007acc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Diagnóstico de Tokens - Balconazo</h1>
+
+    <button onclick="checkTokens()">1. Verificar Tokens en localStorage</button>
+    <button onclick="decodeToken()">2. Decodificar Access Token</button>
+    <button onclick="testRefresh()">3. Probar Refresh Token</button>
+    <button onclick="clearAndLogin()">4. Limpiar y hacer Login</button>
+
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+            output.innerHTML += `<div class="${className}">${message}</div>`;
+        }
+
+        function checkTokens() {
+            output.innerHTML = '<h2>📦 Tokens en localStorage:</h2>';
+
+            const accessToken = localStorage.getItem('accessToken');
+            const refreshToken = localStorage.getItem('refreshToken');
+            const userId = localStorage.getItem('userId');
+
+            if (!accessToken) {
+                log('❌ No hay accessToken', 'error');
+            } else {
+                log(`✅ accessToken: ${accessToken.substring(0, 50)}...`, 'success');
+            }
+
+            if (!refreshToken) {
+                log('❌ No hay refreshToken', 'error');
+            } else {
+                log(`✅ refreshToken: ${refreshToken.substring(0, 50)}...`, 'success');
+            }
+
+            if (!userId) {
+                log('⚠️ No hay userId', 'warning');
+            } else {
+                log(`✅ userId: ${userId}`, 'success');
+            }
+        }
+
+        function decodeToken() {
+            output.innerHTML = '<h2>🔓 Decodificar Access Token:</h2>';
+
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                log('❌ No hay token para decodificar', 'error');
+                return;
+            }
+
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    log('❌ Token JWT inválido', 'error');
+                    return;
+                }
+
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+
+                log('<pre>' + JSON.stringify(payload, null, 2) + '</pre>');
+
+                const exp = new Date(payload.exp * 1000);
+                const now = new Date();
+                const diff = exp - now;
+
+                if (diff < 0) {
+                    log(`❌ Token EXPIRADO hace ${Math.abs(Math.round(diff / 1000))} segundos`, 'error');
+                } else {
+                    log(`✅ Token expira en ${Math.round(diff / 1000)} segundos (${exp.toLocaleString()})`, 'success');
+                }
+
+            } catch (e) {
+                log(`❌ Error decodificando: ${e.message}`, 'error');
+            }
+        }
+
+        async function testRefresh() {
+            output.innerHTML = '<h2>🔄 Probando Refresh Token:</h2>';
+
+            const refreshToken = localStorage.getItem('refreshToken');
+            if (!refreshToken) {
+                log('❌ No hay refreshToken', 'error');
+                return;
+            }
+
+            log('📤 Enviando POST /api/auth/refresh...');
+
+            try {
+                const response = await fetch('/api/auth/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                log(`📥 Status: ${response.status} ${response.statusText}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Refresh exitoso!', 'success');
+                    log('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
+
+                    // Guardar nuevos tokens
+                    if (data.accessToken) {
+                        localStorage.setItem('accessToken', data.accessToken);
+                        log('✅ Nuevo accessToken guardado', 'success');
+                    }
+                    if (data.refreshToken) {
+                        localStorage.setItem('refreshToken', data.refreshToken);
+                        log('✅ Nuevo refreshToken guardado', 'success');
+                    }
+                } else {
+                    const error = await response.text();
+                    log(`❌ Refresh falló: ${error}`, 'error');
+                }
+            } catch (e) {
+                log(`❌ Error: ${e.message}`, 'error');
+            }
+        }
+
+        function clearAndLogin() {
+            output.innerHTML = '<h2>🧹 Limpiar y Login:</h2>';
+
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userRole');
+
+            log('✅ Todos los tokens eliminados', 'success');
+            log('🔄 Redirigiendo a login...', 'warning');
+
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+

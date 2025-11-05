@@ -71,6 +71,9 @@ export class HostDashboardComponent implements OnInit {
   // Imágenes del espacio en edición
   spaceImages: SpaceImage[] = [];
 
+  // Imágenes pendientes durante creación (antes de tener spaceId)
+  pendingImages: Array<{ file: File; url: string; name: string }> = [];
+
   // Modal de confirmación
   showDeleteModal = false;
   spaceToDelete: Space | null = null;
@@ -150,6 +153,7 @@ export class HostDashboardComponent implements OnInit {
   createSpace(): void {
     if (this.spaceForm.invalid) {
       this.markFormGroupTouched(this.spaceForm);
+      this.toastService.error('Por favor completa todos los campos requeridos');
       return;
     }
 
@@ -157,32 +161,172 @@ export class HostDashboardComponent implements OnInit {
     this.formError = null;
 
     const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.toastService.error('No se pudo obtener el ID del usuario');
+      this.formLoading = false;
+      return;
+    }
+
     const formValue = this.spaceForm.value;
 
-    const spaceData = {
-      ...formValue,
-      ownerId: userId,
-      basePriceCents: Math.round(formValue.basePriceCents * 100), // Convertir a centavos
-      amenities: formValue.amenities || []
+    // Validar campos obligatorios
+    if (!formValue.title || !formValue.description || !formValue.address) {
+      this.toastService.error('Faltan campos obligatorios: título, descripción o dirección');
+      this.formLoading = false;
+      return;
+    }
+
+    if (!formValue.lat || !formValue.lon) {
+      this.toastService.error('Faltan coordenadas de ubicación');
+      this.formLoading = false;
+      return;
+    }
+
+    // Asegurar tipos correctos para el backend
+    const spaceData: any = {
+      ownerId: userId, // UUID string
+      title: String(formValue.title).trim(),
+      description: String(formValue.description).trim(),
+      address: String(formValue.address).trim(),
+      lat: parseFloat(formValue.lat), // Double
+      lon: parseFloat(formValue.lon), // Double
+      capacity: parseInt(formValue.capacity, 10), // Integer
+      basePriceCents: Math.round(parseFloat(formValue.basePriceCents) * 100), // Integer
+      amenities: formValue.amenities || [],
+      rules: {}
     };
+
+    // Añadir areaSqm solo si tiene valor
+    if (formValue.areaSqm) {
+      spaceData.areaSqm = parseFloat(formValue.areaSqm);
+    }
+
+    console.log('📤 Creando espacio con datos:', JSON.stringify(spaceData, null, 2));
 
     this.spacesService.createSpace(spaceData).subscribe({
       next: (space) => {
         console.log('✅ Espacio creado:', space);
         this.mySpaces.unshift(space);
         this.calculateStats();
-        this.toastService.success('✓ Espacio creado exitosamente');
-        this.changeView('spaces');
-        this.resetForm();
+
+        // Subir imágenes pendientes si las hay
+        if (this.pendingImages.length > 0) {
+          this.uploadPendingImages(space.id);
+        } else {
+          this.toastService.success('✓ Espacio creado exitosamente');
+          this.changeView('spaces');
+          this.resetForm();
+        }
+
         this.formLoading = false;
       },
       error: (error) => {
-        console.error('❌ Error creando espacio:', error);
-        this.formError = error.error?.message || 'Error al crear el espacio';
-        this.toastService.error('Error al crear el espacio');
+        console.error('❌ Error creando espacio:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.error?.message,
+          errors: error.error?.errors,
+          fullError: error
+        });
+
+        // Mostrar mensaje de error más específico
+        let errorMsg = 'Error al crear el espacio';
+        if (error.error?.message) {
+          errorMsg = error.error.message;
+        } else if (error.error?.errors) {
+          // Validaciones de backend
+          const firstError = Object.values(error.error.errors)[0];
+          errorMsg = firstError as string;
+        }
+
+        this.formError = errorMsg;
+        this.toastService.error(errorMsg);
         this.formLoading = false;
       }
     });
+  }
+
+  // Subir imágenes pendientes después de crear el espacio
+  private uploadPendingImages(spaceId: string): void {
+    console.log(`📤 Subiendo ${this.pendingImages.length} imágenes pendientes...`);
+    let uploaded = 0;
+    const total = this.pendingImages.length;
+
+    this.pendingImages.forEach((preview, index) => {
+      const isPrimary = index === 0; // Primera imagen = principal
+
+      this.imagesService.uploadImage(spaceId, preview.file, isPrimary).subscribe({
+        next: (image) => {
+          uploaded++;
+          console.log(`✅ Imagen ${uploaded}/${total} subida:`, image);
+
+          if (uploaded === total) {
+            this.toastService.success(`✓ Espacio creado con ${total} imagen(es)`);
+            this.changeView('spaces');
+            this.resetForm();
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error subiendo imagen:', error);
+          uploaded++;
+
+          if (uploaded === total) {
+            this.toastService.warning('Espacio creado, pero algunas imágenes no se pudieron subir');
+            this.changeView('spaces');
+            this.resetForm();
+          }
+        }
+      });
+    });
+  }
+
+  // Manejar selección de archivos durante creación
+  onCreateSpaceFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const files = Array.from(input.files);
+
+    // Validar archivos
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        this.toastService.error(`${file.name} no es una imagen válida`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        this.toastService.error(`${file.name} supera los 5MB`);
+        return false;
+      }
+      return true;
+    });
+
+    // Limitar a 10 imágenes total
+    const remaining = 10 - this.pendingImages.length;
+    if (validFiles.length > remaining) {
+      this.toastService.warning(`Solo puedes añadir ${remaining} imágenes más`);
+      validFiles.splice(remaining);
+    }
+
+    // Crear previews
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.pendingImages.push({
+          file: file,
+          url: e.target?.result as string,
+          name: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Limpiar input
+    input.value = '';
+  }
+
+  // Eliminar imagen pendiente
+  removePendingImage(index: number): void {
+    this.pendingImages.splice(index, 1);
   }
 
   editSpace(space: Space): void {
@@ -363,6 +507,8 @@ export class HostDashboardComponent implements OnInit {
     });
     this.editingSpaceId = null;
     this.formError = null;
+    this.pendingImages = []; // Limpiar imágenes pendientes
+    this.spaceImages = []; // Limpiar imágenes cargadas
   }
 
   // === UTILIDADES ===

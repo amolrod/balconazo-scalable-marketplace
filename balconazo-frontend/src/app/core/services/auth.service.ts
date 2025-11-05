@@ -126,6 +126,63 @@ export class AuthService {
   }
 
   /**
+   * Verificar si el token está expirado (con tolerancia de 60s para clock skew)
+   */
+  isTokenExpired(token: string | null = null): boolean {
+    if (!token) {
+      token = this.getToken();
+    }
+
+    if (!token) {
+      return true;
+    }
+
+    try {
+      const payload = this.decodeToken(token);
+      if (!payload || !payload.exp) {
+        return true;
+      }
+
+      // Tolerancia de 60 segundos para clock skew
+      const CLOCK_SKEW_TOLERANCE = 60;
+      const expirationTime = payload.exp * 1000; // Convertir a milisegundos
+      const now = Date.now();
+
+      return (expirationTime - CLOCK_SKEW_TOLERANCE * 1000) < now;
+    } catch (e) {
+      console.error('Error al decodificar token:', e);
+      return true;
+    }
+  }
+
+  /**
+   * Decodificar JWT sin verificar firma (solo para leer payload)
+   */
+  private decodeToken(token: string): any {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid JWT format');
+      }
+
+      const payload = parts[1];
+      const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(decoded);
+    } catch (e) {
+      console.error('Error decodificando JWT:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Obtener datos del token actual
+   */
+  getTokenPayload(): any {
+    const token = this.getToken();
+    return token ? this.decodeToken(token) : null;
+  }
+
+  /**
    * Obtener refresh token
    */
   getRefreshToken(): string | null {

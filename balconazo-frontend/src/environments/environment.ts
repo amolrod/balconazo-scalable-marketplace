@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api',
-  apiGateway: 'http://localhost:8080'
+  apiUrl: '/api', // Proxy se encarga de redirigir a localhost:8080
+  apiGateway: '/api'
 };
 

@@ -42,16 +42,16 @@ public class AuthService {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // Crear usuario
+        // Crear usuario con role HOST por defecto (modelo Airbnb: todos pueden publicar espacios)
         User user = User.builder()
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .role(User.Role.HOST) // ✅ Siempre HOST, sin importar el request
                 .active(true)
                 .build();
 
         user = userRepository.save(user);
-        log.info("Usuario registrado exitosamente con ID: {}", user.getId());
+        log.info("Usuario registrado exitosamente con ID: {} y role: HOST", user.getId());
 
         return UserResponse.builder()
                 .id(user.getId())

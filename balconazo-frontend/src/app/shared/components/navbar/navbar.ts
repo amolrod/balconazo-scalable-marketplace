@@ -13,7 +13,7 @@ import { User } from '../../../core/models/auth.model';
  * - User dropdown menu
  * - Mobile hamburger menu
  * - Logo con gradient
- * - CTA "Publica tu espacio" (solo HOST)
+ * - CTA "Publica tu espacio"
  */
 @Component({
   selector: 'app-navbar',

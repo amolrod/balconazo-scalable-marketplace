@@ -65,7 +65,8 @@
               "buildTarget": "balconazo-frontend:build:production"
             },
             "development": {
-              "buildTarget": "balconazo-frontend:build:development"
+              "buildTarget": "balconazo-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
