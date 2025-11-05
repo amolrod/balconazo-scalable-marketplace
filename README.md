@@ -497,6 +497,6 @@ Para preguntas o soporte, contactar al equipo de desarrollo.
 
 ---
 
-**Última actualización:** Octubre 2025  
+**Última actualización:** nov 2025  
 **Versión del Backend:** 1.0.0 ✅ Completado
 
