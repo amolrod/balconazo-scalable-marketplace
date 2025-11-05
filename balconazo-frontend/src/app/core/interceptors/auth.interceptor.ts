@@ -5,8 +5,9 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const token = authService.getToken();
+  // Evitar dependencia circular: obtener token directamente de localStorage
+  // IMPORTANTE: Usar la misma key que AuthService ('accessToken')
+  const token = localStorage.getItem('accessToken');
 
   // Clonar request y añadir token si existe
   let authReq = req;
@@ -23,10 +24,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       // Si es 401 y no es la página de login, intentar refresh token
       if (error.status === 401 && !req.url.includes('/auth/')) {
+        // Inyectar AuthService solo cuando sea necesario (lazy)
+        const authService = inject(AuthService);
+
         return authService.refreshToken().pipe(
           switchMap(() => {
             // Reintentar request original con nuevo token
-            const newToken = authService.getToken();
+            const newToken = localStorage.getItem('accessToken');
             const retryReq = req.clone({
               setHeaders: {
                 Authorization: `Bearer ${newToken}`

@@ -36,11 +36,8 @@ export class AuthService {
   }
 
   constructor() {
-    // Cargar usuario del localStorage si existe
-    const userId = this.getUserId();
-    if (userId && this.isAuthenticated()) {
-      this.loadUserProfile();
-    }
+    // No cargar perfil automáticamente para evitar errores 401
+    // El perfil se cargará después del login exitoso
   }
 
   /**
@@ -206,8 +203,11 @@ export class AuthService {
         console.log('✅ Usuario cargado:', user);
       },
       error: (error) => {
-        console.error('❌ Error al cargar perfil:', error);
-        // NO hacer logout automático - el usuario sigue autenticado con el token
+        // Silenciar errores 401 - simplemente el token no es válido o expiró
+        if (error.status !== 401) {
+          console.error('❌ Error al cargar perfil:', error);
+        }
+        // NO hacer logout automático - el interceptor maneja el refresh
       }
     });
   }

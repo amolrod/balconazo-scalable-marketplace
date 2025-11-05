@@ -102,7 +102,7 @@ export class HomeComponent implements OnInit {
       }
       return space.images[0].url;
     }
-    return 'https://via.placeholder.com/600x400/E5E7EB/6B7280?text=' + encodeURIComponent(space.title);
+    return '/assets/images/placeholder-space.svg';
   }
 
   getSpaceLocation(space: Space): string {

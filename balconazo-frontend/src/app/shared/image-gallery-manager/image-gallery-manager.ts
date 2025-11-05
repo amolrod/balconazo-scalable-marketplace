@@ -76,11 +76,14 @@ export class ImageGalleryManagerComponent {
 
     // Subir cada archivo
     let uploaded = 0;
-    validFiles.forEach(file => {
-      const isPrimary = this.images.length === 0 && uploaded === 0;
+    validFiles.forEach((file, index) => {
+      const isPrimary = this.images.length === 0 && index === 0;
+
+      console.log(`📤 Subiendo ${index + 1}/${validFiles.length}:`, file.name);
 
       this.imagesService.uploadImage(this.spaceId, file, isPrimary).subscribe({
         next: (image: SpaceImage) => {
+          console.log('✅ Imagen subida:', image);
           this.images.push(image);
           uploaded++;
 
@@ -92,8 +95,24 @@ export class ImageGalleryManagerComponent {
           }
         },
         error: (error: any) => {
-          console.error('Error subiendo imagen:', error);
-          this.toastService.error('Error al subir la imagen');
+          console.error('❌ Error subiendo imagen:', {
+            fileName: file.name,
+            status: error.status,
+            statusText: error.statusText,
+            error: error.error,
+            message: error.message
+          });
+
+          let errorMsg = 'Error al subir la imagen';
+          if (error.status === 400) {
+            errorMsg = error.error?.message || 'Formato de imagen inválido';
+          } else if (error.status === 413) {
+            errorMsg = 'Imagen demasiado grande (máx 5MB)';
+          } else if (error.status === 401) {
+            errorMsg = 'No autorizado. Inicia sesión nuevamente';
+          }
+
+          this.toastService.error(`${file.name}: ${errorMsg}`);
           uploaded++;
 
           if (uploaded === validFiles.length) {
@@ -105,16 +124,28 @@ export class ImageGalleryManagerComponent {
   }
 
   deleteImage(image: SpaceImage): void {
-    if (!confirm('¿Eliminar esta imagen?')) return;
+    if (!confirm(`¿Eliminar la imagen "${image.altText || 'sin nombre'}"?`)) return;
+
+    console.log('🗑️ Eliminando imagen:', image.id);
 
     this.imagesService.deleteImage(this.spaceId, image.id).subscribe({
       next: () => {
-        this.images = this.images.filter(img => img.id !== image.id);
-        this.imagesChange.emit(this.images);
-        this.toastService.success('Imagen eliminada');
+        console.log('✅ Imagen eliminada del backend:', image.id);
+
+        // Filtrar la imagen eliminada
+        const updatedImages = this.images.filter(img => img.id !== image.id);
+        console.log(`📊 Imágenes restantes: ${updatedImages.length} (antes: ${this.images.length})`);
+
+        // Actualizar el array local
+        this.images = updatedImages;
+
+        // Emitir cambio al componente padre
+        this.imagesChange.emit([...this.images]); // Enviar copia para evitar mutación
+
+        this.toastService.success('Imagen eliminada correctamente');
       },
       error: (error: any) => {
-        console.error('Error eliminando imagen:', error);
+        console.error('❌ Error eliminando imagen:', error);
         this.toastService.error('Error al eliminar la imagen');
       }
     });

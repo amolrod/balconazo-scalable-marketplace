@@ -449,7 +449,7 @@ export class HostDashboardComponent implements OnInit {
       const primary = space.images.find(img => img.isPrimary);
       return primary ? primary.url : space.images[0].url;
     }
-    return `https://via.placeholder.com/400x300/E5E7EB/6B7280?text=${encodeURIComponent(space.title)}`;
+    return '/assets/images/placeholder-space.svg';
   }
 
   getStatusLabel(status: string): string {
@@ -492,15 +492,24 @@ export class HostDashboardComponent implements OnInit {
 
   onImagesChanged(images: SpaceImage[]): void {
     console.log('📸 Imágenes actualizadas:', images);
-    this.spaceImages = images;
-    // Actualizar la imagen del espacio en la lista si es necesario
+
+    // Actualizar array local de imágenes (crear nueva referencia)
+    this.spaceImages = [...images];
+
+    // Actualizar el espacio en la lista mySpaces para que se refleje inmediatamente
     if (this.editingSpaceId) {
       const index = this.mySpaces.findIndex(s => s.id === this.editingSpaceId);
       if (index !== -1) {
+        // Crear nuevo objeto para forzar detección de cambios
         this.mySpaces[index] = {
           ...this.mySpaces[index],
-          images: images
+          images: [...images] // Copia del array de imágenes
         };
+
+        // Forzar actualización del array completo
+        this.mySpaces = [...this.mySpaces];
+
+        console.log('✅ Espacio actualizado en lista con nuevas imágenes');
       }
     }
   }

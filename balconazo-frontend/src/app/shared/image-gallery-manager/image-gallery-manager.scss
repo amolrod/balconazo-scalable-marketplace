@@ -167,10 +167,11 @@
 
 .btn-danger-small {
   background: white;
-  color: var(--error);
+  color: var(--gray-700);
 
   &:hover {
-    background: var(--error-light);
+    background: var(--error);
+    color: white;
     transform: scale(1.1);
   }
 }

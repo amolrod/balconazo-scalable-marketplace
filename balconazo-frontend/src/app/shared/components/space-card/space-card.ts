@@ -54,7 +54,7 @@ export class SpaceCardComponent {
     }
 
     // Placeholder si no hay imágenes
-    return 'assets/images/placeholder-space.jpg';
+    return '/assets/images/placeholder-space.svg';
   }
 
   /**

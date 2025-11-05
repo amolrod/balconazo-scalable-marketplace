@@ -40,12 +40,23 @@ export class NavbarComponent implements OnInit {
       this.userRole = this.authService.getUserRole();
     });
 
-    // Cargar usuario inicial si está autenticado
-    if (this.authService.isAuthenticated()) {
-      const userId = this.authService.getUserId();
-      if (userId) {
-        this.authService.getProfile().subscribe();
-      }
+    // Cargar usuario inicial SOLO si hay token Y userId
+    const token = this.authService.getToken();
+    const userId = this.authService.getUserId();
+
+    if (token && userId) {
+      this.authService.getProfile().subscribe({
+        next: (user) => {
+          // Usuario cargado exitosamente
+        },
+        error: (err) => {
+          // Silenciar error 401 - puede significar token expirado
+          // El interceptor intentará renovarlo automáticamente
+          if (err.status === 401) {
+            // No hacer nada, el interceptor lo maneja
+          }
+        }
+      });
     }
   }
 

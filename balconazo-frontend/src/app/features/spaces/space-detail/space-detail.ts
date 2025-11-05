@@ -109,10 +109,8 @@ export class SpaceDetailComponent implements OnInit {
 
   getImages(): string[] {
     if (!this.space || !this.space.images || this.space.images.length === 0) {
-      // Placeholder si no hay imágenes
-      return [
-        `https://via.placeholder.com/1200x800/E5E7EB/6B7280?text=${encodeURIComponent(this.space?.title || 'Sin imagen')}`
-      ];
+      // Placeholder local si no hay imágenes
+      return ['/assets/images/placeholder-space.svg'];
     }
 
     // Retornar las URLs de las imágenes reales, ordenadas (principal primero)
