@@ -20,7 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static com.balconazo.catalog_microservice.constants.CatalogConstants.*;
@@ -41,14 +43,8 @@ public class SpaceServiceImpl implements SpaceService {
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
 
     public SpaceDTO createSpace(CreateSpaceDTO dto) {
-        // Obtener el rol del usuario autenticado desde el JWT
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isHost = authentication.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST"));
-
-        if (!isHost) {
-            throw new BusinessValidationException("Solo hosts pueden crear espacios");
-        }
+        // ✅ CAMBIO: Permitir a cualquier usuario autenticado crear espacios (modelo Airbnb)
+        // Ya no se valida el rol HOST - todos pueden publicar espacios
 
         // Obtener o crear usuario en la BD local
         UserEntity owner = userRepo.findById(dto.getOwnerId())
@@ -58,7 +54,7 @@ public class SpaceServiceImpl implements SpaceService {
                     .id(dto.getOwnerId())
                     .email("user-" + dto.getOwnerId() + "@balconazo.com") // email dummy
                     .passwordHash("") // no se usa aquí
-                    .role("HOST")
+                    .role("HOST") // Se asigna HOST automáticamente al crear espacio
                     .status("active")
                     .build();
                 return userRepo.save(newUser);
@@ -117,10 +113,15 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Transactional(readOnly = true)
     public List<SpaceDTO> getSpacesByOwner(UUID ownerId) {
-        var owner = userRepo.findById(ownerId)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario", ownerId));
+        // Si el usuario no existe en catalog DB, devolver lista vacía
+        // (es normal para usuarios nuevos que aún no han creado espacios)
+        Optional<UserEntity> owner = userRepo.findById(ownerId);
+        if (owner.isEmpty()) {
+            log.info("Usuario {} no existe en catalog DB (usuario nuevo sin espacios)", ownerId);
+            return Collections.emptyList();
+        }
 
-        return repo.findByOwner(owner).stream()
+        return repo.findByOwner(owner.get()).stream()
             .map(entity -> {
                 SpaceDTO dto = mapper.toDTO(entity);
                 dto.setImages(imageService.getSpaceImages(entity.getId()));

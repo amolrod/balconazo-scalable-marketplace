@@ -65,7 +65,7 @@ spring:
 # SERVER
 # ============================================
 server:
-  port: 8081
+  port: 8085
   servlet:
     context-path: /
   error:
@@ -97,6 +97,14 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+# ============================================
+# JWT Configuration
+# ============================================
+jwt:
+  secret: BalconazoSecretKeyForJWTGenerationMustBe256BitsLongMinimumForHS256AlgorithmSecureKey2025
+  expiration: 86400000  # 24 horas en milisegundos
+  refresh-expiration: 604800000  # 7 días en milisegundos
 
 # ============================================
 # LOGGING

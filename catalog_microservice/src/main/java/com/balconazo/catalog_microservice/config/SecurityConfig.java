@@ -92,6 +92,7 @@ public class SecurityConfig {
                 throws ServletException, IOException {
 
             String path = request.getRequestURI();
+            String method = request.getMethod();
 
             // Solo aplicar a rutas /api/catalog/**
             if (!path.startsWith("/api/catalog/")) {
@@ -99,14 +100,56 @@ public class SecurityConfig {
                 return;
             }
 
-            try {
-                String token = extractToken(request);
+            String token = extractToken(request);
 
+            // Para métodos GET: token es opcional, pero si está presente lo validamos
+            if ("GET".equalsIgnoreCase(method)) {
+                if (token != null) {
+                    try {
+                        // Validar JWT si está presente
+                        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+                        Claims claims = Jwts.parser()
+                            .verifyWith(key)
+                            .build()
+                            .parseSignedClaims(token)
+                            .getPayload();
+
+                        String userId = claims.getSubject();
+                        String role = claims.get("role", String.class);
+
+                        log.debug("✅ JWT validated for GET - userId: {}, role: {}", userId, role);
+
+                        // Crear autenticación
+                        UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                userId,
+                                null,
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                            );
+
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    } catch (Exception e) {
+                        // Para GET, si el token es inválido, simplemente ignorarlo y continuar sin auth
+                        log.warn("⚠️ Invalid JWT in GET request (continuing without auth): {}", e.getMessage());
+                        SecurityContextHolder.clearContext();
+                    }
+                }
+                // Continuar sin importar si hay token o no (GET es público)
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // Para POST/PUT/DELETE: JWT es OBLIGATORIO
+            try {
                 if (token == null) {
-                    log.warn("No JWT token found in request to: {}", path);
+                    log.warn("❌ No JWT token found in {} request to: {}", method, path);
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing JWT token");
                     return;
                 }
+
+                log.info("🔍 Validando JWT para {} {}", method, path);
+                log.info("🔑 Token (primeros 50 chars): {}...", token.substring(0, Math.min(50, token.length())));
+                log.info("🔐 JWT Secret length: {}", jwtSecret.length());
 
                 // Validar y parsear JWT
                 SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
@@ -118,8 +161,9 @@ public class SecurityConfig {
 
                 String userId = claims.getSubject();
                 String role = claims.get("role", String.class);
+                String email = claims.get("email", String.class);
 
-                log.debug("JWT validated - userId: {}, role: {}", userId, role);
+                log.info("✅ JWT validated for {} - userId: {}, role: {}, email: {}", method, userId, role, email);
 
                 // Crear autenticación
                 UsernamePasswordAuthenticationToken authentication =
@@ -135,7 +179,10 @@ public class SecurityConfig {
                 filterChain.doFilter(request, response);
 
             } catch (Exception e) {
-                log.error("JWT validation error: {}", e.getMessage());
+                log.error("❌ JWT validation error for {} {}", method, path);
+                log.error("❌ Exception type: {}", e.getClass().getName());
+                log.error("❌ Error message: {}", e.getMessage());
+                log.error("❌ Stack trace:", e);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             }
         }
