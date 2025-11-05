@@ -8,6 +8,9 @@ import { ToastService } from '../../../core/services/toast.service';
 import { SpaceImagesService } from '../../../core/services/space-images.service';
 import { SpaceImage } from '../../../core/models/space.model';
 import { ImageGalleryManagerComponent } from '../../../shared/image-gallery-manager/image-gallery-manager';
+import { SpaceCardComponent } from '../../../shared/components/space-card/space-card';
+import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
+import { PricePipe } from '../../../shared/pipes/price.pipe';
 
 interface DashboardStats {
   totalSpaces: number;
@@ -20,7 +23,17 @@ interface DashboardStats {
 
 @Component({
   selector: 'app-host-dashboard',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, ImageGalleryManagerComponent],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    ImageGalleryManagerComponent,
+    SpaceCardComponent,
+    EmptyStateComponent,
+    PricePipe
+  ],
   templateUrl: './host-dashboard.html',
   styleUrl: './host-dashboard.scss'
 })
@@ -187,25 +200,9 @@ export class HostDashboardComponent implements OnInit {
     });
 
     // Cargar imágenes del espacio
-    this.loadSpaceImages(space.id);
+    this.spaceImages = space.images || [];
 
     this.changeView('edit-space');
-  }
-
-  loadSpaceImages(spaceId: string): void {
-    this.imagesService.getImages(spaceId).subscribe({
-      next: (images) => {
-        this.spaceImages = images;
-      },
-      error: (error) => {
-        console.error('Error cargando imágenes:', error);
-        this.spaceImages = [];
-      }
-    });
-  }
-
-  onImagesChange(images: SpaceImage[]): void {
-    this.spaceImages = images;
   }
 
   updateSpace(): void {
@@ -262,17 +259,17 @@ export class HostDashboardComponent implements OnInit {
     });
   }
 
-  openDeleteModal(space: Space): void {
+  confirmDelete(space: Space): void {
     this.spaceToDelete = space;
     this.showDeleteModal = true;
   }
 
-  closeDeleteModal(): void {
+  cancelDelete(): void {
     this.showDeleteModal = false;
     this.spaceToDelete = null;
   }
 
-  confirmDelete(): void {
+  deleteSpace(): void {
     if (!this.spaceToDelete) return;
 
     const spaceId = this.spaceToDelete.id;
@@ -280,7 +277,6 @@ export class HostDashboardComponent implements OnInit {
     this.spacesService.deleteSpace(spaceId).subscribe({
       next: () => {
         console.log('✅ Espacio eliminado');
-        // NO eliminamos del array, solo actualizamos el estado a DELETED
         const index = this.mySpaces.findIndex(s => s.id === spaceId);
         if (index !== -1) {
           this.mySpaces[index] = {
@@ -290,14 +286,13 @@ export class HostDashboardComponent implements OnInit {
         }
         this.calculateStats();
         this.toastService.success('✓ Espacio eliminado exitosamente');
-        // Cambiar automáticamente al filtro de eliminados para ver el espacio
         this.changeSpacesFilter('deleted');
-        this.closeDeleteModal();
+        this.cancelDelete();
       },
       error: (error) => {
         console.error('❌ Error eliminando espacio:', error);
         this.toastService.error('Error al eliminar el espacio');
-        this.closeDeleteModal();
+        this.cancelDelete();
       }
     });
   }
@@ -441,5 +436,72 @@ export class HostDashboardComponent implements OnInit {
       'cocina_exterior': 'Cocina exterior'
     };
     return labels[amenity] || amenity;
+  }
+
+  // Helper methods for new template
+  getFilteredSpaces(filter: string): Space[] {
+    if (filter === 'all') return this.mySpaces;
+    return this.mySpaces.filter(s => s.status.toUpperCase() === filter.toUpperCase());
+  }
+
+  getSpaceImage(space: Space): string {
+    if (space.images && space.images.length > 0) {
+      const primary = space.images.find(img => img.isPrimary);
+      return primary ? primary.url : space.images[0].url;
+    }
+    return `https://via.placeholder.com/400x300/E5E7EB/6B7280?text=${encodeURIComponent(space.title)}`;
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: { [key: string]: string } = {
+      'ACTIVE': 'Activo',
+      'SNOOZED': 'Pausado',
+      'DELETED': 'Eliminado',
+      'DRAFT': 'Borrador'
+    };
+    return labels[status.toUpperCase()] || status;
+  }
+
+  pauseSpace(space: Space): void {
+    this.spacesService.snoozeSpace(space.id).subscribe({
+      next: (updated) => {
+        const index = this.mySpaces.findIndex(s => s.id === space.id);
+        if (index !== -1) this.mySpaces[index] = updated;
+        this.calculateStats();
+        this.toastService.success('Espacio pausado');
+      },
+      error: () => this.toastService.error('Error al pausar el espacio')
+    });
+  }
+
+  activateSpace(space: Space): void {
+    this.spacesService.activateSpace(space.id).subscribe({
+      next: (updated) => {
+        const index = this.mySpaces.findIndex(s => s.id === space.id);
+        if (index !== -1) this.mySpaces[index] = updated;
+        this.calculateStats();
+        this.toastService.success('Espacio activado');
+      },
+      error: () => this.toastService.error('Error al activar el espacio')
+    });
+  }
+
+  viewSpace(spaceId: string): void {
+    this.router.navigate(['/spaces', spaceId]);
+  }
+
+  onImagesChanged(images: SpaceImage[]): void {
+    console.log('📸 Imágenes actualizadas:', images);
+    this.spaceImages = images;
+    // Actualizar la imagen del espacio en la lista si es necesario
+    if (this.editingSpaceId) {
+      const index = this.mySpaces.findIndex(s => s.id === this.editingSpaceId);
+      if (index !== -1) {
+        this.mySpaces[index] = {
+          ...this.mySpaces[index],
+          images: images
+        };
+      }
+    }
   }
 }
