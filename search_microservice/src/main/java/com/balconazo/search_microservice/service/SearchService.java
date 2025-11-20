@@ -46,9 +46,42 @@ public class SearchService {
             offset
         );
 
-        // Por ahora, retornamos resultado vacío hasta implementar el mapeo correcto
-        // TODO: Implementar mapeo de Object[] a SpaceSearchResultDTO
-        List<SpaceSearchResultDTO> spaces = List.of();
+        // Mapear resultados de Object[] a SpaceSearchResultDTO
+        // rawResults contiene: [space_id (UUID), distance_km (Double)]
+        List<SpaceSearchResultDTO> spaces = rawResults.stream()
+            .map(row -> {
+                UUID spaceId = (UUID) row[0];
+                Double distanceKm = row.length > 1 ? (Double) row[1] : null;
+                
+                // Cargar la entidad completa por ID
+                SpaceProjection projection = repository.findById(spaceId).orElse(null);
+                if (projection == null) {
+                    return null;
+                }
+                
+                var geo = projection.getGeo();
+                return SpaceSearchResultDTO.builder()
+                    .id(projection.getSpaceId())
+                    .ownerId(projection.getOwnerId())
+                    .ownerEmail(projection.getOwnerEmail())
+                    .title(projection.getTitle())
+                    .description(projection.getDescription())
+                    .address(projection.getAddress())
+                    .lat(geo != null ? geo.getY() : null)
+                    .lon(geo != null ? geo.getX() : null)
+                    .capacity(projection.getCapacity())
+                    .areaSqm(projection.getAreaSqm())
+                    .basePriceCents(projection.getBasePriceCents())
+                    .averageRating(projection.getAvgRating())
+                    .totalReviews(projection.getReviewCount())
+                    .totalBookings(projection.getCompletedBookings())
+                    .status(projection.getStatus())
+                    .amenities(projection.getAmenities())
+                    .distanceKm(distanceKm)
+                    .build();
+            })
+            .filter(dto -> dto != null)
+            .collect(java.util.stream.Collectors.toList());
 
         // Contar total de resultados
         long totalResults = repository.countSearchResults(

@@ -78,5 +78,16 @@ public class AuthController {
         UserResponse response = authService.getUserById(userId);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * Endpoint para promover usuario a HOST (isHost=true)
+     * Se invoca desde Catalog Service cuando el usuario crea su primer espacio
+     */
+    @PutMapping("/users/{userId}/promote-to-host")
+    public ResponseEntity<Void> promoteToHost(@PathVariable String userId) {
+        log.info("PUT /api/auth/users/{}/promote-to-host", userId);
+        authService.promoteToHost(userId);
+        return ResponseEntity.ok().build();
+    }
 }
 

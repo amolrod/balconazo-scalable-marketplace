@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/booking/bookings")
+@RequestMapping("/api/bookings")
 @RequiredArgsConstructor
 @Slf4j
 public class BookingController {
@@ -23,7 +23,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDTO> createBooking(@Valid @RequestBody CreateBookingDTO createBookingDTO) {
-        log.info("📥 POST /api/booking/bookings - Crear reserva");
+        log.info("📥 POST /api/bookings - Crear reserva");
         BookingDTO booking = bookingService.createBooking(createBookingDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }

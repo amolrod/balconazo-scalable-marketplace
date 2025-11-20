@@ -22,11 +22,20 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    private String name;
+    
+    private String phone;
+    
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
-    @Column(nullable = false)
-    private String role;
+    @Column(name = "is_host", nullable = false)
+    @Builder.Default
+    private Boolean isHost = false;
+
+    @Column(name = "is_guest", nullable = false)
+    @Builder.Default
+    private Boolean isGuest = true;
 
     @Column(name = "trust_score")
     @Builder.Default
@@ -34,7 +43,7 @@ public class UserEntity {
 
     @Column(nullable = false)
     @Builder.Default
-    private String status = "active";
+    private Boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

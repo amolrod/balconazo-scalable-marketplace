@@ -42,21 +42,27 @@ public class AuthService {
             throw new RuntimeException("El email ya está registrado");
         }
 
-        // Crear usuario
+        // Crear usuario con modelo dinámico: isHost=false, isGuest=true por defecto
         User user = User.builder()
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
+                .name(request.getName())
+                .phone(request.getPhone())
+                .isHost(false)  // Todos empiezan como NO host
+                .isGuest(true)  // Todos son guest por defecto
                 .active(true)
                 .build();
 
         user = userRepository.save(user);
-        log.info("Usuario registrado exitosamente con ID: {}", user.getId());
+        log.info("Usuario registrado exitosamente con ID: {} (isHost=false, isGuest=true)", user.getId());
 
         return UserResponse.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .isHost(user.getIsHost())
+                .isGuest(user.getIsGuest())
                 .active(user.getActive())
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -81,8 +87,8 @@ public class AuthService {
             throw new org.springframework.security.authentication.BadCredentialsException("User account is disabled");
         }
 
-        // Generar tokens
-        String accessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole().name());
+        // Generar tokens con isHost/isGuest
+        String accessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getIsHost(), user.getIsGuest());
         String refreshToken = jwtService.generateRefreshToken(user.getId());
 
         // Guardar refresh token
@@ -93,7 +99,7 @@ public class AuthService {
                 .build();
         refreshTokenRepository.save(refreshTokenEntity);
 
-        log.info("Login exitoso para usuario: {}", user.getEmail());
+        log.info("Login exitoso para usuario: {} (isHost={}, isGuest={})", user.getEmail(), user.getIsHost(), user.getIsGuest());
 
         return LoginResponse.builder()
                 .accessToken(accessToken)
@@ -102,7 +108,8 @@ public class AuthService {
                 .expiresIn(jwtExpiration / 1000)
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .isHost(user.getIsHost())
+                .isGuest(user.getIsGuest())
                 .build();
     }
 
@@ -124,10 +131,10 @@ public class AuthService {
         User user = userRepository.findById(tokenEntity.getUserId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Generar nuevo access token
-        String newAccessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole().name());
+        // Generar nuevo access token con isHost/isGuest actualizados
+        String newAccessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getIsHost(), user.getIsGuest());
 
-        log.info("Token refrescado para usuario: {}", user.getEmail());
+        log.info("Token refrescado para usuario: {} (isHost={}, isGuest={})", user.getEmail(), user.getIsHost(), user.getIsGuest());
 
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
@@ -136,7 +143,8 @@ public class AuthService {
                 .expiresIn(jwtExpiration / 1000)
                 .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .isHost(user.getIsHost())
+                .isGuest(user.getIsGuest())
                 .build();
     }
 
@@ -151,12 +159,34 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         return UserResponse.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .email(user.getEmail())
-                .role(user.getRole().name())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .profileImageUrl(user.getProfileImageUrl())
+                .isHost(user.getIsHost())
+                .isGuest(user.getIsGuest())
                 .active(user.getActive())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    /**
+     * Promueve un usuario a HOST (isHost=true)
+     * Se invoca automáticamente cuando el usuario crea su primer espacio
+     */
+    @Transactional
+    public void promoteToHost(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!user.getIsHost()) {
+            user.setIsHost(true);
+            userRepository.save(user);
+            log.info("Usuario {} promovido a HOST (isHost=true)", userId);
+        } else {
+            log.info("Usuario {} ya es HOST, no se requiere acción", userId);
+        }
     }
 }
 

@@ -10,9 +10,13 @@ import java.util.UUID;
 public class UserDTO {
     private UUID id;
     private String email;
-    private String role;
+    private String name;
+    private String phone;
+    private String profileImageUrl;
+    private Boolean isHost;
+    private Boolean isGuest;
     private Integer trustScore;
-    private String status;
+    private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

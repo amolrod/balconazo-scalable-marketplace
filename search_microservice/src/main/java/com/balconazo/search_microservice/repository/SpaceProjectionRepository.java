@@ -17,7 +17,7 @@ public interface SpaceProjectionRepository extends JpaRepository<SpaceProjection
      */
     @Query(value = """
         SELECT 
-            s.*,
+            s.space_id,
             ST_Distance(s.geo::geography, 
                        ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) / 1000 as distance_km
         FROM search.spaces_projection s

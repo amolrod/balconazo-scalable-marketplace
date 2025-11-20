@@ -1,6 +1,5 @@
 package com.balconazo.auth.dto;
 
-import com.balconazo.auth.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
-    private String id;
+    private String userId;
     private String email;
-    private String role;
+    private String name;
+    private String phone;
+    private String profileImageUrl;
+    private Boolean isHost;
+    private Boolean isGuest;
     private Boolean active;
     private LocalDateTime createdAt;
 }

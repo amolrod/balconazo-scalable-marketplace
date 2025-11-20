@@ -16,6 +16,7 @@ public class LoginResponse {
     private Long expiresIn;
     private String userId;
     private String email;
-    private String role;
+    private Boolean isHost;
+    private Boolean isGuest;
 }
 

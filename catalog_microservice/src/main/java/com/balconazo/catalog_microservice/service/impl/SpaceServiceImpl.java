@@ -11,6 +11,7 @@ import com.balconazo.catalog_microservice.exception.ResourceNotFoundException;
 import com.balconazo.catalog_microservice.mapper.SpaceMapper;
 import com.balconazo.catalog_microservice.repository.SpaceRepository;
 import com.balconazo.catalog_microservice.repository.UserRepository;
+import com.balconazo.catalog_microservice.client.AuthServiceClient;
 import com.balconazo.catalog_microservice.service.CacheService;
 import com.balconazo.catalog_microservice.service.SpaceService;
 import com.balconazo.catalog_microservice.service.SpaceImageService;
@@ -36,43 +37,27 @@ public class SpaceServiceImpl implements SpaceService {
     private final CacheService cacheService;
     private final EventPublisher eventPublisher;
     private final SpaceImageService imageService;
+    private final AuthServiceClient authServiceClient;
 
     private static final String CACHE_KEY_SPACE = "space:";
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
 
     public SpaceDTO createSpace(CreateSpaceDTO dto) {
-        // Obtener el rol del usuario autenticado desde el JWT
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isHost = authentication.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_HOST"));
-
-        if (!isHost) {
-            throw new BusinessValidationException("Solo hosts pueden crear espacios");
-        }
-
-        // Obtener o crear usuario en la BD local
-        UserEntity owner = userRepo.findById(dto.getOwnerId())
-            .orElseGet(() -> {
-                // Crear usuario local si no existe
-                UserEntity newUser = UserEntity.builder()
-                    .id(dto.getOwnerId())
-                    .email("user-" + dto.getOwnerId() + "@balconazo.com") // email dummy
-                    .passwordHash("") // no se usa aquí
-                    .role("HOST")
-                    .status("active")
-                    .build();
-                return userRepo.save(newUser);
-            });
-
-        var space = mapper.toEntity(dto, owner);
+        // MODELO DINÁMICO: Cualquier usuario autenticado puede crear espacios
+        // Se promueve a HOST automáticamente al crear el primer espacio
+        
+        var space = mapper.toEntity(dto);
         space.setStatus(SPACE_STATUS_ACTIVE); // Crear espacios directamente como ACTIVE
         var saved = repo.save(space);
-        log.info("Espacio creado con estado ACTIVE: {}", saved.getId());
+        log.info("Espacio creado con estado ACTIVE: {} por usuario: {}", saved.getId(), dto.getOwnerId());
+        
+        // Promover usuario a host automáticamente
+        authServiceClient.promoteToHost(dto.getOwnerId());
 
         // Publicar evento a Kafka para que Search Service lo indexe
         SpaceCreatedEvent event = SpaceCreatedEvent.builder()
             .spaceId(saved.getId())
-            .ownerId(saved.getOwner().getId())
+            .ownerId(saved.getOwnerId())
             .title(saved.getTitle())
             .description(saved.getDescription())
             .address(saved.getAddress())
@@ -117,10 +102,7 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Transactional(readOnly = true)
     public List<SpaceDTO> getSpacesByOwner(UUID ownerId) {
-        var owner = userRepo.findById(ownerId)
-            .orElseThrow(() -> new ResourceNotFoundException("Usuario", ownerId));
-
-        return repo.findByOwner(owner).stream()
+        return repo.findByOwnerId(ownerId).stream()
             .map(entity -> {
                 SpaceDTO dto = mapper.toDTO(entity);
                 dto.setImages(imageService.getSpaceImages(entity.getId()));

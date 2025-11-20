@@ -16,6 +16,8 @@ public interface BookingRepository extends JpaRepository<BookingEntity, UUID> {
 
     List<BookingEntity> findByGuestIdOrderByCreatedAtDesc(UUID guestId);
 
+    List<BookingEntity> findBySpaceIdOrderByStartTsAsc(UUID spaceId);
+
     List<BookingEntity> findBySpaceIdAndStatusOrderByStartTsAsc(UUID spaceId, BookingEntity.BookingStatus status);
 
     @Query("SELECT b FROM BookingEntity b WHERE b.spaceId = :spaceId " +

@@ -16,7 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Filtro JWT para validar tokens en requests protegidos
@@ -65,15 +67,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extraer información del token
             String userId = jwtService.extractUserId(token);
             String email = jwtService.extractEmail(token);
-            String role = jwtService.extractRole(token);
+            Boolean isHost = jwtService.extractIsHost(token);
+            Boolean isGuest = jwtService.extractIsGuest(token);
 
-            log.debug("JWT validated for user: {} ({})", email, userId);
+            log.debug("JWT validated for user: {} ({}) - isHost={}, isGuest={}", email, userId, isHost, isGuest);
+
+            // Crear authorities basadas en isHost/isGuest
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            if (Boolean.TRUE.equals(isHost)) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_HOST"));
+            }
+            if (Boolean.TRUE.equals(isGuest)) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_GUEST"));
+            }
 
             // Crear autenticación en el contexto de Spring Security
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId,
                     null,
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                    authorities
             );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -82,7 +94,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Añadir headers para que el controller pueda usarlos
             request.setAttribute("X-User-Id", userId);
             request.setAttribute("X-User-Email", email);
-            request.setAttribute("X-User-Role", role);
+            request.setAttribute("X-Is-Host", isHost);
+            request.setAttribute("X-Is-Guest", isGuest);
 
         } catch (Exception e) {
             log.error("Error processing JWT token: {}", e.getMessage());

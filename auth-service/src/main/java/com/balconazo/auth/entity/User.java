@@ -28,9 +28,22 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @Column(nullable = false, length = 100)
+    private String name;
+
+    @Column(length = 20)
+    private String phone;
+
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+
+    @Builder.Default
+    @Column(name = "is_host", nullable = false)
+    private Boolean isHost = false;
+
+    @Builder.Default
+    @Column(name = "is_guest", nullable = false)
+    private Boolean isGuest = true;
 
     @Builder.Default
     @Column(nullable = false)
@@ -49,15 +62,17 @@ public class User {
         if (this.active == null) {
             this.active = true;
         }
+        if (this.isHost == null) {
+            this.isHost = false;
+        }
+        if (this.isGuest == null) {
+            this.isGuest = true;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-    }
-
-    public enum Role {
-        GUEST, HOST, ADMIN
     }
 }
 

@@ -113,7 +113,7 @@ spring:
         - id: booking-service-bookings
           uri: lb://booking-service
           predicates:
-            - Path=/api/booking/bookings/**
+            - Path=/api/bookings/**
           filters:
             - StripPrefix=0
             - name: RequestRateLimiter
@@ -129,7 +129,7 @@ spring:
         - id: booking-service-reviews
           uri: lb://booking-service
           predicates:
-            - Path=/api/booking/reviews/**
+            - Path=/api/reviews/**
           filters:
             - StripPrefix=0
             - name: RequestRateLimiter

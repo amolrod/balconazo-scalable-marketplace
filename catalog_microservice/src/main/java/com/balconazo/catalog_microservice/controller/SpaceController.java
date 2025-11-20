@@ -16,6 +16,18 @@ public class SpaceController {
 
     @PostMapping
     public ResponseEntity<SpaceDTO> create(@Valid @RequestBody CreateSpaceDTO dto) {
+        // Extraer userId del SecurityContext (viene del JWT)
+        var authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String userId = (String) authentication.getPrincipal();
+        dto.setOwnerId(UUID.fromString(userId));
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createSpace(dto));
     }
 
@@ -35,8 +47,26 @@ public class SpaceController {
     }
 
     @PutMapping("/{id}")
-    public SpaceDTO update(@PathVariable UUID id, @Valid @RequestBody CreateSpaceDTO dto) {
-        return service.updateSpace(id, dto);
+    public ResponseEntity<SpaceDTO> update(@PathVariable UUID id, @Valid @RequestBody CreateSpaceDTO dto) {
+        // Extraer userId del SecurityContext
+        var authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String userId = (String) authentication.getPrincipal();
+        UUID authenticatedUserId = UUID.fromString(userId);
+        
+        // Validar ownership antes de actualizar
+        SpaceDTO existingSpace = service.getSpaceById(id);
+        if (!existingSpace.getOwnerId().equals(authenticatedUserId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        return ResponseEntity.ok(service.updateSpace(id, dto));
     }
 
     @PostMapping("/{id}/activate")
@@ -56,6 +86,24 @@ public class SpaceController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        // Extraer userId del SecurityContext
+        var authentication = org.springframework.security.core.context.SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        String userId = (String) authentication.getPrincipal();
+        UUID authenticatedUserId = UUID.fromString(userId);
+        
+        // Validar ownership antes de eliminar
+        SpaceDTO existingSpace = service.getSpaceById(id);
+        if (!existingSpace.getOwnerId().equals(authenticatedUserId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
         service.deleteSpace(id);
         return ResponseEntity.noContent().build();
     }

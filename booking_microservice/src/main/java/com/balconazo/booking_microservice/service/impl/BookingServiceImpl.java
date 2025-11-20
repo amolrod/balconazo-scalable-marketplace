@@ -185,8 +185,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDTO> getBookingsBySpace(UUID spaceId) {
         log.info("🔍 Buscando reservas del espacio: {}", spaceId);
 
-        List<BookingEntity> bookings = bookingRepository.findBySpaceIdAndStatusOrderByStartTsAsc(
-                spaceId, BookingEntity.BookingStatus.confirmed);
+        List<BookingEntity> bookings = bookingRepository.findBySpaceIdOrderByStartTsAsc(spaceId);
 
         return bookings.stream()
                 .map(bookingMapper::toDTO)

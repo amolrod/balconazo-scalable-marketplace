@@ -1,4 +1,4 @@
-package com.balconazo.catalog_microservice.config;
+package com.balconazo.booking_microservice.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,10 +29,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Configuración de seguridad para Catalog Service
+ * Configuración de seguridad para Booking Service
  *
- * - Valida JWT en todas las rutas /api/catalog/**
- * - El filtro JWT se ejecuta ANTES de la validación del DTO
+ * - Valida JWT en todas las rutas /api/bookings/**
  * - Si no hay JWT o es inválido → 401 UNAUTHORIZED
  * - Si JWT válido → continúa al controlador
  */
@@ -51,7 +50,6 @@ public class SecurityConfig {
 
     /**
      * Configuración del filtro de seguridad
-     * @Order(1) asegura que se ejecute ANTES de otros filtros
      */
     @Bean
     @Order(1)
@@ -62,8 +60,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
                 .requestMatchers("/actuator/**").permitAll()
-                // TODAS las rutas de catalog requieren autenticación JWT
-                .requestMatchers("/api/catalog/**").authenticated()
+                // TODAS las rutas de bookings requieren autenticación JWT
+                .requestMatchers("/api/bookings/**").authenticated()
                 .anyRequest().permitAll()
             )
             // Agregar filtro JWT ANTES del UsernamePasswordAuthenticationFilter
@@ -73,7 +71,6 @@ public class SecurityConfig {
 
     /**
      * Filtro de autenticación JWT
-     * Se ejecuta ANTES de validar el DTO
      */
     @Component
     @Slf4j
@@ -90,8 +87,8 @@ public class SecurityConfig {
 
             String path = request.getRequestURI();
 
-            // Solo aplicar a rutas /api/catalog/**
-            if (!path.startsWith("/api/catalog/")) {
+            // Solo aplicar a rutas /api/bookings/** (con o sin slash final)
+            if (!path.startsWith("/api/bookings")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -159,4 +156,3 @@ public class SecurityConfig {
         }
     }
 }
-

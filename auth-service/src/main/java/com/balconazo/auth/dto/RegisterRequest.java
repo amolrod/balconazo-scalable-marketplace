@@ -1,9 +1,7 @@
 package com.balconazo.auth.dto;
 
-import com.balconazo.auth.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,7 +16,11 @@ public class RegisterRequest {
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     private String password;
 
-    @NotNull(message = "El rol es obligatorio")
-    private User.Role role;
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre no puede exceder 100 caracteres")
+    private String name;
+
+    @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
+    private String phone;
 }
 

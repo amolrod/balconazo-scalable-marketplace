@@ -9,7 +9,8 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateSpaceDTO {
-    @NotNull(message = "El ID del propietario es obligatorio")
+    // El ownerId se asigna automáticamente desde el SecurityContext
+    // No debe venir en el body del request
     private UUID ownerId;
     
     @NotBlank(message = "El título es obligatorio")

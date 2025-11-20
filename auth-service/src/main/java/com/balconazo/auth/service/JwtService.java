@@ -25,11 +25,12 @@ public class JwtService {
     @Value("${jwt.refresh-expiration}")
     private Long refreshExpiration;
 
-    public String generateToken(String userId, String email, String role) {
+    public String generateToken(String userId, String email, Boolean isHost, Boolean isGuest) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("email", email);
-        claims.put("role", role);
+        claims.put("isHost", isHost);
+        claims.put("isGuest", isGuest);
         return createToken(claims, userId, expiration);
     }
 
@@ -60,8 +61,12 @@ public class JwtService {
         return extractClaim(token, claims -> claims.get("email", String.class));
     }
 
-    public String extractRole(String token) {
-        return extractClaim(token, claims -> claims.get("role", String.class));
+    public Boolean extractIsHost(String token) {
+        return extractClaim(token, claims -> claims.get("isHost", Boolean.class));
+    }
+
+    public Boolean extractIsGuest(String token) {
+        return extractClaim(token, claims -> claims.get("isGuest", Boolean.class));
     }
 
     public Date extractExpiration(String token) {

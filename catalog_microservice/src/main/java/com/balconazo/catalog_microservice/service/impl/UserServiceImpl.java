@@ -23,16 +23,8 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
 
     public UserDTO createUser(CreateUserDTO dto) {
-        if (repo.existsByEmail(dto.getEmail()))
-            throw new DuplicateResourceException("Usuario", "email", dto.getEmail());
-        var user = UserEntity.builder()
-            .email(dto.getEmail())
-            .passwordHash(encoder.encode(dto.getPassword()))
-            .role(dto.getRole())
-            .trustScore(0)
-            .status(STATUS_ACTIVE)
-            .build();
-        return mapper.toDTO(repo.save(user));
+        // DEPRECATED: Catalog Service no debe crear usuarios - usar Auth Service
+        throw new UnsupportedOperationException("Use Auth Service to create users");
     }
 
     @Transactional(readOnly = true)
@@ -56,7 +48,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     public List<UserDTO> getUsersByRole(String role) {
-        return repo.findByRoleAndStatus(role, STATUS_ACTIVE).stream()
+        // Convertir role antiguo a nuevo modelo
+        Boolean isHost = "HOST".equals(role);
+        return repo.findByIsHostAndActive(isHost, true).stream()
             .map(mapper::toDTO).collect(Collectors.toList());
     }
 
@@ -68,13 +62,13 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO suspendUser(UUID id) {
         var user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
-        user.setStatus(STATUS_SUSPENDED);
+        user.setActive(false);
         return mapper.toDTO(repo.save(user));
     }
 
     public UserDTO activateUser(UUID id) {
         var user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
-        user.setStatus(STATUS_ACTIVE);
+        user.setActive(true);
         return mapper.toDTO(repo.save(user));
     }
 }
