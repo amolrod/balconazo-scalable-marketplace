@@ -2,6 +2,57 @@
 
 Todos los cambios importantes del proyecto se documentan en este archivo.
 
+## [1.1.0] - 2025-11-20
+
+### 📚 Consolidación de Documentación
+
+#### ✅ Implementado
+- **PROJECT_CONTEXT.md**: Documento maestro unificado con toda la información del proyecto (6500+ líneas)
+  - Arquitectura completa de microservicios
+  - Guías de inicio y configuración
+  - Variables de entorno
+  - Datos de prueba completos
+  - Roadmap y próximos pasos
+  - ADRs (Decisiones Arquitectónicas)
+  - Convenciones de código
+  - Troubleshooting
+  - Documentación de frontend
+
+#### 🧹 Documentación Histórica Consolidada
+Los siguientes archivos fueron consolidados en `CHANGELOG.md` (v1.1.0) y `PROJECT_CONTEXT.md`:
+
+**Implementaciones Completadas:**
+- `JWT_IMPLEMENTADO.md` - Sistema JWT con HS512 (24h expiration)
+- `FRONTEND_SETUP_COMPLETADO.md` - Angular 20 + TailwindCSS + Design System
+- `IMAGENES_EN_DETALLE_COMPLETADO.md` - Sistema de upload y galería de imágenes
+- `INSTAGRAM-LAYOUT-IMPLEMENTADO.md` - Layout tipo Instagram en Space Detail
+- `MODELO-AIRBNB-IMPLEMENTADO.md` - Modelo de roles dinámicos (usuario = host + guest)
+- `AUTH-SIN-SCROLL-FINAL.md` - Solución scroll en login/register
+- `REGISTRO-ARREGLADO-FINAL.md` - Corrección flujo de registro
+- `MIS-ESPACIOS-VISIBLE.md` - Dashboard de host funcionando
+- `SISTEMA_IMAGENES_COMPLETADO.md` - Sistema completo de imágenes (backend + frontend)
+
+**Problemas Resueltos:**
+- `PROBLEMAS-FINALES-SOLUCIONADOS.md` - Correcciones finales sistema
+- `RESUMEN_CORRECCIONES_FINALES.md` - Resumen de correcciones
+- `PRUEBAS_COMPLETAS_SISTEMA.md` - Suite de pruebas E2E
+
+**Pull Requests Frontend:**
+- `RESUMEN-3-PRS-COMPLETADOS.md` - Resumen de 3 PRs
+- `PR-1-DESIGN-SYSTEM.md` - Design System base
+- `PR-1-ENTREGA.md` - Primera entrega frontend
+- `PR-2-CORE-INFRASTRUCTURE.md` - Infraestructura core
+
+**Roadmap y Postman:**
+- `siguientesfuncionalidades.md` - Próximas funcionalidades (ahora en NEXT-STEPS.md)
+- `POSTMAN_README.md` - Introducción a colección Postman (ahora en POSTMAN_ENDPOINTS.md)
+
+#### 🗃️ Archivos Eliminados (20 Nov 2025)
+Total: **17 archivos** de documentación histórica eliminados tras consolidación
+- Sin pérdida de información (todo migrado a `PROJECT_CONTEXT.md` y `CHANGELOG.md`)
+
+---
+
 ## [1.0.0] - 2025-10-30
 
 ### ✅ Sistema Completamente Funcional

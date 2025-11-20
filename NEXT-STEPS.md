@@ -1,6 +1,329 @@
-# 📊 Estado Final del Proyecto - 2 Noviembre 2025
+# 🚀 ROADMAP Y PRÓXIMOS PASOS - BalconazoApp
 
-## ✅ PROBLEMAS SOLUCIONADOS EN ESTA SESIÓN
+**Última actualización**: 20 Noviembre 2025  
+**Estado**: Backend 100% | Frontend 70%
+
+---
+
+## 📊 RESUMEN EJECUTIVO
+
+### Estado del Proyecto
+
+✅ **Backend (100% Completado)**
+- Arquitectura de microservicios completa (6 servicios)
+- Autenticación JWT + Security
+- CRUD completo (Espacios, Reservas, Reviews)
+- Búsqueda geoespacial con PostGIS
+- Eventos asíncronos con Kafka
+- Tests E2E automatizados (29 tests, 100% éxito)
+
+🟡 **Frontend (70% Completado)**
+- Design System + Core Infrastructure
+- Autenticación (Login/Logout)
+- Home + Explore con búsqueda/mapa
+- Space Detail con galería de imágenes
+- Host Dashboard (CRUD espacios)
+- **Pendiente**: Reservas (guest), Pagos, Reviews UI, Perfil
+
+### Priorización de Features
+
+| Prioridad | Features | Esfuerzo | Estado |
+|-----------|----------|----------|--------|
+| 🔴 **CRÍTICO (MVP)** | Reservas + Pagos + Reviews | 40-50h | Pendiente |
+| 🟡 **IMPORTANTE** | Perfil, Notificaciones, Chat | 30-40h | Pendiente |
+| 🟢 **DESEABLE** | Pricing dinámico, Analytics, Favoritos | 20-30h | Futuro |
+
+---
+
+## 🔴 PRIORIDAD CRÍTICA (MVP - 40-50 HORAS)
+
+### 1. Sistema de Reservas Completo 🔴
+**Tiempo:** 15-18 horas  
+**Impacto:** CRÍTICO - Sin reservas no hay transacciones
+
+#### Funcionalidades
+- **Calendario de Selección** (Guest)
+  - DateRangePicker para fecha/hora inicio y fin
+  - Validación de disponibilidad
+  - Cálculo automático de precio (horas × precio/hora)
+  - Visualización de ocupación
+  - Mínimo de horas configurable
+
+- **Proceso de Reserva**
+  1. Selección de fecha/hora
+  2. Resumen (espacio, fechas, precio)
+  3. Confirmación (solicitud inicial)
+  4. Estado: `PENDING` → `CONFIRMED` → `COMPLETED`
+
+- **Vista Guest** (`/bookings`)
+  - Reservas activas (upcoming)
+  - Historial (past/completed)
+  - Estados: Pending, Confirmed, Completed, Cancelled
+  - Botón "Cancelar" con políticas
+  - Detalles completos
+
+- **Vista Host** (Dashboard)
+  - Reservas recibidas
+  - Filtros: Pendientes, Confirmadas, etc.
+  - Acciones: Aceptar/Rechazar
+  - Calendario de ocupación
+  - Timeline de próximas reservas
+
+#### Backend (Ya Implementado ✅)
+```
+POST   /api/booking/bookings
+GET    /api/booking/bookings/guest/{guestId}
+GET    /api/booking/bookings/space/{spaceId}
+PUT    /api/booking/bookings/{id}/confirm
+PUT    /api/booking/bookings/{id}/cancel
+```
+
+#### Componentes a Crear
+```
+bookings/
+├── booking-create/       (proceso de reserva)
+├── booking-list/         (vista guest)
+├── host-bookings/        (vista host)
+└── shared/
+    ├── booking-card.ts
+    ├── date-range-picker.ts
+    └── booking-calendar.ts
+```
+
+#### Criterios de Aceptación
+- [ ] Guest selecciona fechas/horas y crea reserva
+- [ ] Cálculo automático de precio
+- [ ] Host recibe notificación y puede aceptar/rechazar
+- [ ] Estados de reserva correctos
+- [ ] Guest puede cancelar (con políticas)
+- [ ] Calendario muestra ocupación
+
+---
+
+### 2. Sistema de Pagos con Stripe 🔴
+**Tiempo:** 18-22 horas  
+**Impacto:** CRÍTICO - Sin pagos no hay ingresos
+
+#### Funcionalidades
+- **Integración Stripe**
+  - API Keys (test + production)
+  - Webhooks para confirmación
+  - PaymentIntent flow
+
+- **Checkout Page** (`/checkout/:bookingId`)
+  - Resumen de reserva
+  - Desglose de costos:
+    - Subtotal (precio × horas)
+    - Comisión plataforma (10-15%)
+    - Total a pagar
+  - Stripe Payment Element (tarjeta)
+  - Loading durante procesamiento
+  - Redirección éxito/error
+
+- **Confirmación** (`/booking-confirmed/:bookingId`)
+  - Mensaje de éxito
+  - Detalles de reserva
+  - Recibo/Invoice PDF
+  - Email confirmación automático
+
+- **Dashboard Host**
+  - Historial de pagos recibidos
+  - Balance disponible
+  - Solicitar payout
+
+#### Backend Necesario (Nuevo)
+```
+POST   /api/payments/create-intent
+POST   /api/payments/confirm
+POST   /api/payments/refund
+GET    /api/payments/host/{hostId}
+POST   /api/webhooks/stripe
+```
+
+#### Dependencias
+- `@stripe/stripe-js` (frontend)
+- `stripe` SDK (backend)
+- Cuenta Stripe (test mode)
+
+#### Criterios de Aceptación
+- [ ] Pago seguro con tarjeta vía Stripe
+- [ ] Confirmación automática tras pago
+- [ ] Email de confirmación
+- [ ] Host ve pago en dashboard
+- [ ] Sistema de reembolsos
+- [ ] Comisión calculada correctamente
+- [ ] Webhooks funcionan
+
+---
+
+### 3. Sistema de Reviews Real 🔴
+**Tiempo:** 8-10 horas  
+**Impacto:** ALTO - Confianza y reputación
+
+#### Funcionalidades
+- **Crear Review** (Guest post-checkout)
+  - Solo para `COMPLETED` bookings
+  - Rating 1-5 estrellas (obligatorio)
+  - Categorías: Limpieza, Ubicación, Comunicación, Valor
+  - Comentario (mín 20 chars)
+  - Fotos opcionales (hasta 3)
+  - Límite: 30 días post-checkout
+
+- **Responder** (Host)
+  - 1 respuesta por review
+  - Max 500 caracteres
+  - No editable tras publicar
+
+- **Mostrar Reviews** (Space Detail)
+  - Todas las reviews + respuestas
+  - Ordenar: Recientes, Mejor valoradas
+  - Filtros: Con fotos, Por rating
+  - Paginación (10 por página)
+  - Badge "Reserva verificada"
+
+- **Rating Promedio**
+  - Cálculo automático
+  - Mostrar en cards y detail
+  - Número total de reviews
+  - Actualización automática
+
+#### Backend (Ya Implementado ✅)
+```
+POST   /api/booking/reviews
+GET    /api/booking/reviews/space/{spaceId}
+PUT    /api/booking/reviews/{id}/respond
+GET    /api/booking/reviews/pending/guest/{guestId}
+```
+
+#### Componentes a Crear
+```
+reviews/
+├── review-create/
+├── review-list/
+├── review-card/
+└── rating-stars/
+```
+
+#### Criterios de Aceptación
+- [ ] Guest crea review tras reserva completada
+- [ ] Rating por categorías
+- [ ] Host responde
+- [ ] Reviews visibles en Space Detail
+- [ ] Rating promedio actualizado
+- [ ] Badge "Verificada"
+
+---
+
+## 🟡 PRIORIDAD IMPORTANTE (30-40 HORAS)
+
+### 4. Perfil de Usuario
+**Tiempo:** 10-12 horas
+- Editar información personal
+- Avatar/foto de perfil
+- Verificación email/teléfono
+- Historial de actividad
+- Trust score visualización
+- Preferencias de notificaciones
+
+### 5. Sistema de Notificaciones
+**Tiempo:** 10-12 horas
+- Notificaciones en tiempo real (WebSocket)
+- Email notifications (SendGrid)
+- Push notifications (PWA)
+- Tipos:
+  - Nueva reserva recibida
+  - Reserva confirmada/cancelada
+  - Nueva review
+  - Mensaje nuevo
+
+### 6. Mensajería Host/Guest
+**Tiempo:** 8-10 horas
+- Chat en tiempo real
+- Historial de conversaciones
+- Notificaciones de nuevos mensajes
+- Adjuntar archivos (opcional)
+
+### 7. Búsqueda Avanzada
+**Tiempo:** 6-8 horas
+- Autocompletado (Google Places)
+- Filtros guardados
+- Historial de búsquedas
+- Búsqueda arrastrando mapa
+
+---
+
+## 🟢 FEATURES DESEABLES (FUTURO)
+
+### 8. Pricing Dinámico
+**Tiempo:** 6-8 horas
+- Activar algoritmo existente en backend
+- Dashboard para configurar precios
+- Vista de calendario con precios variables
+- Promociones y descuentos
+
+### 9. Calendario de Disponibilidad
+**Tiempo:** 8-10 horas
+- Vista mensual para hosts
+- Bloquear fechas específicas
+- Establecer horarios especiales
+- Sincronización con Google Calendar
+
+### 10. Favoritos/Wishlist
+**Tiempo:** 4-6 horas
+- Guardar espacios favoritos
+- Lista de deseos
+- Compartir favoritos
+
+### 11. Promociones y Cupones
+**Tiempo:** 6-8 horas
+- Crear códigos de descuento
+- Descuentos por primera reserva
+- Cupones por referidos
+
+### 12. Verificación de Identidad
+**Tiempo:** 10-12 horas
+- KYC con documento
+- Verificación de email/teléfono
+- Badge "Verificado"
+- Aumento de trust score
+
+### 13. Analytics Dashboard
+**Tiempo:** 8-10 horas
+- Reportes de ingresos
+- Estadísticas de ocupación
+- Métricas de performance
+- Gráficos interactivos
+
+### 14. App Móvil
+**Tiempo:** 80-100 horas
+- React Native o Flutter
+- Features principales
+- Push notifications nativas
+- Geolocalización
+
+### 15. Multi-idioma
+**Tiempo:** 6-8 horas
+- i18n en frontend (español, inglés)
+- Traducción de contenido
+- Selector de idioma
+
+### 16. Multi-moneda
+**Tiempo:** 6-8 horas
+- Conversión de precios
+- Mostrar en moneda local
+- API de tipos de cambio
+
+### 17. Blog/CMS
+**Tiempo:** 12-15 horas
+- Sistema de contenido
+- SEO optimization
+- Marketing content
+
+---
+
+## 📊 HISTORIAL DE DESARROLLO
+
+### ✅ Sesión 2 Noviembre 2025 - Problemas Solucionados
 
 ### 1. Inconsistencia de Status (Case-Sensitivity) ✅
 **Problema:** Base de datos con status en minúsculas/mayúsculas mezclados  

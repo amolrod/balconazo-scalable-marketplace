@@ -1,53 +1,109 @@
 # 📮 COLECCIÓN DE ENDPOINTS POSTMAN - BALCONAZO API
 
-**Fecha:** 29 de Octubre de 2025  
+**Fecha:** 20 Noviembre 2025  
 **Base URL:** `http://localhost:8080`
 
 ---
 
-## 🚀 IMPORTAR A POSTMAN (OPCIÓN RECOMENDADA)
+## 📬 Guía de Uso Completa
 
-### Archivo JSON para importar directamente
+Esta guía te ayudará a probar todos los endpoints del sistema usando Postman.
 
-**Archivo:** `Balconazo_API.postman_collection.json`
+### 📦 Archivos Necesarios
 
-**Pasos:**
-1. Abre Postman
-2. Click en **Import** (botón superior izquierdo)
-3. Arrastra el archivo `Balconazo_API.postman_collection.json` o selecciónalo
-4. Click en **Import**
-5. ✅ La colección completa con 29 endpoints estará lista
-
-**Incluye:**
-- ✅ Todos los endpoints organizados por servicio
-- ✅ Scripts automáticos para guardar tokens
-- ✅ Variables preconfiguradas ({{baseUrl}}, {{accessToken}}, etc.)
-- ✅ Headers y bodies ya configurados
-
-### Configurar Environment en Postman
-
-Después de importar, crea un Environment:
-
-1. Click en **Environments** (panel izquierdo)
-2. Click en **+** (Create Environment)
-3. Nombre: `Balconazo Local`
-4. Añadir variables:
-
-| Variable | Initial Value | Current Value |
-|----------|---------------|---------------|
-| `baseUrl` | `http://localhost:8080` | `http://localhost:8080` |
-| `accessToken` | (dejar vacío) | (se actualiza automáticamente) |
-| `refreshToken` | (dejar vacío) | (se actualiza automáticamente) |
-| `userId` | (dejar vacío) | (se actualiza automáticamente) |
-| `spaceId` | (dejar vacío) | (se actualiza automáticamente) |
-| `bookingId` | (dejar vacío) | (se actualiza automáticamente) |
-
-5. Click en **Save**
-6. Selecciona el environment `Balconazo Local` en el dropdown superior
+1. **Colección**: `BalconazoApp.postman_collection.json` (29 endpoints)
+2. **Entorno**: `Balconazo_Local.postman_environment.json`
 
 ---
 
-## 📋 ALTERNATIVA: COPIAR MANUALMENTE
+## 🚀 CONFIGURACIÓN INICIAL
+
+### 1. Importar la Colección
+
+1. Abre Postman
+2. Click en **Import** (botón superior izquierdo)
+3. Arrastra el archivo `BalconazoApp.postman_collection.json` o selecciónalo
+4. Click en **Import**
+5. ✅ La colección completa con 29 endpoints estará lista
+
+**La colección incluye:**
+- ✅ Todos los endpoints organizados por servicio
+- ✅ Scripts automáticos para guardar tokens
+- ✅ Variables preconfiguradas (`{{baseUrl}}`, `{{token}}`, etc.)
+- ✅ Headers y bodies ya configurados
+
+### 2. Importar el Entorno
+
+1. Click en el icono de **Environments** (⚙️)
+2. Click en **Import**
+3. Selecciona `Balconazo_Local.postman_environment.json`
+4. Selecciona el entorno **Balconazo_Local** en el dropdown superior derecho
+
+### 3. Variables de Entorno Incluidas
+
+El entorno ya tiene configuradas:
+
+| Variable | Initial Value | Descripción |
+|----------|---------------|-------------|
+| `baseUrl` | `http://localhost:8080` | URL base del API Gateway |
+| `hostEmail` | `host1@balconazo.com` | Usuario host de prueba |
+| `hostPassword` | `password123` | Contraseña host |
+| `guestEmail` | `guest1@balconazo.com` | Usuario guest de prueba |
+| `guestPassword` | `password123` | Contraseña guest |
+| `token` | (vacío) | Se llena automáticamente tras login |
+| `userId` | (vacío) | Se llena automáticamente tras login |
+| `spaceId` | (vacío) | Se llena tras crear espacio |
+| `bookingId` | (vacío) | Se llena tras crear reserva |
+
+---
+
+## 📋 FLUJO DE PRUEBAS RECOMENDADO
+
+### Paso 1: Autenticación ✅
+
+1. Abrir carpeta **Auth Service**
+2. Ejecutar **Login**
+   - ✅ Token JWT guardado automáticamente en `{{token}}`
+   - ✅ UserId guardado en `{{userId}}`
+3. Ejecutar **Get Me** para verificar token
+
+### Paso 2: Catálogo de Espacios 🏠
+
+1. Abrir carpeta **Catalog Service**
+2. Secuencia:
+   - **List All Spaces**: Ver espacios existentes
+   - **Create Space**: Crear nuevo (guarda `{{spaceId}}`)
+   - **Get Space by ID**: Ver detalles
+   - **Update Space**: Editar (solo owner)
+   - **Delete Space**: Eliminar (soft delete)
+
+### Paso 3: Búsqueda Geoespacial 🗺️
+
+1. Abrir carpeta **Search Service**
+2. Ejecutar **Search Nearby Spaces** (público, no requiere token)
+   - Busca espacios cerca de Madrid centro
+3. Probar filtros avanzados (precio, capacidad, amenities)
+
+### Paso 4: Reservas 📅
+
+1. Abrir carpeta **Booking Service**
+2. Secuencia:
+   - **Create Booking**: Crear reserva (guarda `{{bookingId}}`)
+   - **List Guest Bookings**: Ver reservas del usuario
+   - **List Space Bookings**: Ver reservas de un espacio
+   - **Confirm Booking**: Host acepta reserva
+   - **Cancel Booking**: Cancelar
+
+### Paso 5: Reviews ⭐
+
+1. Tras completar una reserva:
+   - **Create Review**: Guest deja reseña
+   - **List Space Reviews**: Ver todas las reviews
+   - **Respond to Review**: Host responde
+
+---
+
+## 📋 ALTERNATIVA: COPIAR ENDPOINTS MANUALMENTE
 
 Si prefieres copiar los endpoints manualmente, aquí están con URLs completas:
 

@@ -914,6 +914,97 @@ open target/site/jacoco/index.html
 
 ---
 
+## 🧪 Testing del Sistema
+
+### Suite de Tests E2E Completa
+
+**Script:** `./test-e2e-completo.sh`
+
+La suite incluye **29 tests** divididos en 9 categorías:
+
+#### 1. Health Checks (6 servicios)
+- Eureka Server
+- API Gateway
+- Auth Service
+- Catalog Service
+- Booking Service
+- Search Service
+
+#### 2. Service Discovery
+- Verificación de registro en Eureka
+- Endpoints dinámicos
+
+#### 3. Autenticación (4 tests)
+- Registro de usuario nuevo
+- Login con credenciales válidas
+- Validación de JWT
+- Endpoint `/me` con token
+
+#### 4. Catálogo (5 tests)
+- Crear espacio (requiere JWT)
+- Listar espacios
+- Obtener espacio por ID
+- Actualizar espacio (owner verification)
+- Eliminar espacio (soft delete)
+
+#### 5. Búsqueda Geoespacial (4 tests)
+- Búsqueda por coordenadas + radio
+- Filtros avanzados (capacidad, precio)
+- Ordenamiento (precio, rating, distancia)
+- Paginación
+
+#### 6. Reservas (5 tests)
+- Crear reserva (requiere JWT)
+- Listar reservas de guest
+- Listar reservas de espacio
+- Confirmar reserva (solo host)
+- Cancelar reserva
+
+#### 7. Reviews (3 tests)
+- Crear review (solo completed booking)
+- Listar reviews de espacio
+- Host responde a review
+
+#### 8. Seguridad (2 tests)
+- Acceso sin JWT (debe fallar con 401)
+- Endpoints públicos (/auth, /search)
+
+#### 9. Eventos Kafka (1 test)
+- Propagación de eventos entre servicios
+- Consistencia eventual
+
+#### 10. Actuator (3 tests)
+- Health endpoints
+- Métricas
+- Gateway routes
+
+**Ejecutar:**
+```bash
+./test-e2e-completo.sh
+
+# Resultado esperado:
+# ✅ Tests ejecutados: 29
+# ✅ Tests exitosos: 29
+# ❌ Tests fallidos: 0
+# Tasa de éxito: 100%
+```
+
+### Tests Unitarios (Futuro)
+
+Por servicio:
+```bash
+cd catalog_microservice
+mvn test
+
+# Coverage report
+mvn jacoco:report
+open target/site/jacoco/index.html
+```
+
+**Meta de Coverage:** >80%
+
+---
+
 ## 📚 Referencias y Recursos
 
 ### Documentación Oficial
@@ -932,7 +1023,7 @@ open target/site/jacoco/index.html
 
 ---
 
-**Documento actualizado:** Octubre 2025  
-**Mantenedor:** Equipo de Backend  
+**Documento actualizado:** 20 Noviembre 2025  
+**Mantenedor:** Equipo de Desarrollo BalconazoApp  
 **Próxima revisión:** Trimestral
 
