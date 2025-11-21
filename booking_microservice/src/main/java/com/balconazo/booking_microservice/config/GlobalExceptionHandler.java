@@ -4,6 +4,9 @@ import com.balconazo.booking_microservice.exception.BookingNotFoundException;
 import com.balconazo.booking_microservice.exception.BookingStateException;
 import com.balconazo.booking_microservice.exception.BookingValidationException;
 import com.balconazo.booking_microservice.exception.SpaceNotAvailableException;
+import com.balconazo.booking_microservice.exception.UnauthorizedReviewException;
+import com.balconazo.booking_microservice.exception.ReviewNotAllowedException;
+import com.balconazo.booking_microservice.exception.DuplicateReviewException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -76,6 +79,48 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CONFLICT.value())
                 .error("Space Not Available")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    @ExceptionHandler(UnauthorizedReviewException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedReviewException(UnauthorizedReviewException ex) {
+        log.warn("⚠️ Unauthorized review attempt: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(ReviewNotAllowedException.class)
+    public ResponseEntity<ErrorResponse> handleReviewNotAllowedException(ReviewNotAllowedException ex) {
+        log.warn("⚠️ Review not allowed: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Review Not Allowed")
+                .message(ex.getMessage())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateReviewException(DuplicateReviewException ex) {
+        log.warn("⚠️ Duplicate review: {}", ex.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Duplicate Review")
                 .message(ex.getMessage())
                 .build();
 

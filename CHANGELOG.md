@@ -4,6 +4,19 @@ Todos los cambios notables de este proyecto serán documentados aquí.
 
 ## [Unreleased] - 2025-11-21
 
+### Security - Reviews System
+- **[CRÍTICO]** Implementado sistema de seguridad para reviews
+  - **Problema**: Cualquier usuario podía crear reseñas falsas para reservas de otros
+  - **Solución**: Validación de ownership - solo el guest de la reserva puede reseñarla
+  - **Implementado**:
+    - Extracción de userId del JWT en ReviewController
+    - Validación de ownership en ReviewServiceImpl
+    - Excepciones custom: UnauthorizedReviewException, ReviewNotAllowedException, DuplicateReviewException
+    - Handlers específicos en GlobalExceptionHandler (403, 400, 409)
+  - **Rutas actualizadas**: `/api/booking/reviews` → `/api/bookings/reviews`
+  - **Protección JWT**: Ahora bajo `/api/bookings/**` (protegido por SecurityFilter)
+  - Ver detalles en: `REVIEWS_SEGURIDAD_IMPLEMENTADO.md`
+
 ### Fixed
 - **[CRÍTICO]** Duplicación de path `/bookings` en BookingsService del frontend
   - Problema: Todos los métodos generaban rutas con `/bookings/bookings/...`

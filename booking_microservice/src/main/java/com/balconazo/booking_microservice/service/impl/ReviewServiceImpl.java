@@ -5,6 +5,10 @@ import com.balconazo.booking_microservice.dto.CreateReviewDTO;
 import com.balconazo.booking_microservice.dto.ReviewDTO;
 import com.balconazo.booking_microservice.entity.BookingEntity;
 import com.balconazo.booking_microservice.entity.ReviewEntity;
+import com.balconazo.booking_microservice.exception.BookingNotFoundException;
+import com.balconazo.booking_microservice.exception.UnauthorizedReviewException;
+import com.balconazo.booking_microservice.exception.ReviewNotAllowedException;
+import com.balconazo.booking_microservice.exception.DuplicateReviewException;
 import com.balconazo.booking_microservice.kafka.event.ReviewCreatedEvent;
 import com.balconazo.booking_microservice.kafka.producer.OutboxService;
 import com.balconazo.booking_microservice.mapper.ReviewMapper;
@@ -33,32 +37,40 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewDTO createReview(CreateReviewDTO createReviewDTO) {
-        log.info("🔵 Creando review para booking: {}", createReviewDTO.getBookingId());
+    public ReviewDTO createReview(CreateReviewDTO createReviewDTO, UUID authenticatedUserId) {
+        log.info("🔵 Creando review para booking: {} por usuario: {}", createReviewDTO.getBookingId(), authenticatedUserId);
 
-        // Validar que la reserva existe y está completada
+        // 1. Validar que la reserva existe
         BookingEntity booking = bookingRepository.findById(createReviewDTO.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada: " + createReviewDTO.getBookingId()));
+                .orElseThrow(() -> new BookingNotFoundException(createReviewDTO.getBookingId()));
 
+        // 2. 🔒 SEGURIDAD: Validar que el usuario autenticado es el guest de la reserva
+        if (!booking.getGuestId().equals(authenticatedUserId)) {
+            log.warn("⛔ Usuario {} intentó crear review para reserva {} que pertenece a {}",
+                    authenticatedUserId, booking.getId(), booking.getGuestId());
+            throw new UnauthorizedReviewException("Solo el huésped de la reserva puede crear una reseña");
+        }
+
+        // 3. Validar que la reserva está completada
         if (booking.getStatus() != BookingEntity.BookingStatus.completed) {
-            throw new RuntimeException("Solo se pueden reseñar reservas completadas");
+            throw new ReviewNotAllowedException("Solo se pueden reseñar reservas completadas. Estado actual: " + booking.getStatus());
         }
 
-        // Validar que no exista ya una review para esta reserva
+        // 4. Validar que no exista ya una review para esta reserva
         if (reviewRepository.existsByBookingId(createReviewDTO.getBookingId())) {
-            throw new RuntimeException("Ya existe una reseña para esta reserva");
+            throw new DuplicateReviewException("Ya existe una reseña para esta reserva");
         }
 
-        // Crear entidad
+        // 5. Crear entidad
         ReviewEntity review = reviewMapper.toEntity(createReviewDTO);
         review.setSpaceId(booking.getSpaceId());
         review.setGuestId(booking.getGuestId());
 
-        // Guardar
+        // 6. Guardar
         ReviewEntity savedReview = reviewRepository.save(review);
-        log.info("✅ Review creada con ID: {}", savedReview.getId());
+        log.info("✅ Review creada con ID: {} por usuario {}", savedReview.getId(), authenticatedUserId);
 
-        // Publicar evento vía Outbox
+        // 7. Publicar evento vía Outbox
         publishReviewCreatedEvent(savedReview);
 
         return reviewMapper.toDTO(savedReview);

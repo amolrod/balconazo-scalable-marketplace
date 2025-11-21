@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ReviewService {
 
-    ReviewDTO createReview(CreateReviewDTO createReviewDTO);
+    ReviewDTO createReview(CreateReviewDTO createReviewDTO, UUID authenticatedUserId);
 
     ReviewDTO getReviewById(UUID reviewId);
 

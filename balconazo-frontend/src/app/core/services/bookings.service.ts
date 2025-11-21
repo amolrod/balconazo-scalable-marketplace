@@ -126,7 +126,7 @@ export class BookingsService {
    * Obtener reseñas escritas por el usuario actual
    */
   getMyReviews(): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.baseUrl}/reviews/reviewer/me`);
+    return this.http.get<Review[]>(`${this.baseUrl}/reviews/my`);
   }
 
   /**
