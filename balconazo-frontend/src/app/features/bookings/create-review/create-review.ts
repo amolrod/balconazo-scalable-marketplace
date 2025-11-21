@@ -48,7 +48,7 @@ export class CreateReviewComponent implements OnInit {
     this.bookingsService.getMyBookings().subscribe({
       next: (bookings) => {
         const booking = bookings.find(b => b.id === bookingId);
-        
+
         if (!booking) {
           this.error = 'Reserva no encontrada';
           this.loading = false;
@@ -61,8 +61,28 @@ export class CreateReviewComponent implements OnInit {
           return;
         }
 
-        this.booking = booking;
-        this.loading = false;
+        // Verificar si ya dejó una reseña para este espacio
+        this.bookingsService.getReviewsBySpace(booking.spaceId).subscribe({
+          next: (reviews) => {
+            const userId = localStorage.getItem('userId');
+            const alreadyReviewed = reviews.some(r => r.guestId === userId);
+            
+            if (alreadyReviewed) {
+              this.error = 'Ya dejaste una reseña para este espacio';
+              this.loading = false;
+              return;
+            }
+
+            this.booking = booking;
+            this.loading = false;
+          },
+          error: (err) => {
+            console.error('❌ Error verificando reseñas:', err);
+            // Si falla la verificación, permitir continuar
+            this.booking = booking;
+            this.loading = false;
+          }
+        });
       },
       error: (err) => {
         console.error('❌ Error cargando reserva:', err);
@@ -93,7 +113,7 @@ export class CreateReviewComponent implements OnInit {
         console.log('✅ Review creada exitosamente:', review);
         this.reviewSuccess = true;
         this.reviewSubmitting = false;
-        
+
         // Redirigir a "Mis Reservas" después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/my-bookings']);
@@ -112,17 +132,17 @@ export class CreateReviewComponent implements OnInit {
   }
 
   formatDate(timestamp: string): string {
-    return new Date(timestamp).toLocaleDateString('es-ES', { 
-      day: '2-digit', 
-      month: 'short', 
-      year: 'numeric' 
+    return new Date(timestamp).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
     });
   }
 
   formatTime(timestamp: string): string {
-    return new Date(timestamp).toLocaleTimeString('es-ES', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date(timestamp).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 }

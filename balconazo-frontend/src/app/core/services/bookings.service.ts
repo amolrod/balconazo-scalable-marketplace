@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Booking {
@@ -109,12 +109,13 @@ export class BookingsService {
   }
 
   /**
-   * Verificar si el usuario tiene una reserva completada para un espacio
+   * Verificar si el usuario tiene una reserva completada para un espacio Y no ha dejado reseña
    */
-  hasCompletedBookingForSpace(spaceId: string): Observable<{ hasBooking: boolean; bookingId?: string }> {
+  hasCompletedBookingForSpace(spaceId: string): Observable<{ hasBooking: boolean; bookingId?: string; alreadyReviewed?: boolean }> {
     console.log('📞 hasCompletedBookingForSpace llamado con spaceId:', spaceId);
+
     return this.getMyBookings().pipe(
-      map(bookings => {
+      switchMap(bookings => {
         console.log('📦 Total de reservas obtenidas:', bookings.length);
         console.log('📋 Reservas:', bookings.map(b => ({ id: b.id, spaceId: b.spaceId, status: b.status })));
 
@@ -125,17 +126,35 @@ export class BookingsService {
         });
 
         console.log('🎯 Reserva completada encontrada:', completedBooking ? completedBooking.id : 'NINGUNA');
-        
-        const result = {
-          hasBooking: !!completedBooking,
-          bookingId: completedBooking?.id
-        };
-        
-        console.log('🎁 Resultado a devolver:', JSON.stringify(result, null, 2));
-        console.log('🔑 bookingId exacto:', result.bookingId);
-        console.log('🔑 bookingId tipo:', typeof result.bookingId);
-        
-        return result;
+
+        if (!completedBooking) {
+          return of({
+            hasBooking: false,
+            bookingId: undefined,
+            alreadyReviewed: false
+          });
+        }
+
+        // Verificar si ya existe una reseña del usuario para este espacio
+        return this.getReviewsBySpace(spaceId).pipe(
+          map(reviews => {
+            const userId = localStorage.getItem('userId');
+            const userReview = reviews.find(r => r.guestId === userId);
+            const alreadyReviewed = !!userReview;
+
+            console.log('📝 Usuario ya dejó reseña:', alreadyReviewed);
+
+            const result = {
+              hasBooking: true,
+              bookingId: completedBooking.id,
+              alreadyReviewed: alreadyReviewed
+            };
+
+            console.log('🎁 Resultado final:', JSON.stringify(result, null, 2));
+
+            return result;
+          })
+        );
       })
     );
   }  /**

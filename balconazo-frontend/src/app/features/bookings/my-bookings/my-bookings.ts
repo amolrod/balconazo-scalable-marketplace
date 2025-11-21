@@ -17,6 +17,7 @@ export class MyBookingsComponent implements OnInit {
   bookings: Booking[] = [];
   loading = true;
   error: string | null = null;
+  reviewedSpaceIds: Set<string> = new Set(); // Para rastrear espacios con reseña
 
   selectedFilter: 'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed' = 'all';
 
@@ -27,6 +28,7 @@ export class MyBookingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBookings();
+    this.loadUserReviews();
   }
 
   loadBookings(): void {
@@ -46,6 +48,22 @@ export class MyBookingsComponent implements OnInit {
         this.error = 'No se pudieron cargar las reservas. Verifica que estés autenticado y el backend esté corriendo.';
         this.bookings = [];
         this.loading = false;
+      }
+    });
+  }
+
+  loadUserReviews(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    // Cargar todas las reseñas del usuario para saber qué espacios ya reseñó
+    this.bookingsService.getMyReviews().subscribe({
+      next: (reviews) => {
+        this.reviewedSpaceIds = new Set(reviews.map(r => r.spaceId));
+        console.log('✅ Espacios con reseña:', Array.from(this.reviewedSpaceIds));
+      },
+      error: (err) => {
+        console.error('❌ Error cargando reseñas del usuario:', err);
       }
     });
   }
@@ -127,7 +145,8 @@ export class MyBookingsComponent implements OnInit {
   }
 
   canReview(booking: Booking): boolean {
-    return booking.status === 'completed';
+    // Solo puede dejar reseña si está completada Y no ha dejado reseña para ese espacio
+    return booking.status === 'completed' && !this.reviewedSpaceIds.has(booking.spaceId);
   }
 
   openCancelModal(booking: Booking): void {

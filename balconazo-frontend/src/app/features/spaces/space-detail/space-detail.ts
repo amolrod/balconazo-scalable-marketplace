@@ -350,14 +350,19 @@ export class SpaceDetailComponent implements OnInit {
     this.bookingsService.hasCompletedBookingForSpace(spaceId).subscribe({
       next: (result) => {
         console.log('✅ Resultado elegibilidad COMPLETO:', JSON.stringify(result, null, 2));
-        this.canWriteReview = result.hasBooking;
+        
+        // Solo puede escribir si tiene reserva completada Y no ha dejado reseña
+        this.canWriteReview = result.hasBooking && !result.alreadyReviewed;
         this.completedBookingId = result.bookingId || null;
         this.eligibilityLoading = false;
+        
         console.log('🎯 canWriteReview =', this.canWriteReview);
+        console.log('📝 Ya dejó reseña =', result.alreadyReviewed);
         console.log('🎫 completedBookingId GUARDADO =', this.completedBookingId);
         console.log('📊 Estado del componente:', {
           canWriteReview: this.canWriteReview,
           completedBookingId: this.completedBookingId,
+          alreadyReviewed: result.alreadyReviewed,
           spaceId: this.space?.id
         });
       },
@@ -398,7 +403,7 @@ export class SpaceDetailComponent implements OnInit {
     console.log('📝 submitReview() iniciado');
     console.log('📋 Formulario válido:', this.reviewForm.valid);
     console.log('🏠 Space presente:', !!this.space);
-    
+
     if (!this.reviewForm.valid || !this.space) {
       console.error('❌ Formulario inválido o sin espacio');
       return;
@@ -414,7 +419,7 @@ export class SpaceDetailComponent implements OnInit {
     console.log('🎫 completedBookingId ANTES de validar:', this.completedBookingId);
     console.log('🔍 Tipo de completedBookingId:', typeof this.completedBookingId);
     console.log('🔍 Valor exacto:', this.completedBookingId);
-    
+
     if (!this.completedBookingId || this.completedBookingId === 'undefined' || this.completedBookingId === 'null') {
       this.reviewError = 'No se encontró una reserva completada para este espacio. Por favor, recarga la página.';
       console.error('❌ No hay bookingId disponible - ESTADO COMPLETO:', {
@@ -424,7 +429,7 @@ export class SpaceDetailComponent implements OnInit {
         spaceId: this.space?.id,
         userId: localStorage.getItem('userId')
       });
-      
+
       // Intentar recargar eligibilidad
       console.log('🔄 Intentando recargar elegibilidad...');
       if (this.space?.id) {
@@ -441,7 +446,7 @@ export class SpaceDetailComponent implements OnInit {
       rating: this.reviewForm.value.rating,
       comment: this.reviewForm.value.comment
     };
-    
+
     console.log('📤 Enviando review con datos COMPLETOS:', {
       bookingId: reviewData.bookingId,
       bookingIdLength: reviewData.bookingId?.length,

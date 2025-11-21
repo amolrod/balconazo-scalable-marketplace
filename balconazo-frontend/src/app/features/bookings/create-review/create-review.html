@@ -80,7 +80,7 @@
         <!-- Review Form -->
         <div class="review-form-card">
           <h3>Tu opinión</h3>
-          
+
           <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
             <!-- Rating -->
             <div class="form-group">
@@ -136,8 +136,8 @@
 
             <!-- Actions -->
             <div class="form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 class="btn btn-secondary btn-lg"
                 (click)="goBack()"
                 [disabled]="reviewSubmitting">
