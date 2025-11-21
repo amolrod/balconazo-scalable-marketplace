@@ -35,6 +35,7 @@ public class SecurityConfig {
 
         return http
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .cors(cors -> cors.disable()) // CORS se maneja en application.yml
             .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
             .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
             .authorizeExchange(exchanges -> exchanges

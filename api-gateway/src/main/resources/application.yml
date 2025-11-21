@@ -15,23 +15,26 @@ spring:
           lower-case-service-id: true
 
       # Global CORS Configuration
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      
       globalcors:
         cors-configurations:
           '[/**]':
-            allowed-origins:
+            allowedOrigins:
               - "http://localhost:4200"
               - "http://localhost:3000"
               - "https://balconazo.com"
-            allowed-methods:
+            allowedMethods:
               - GET
               - POST
               - PUT
               - DELETE
               - PATCH
               - OPTIONS
-            allowed-headers: "*"
-            allow-credentials: true
-            max-age: 3600
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
 
       # Routes Configuration
       routes:
