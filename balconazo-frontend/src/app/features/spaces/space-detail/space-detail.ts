@@ -412,14 +412,24 @@ export class SpaceDetailComponent implements OnInit {
     }
 
     console.log('🎫 completedBookingId ANTES de validar:', this.completedBookingId);
+    console.log('🔍 Tipo de completedBookingId:', typeof this.completedBookingId);
+    console.log('🔍 Valor exacto:', this.completedBookingId);
     
-    if (!this.completedBookingId) {
-      this.reviewError = 'No se encontró una reserva completada para este espacio';
-      console.error('❌ No hay bookingId disponible - ESTADO:', {
+    if (!this.completedBookingId || this.completedBookingId === 'undefined' || this.completedBookingId === 'null') {
+      this.reviewError = 'No se encontró una reserva completada para este espacio. Por favor, recarga la página.';
+      console.error('❌ No hay bookingId disponible - ESTADO COMPLETO:', {
         completedBookingId: this.completedBookingId,
+        completedBookingIdType: typeof this.completedBookingId,
         canWriteReview: this.canWriteReview,
-        spaceId: this.space?.id
+        spaceId: this.space?.id,
+        userId: localStorage.getItem('userId')
       });
+      
+      // Intentar recargar eligibilidad
+      console.log('🔄 Intentando recargar elegibilidad...');
+      if (this.space?.id) {
+        this.checkReviewEligibility(this.space.id);
+      }
       return;
     }
 
@@ -432,7 +442,13 @@ export class SpaceDetailComponent implements OnInit {
       comment: this.reviewForm.value.comment
     };
     
-    console.log('📤 Enviando review con datos:', JSON.stringify(reviewData, null, 2));
+    console.log('📤 Enviando review con datos COMPLETOS:', {
+      bookingId: reviewData.bookingId,
+      bookingIdLength: reviewData.bookingId?.length,
+      bookingIdType: typeof reviewData.bookingId,
+      rating: reviewData.rating,
+      comment: reviewData.comment?.substring(0, 50) + '...'
+    });
 
     this.bookingsService.createReview(reviewData).subscribe({
       next: (review) => {

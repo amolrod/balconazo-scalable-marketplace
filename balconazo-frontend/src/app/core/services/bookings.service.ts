@@ -125,11 +125,17 @@ export class BookingsService {
         });
 
         console.log('🎯 Reserva completada encontrada:', completedBooking ? completedBooking.id : 'NINGUNA');
-
-        return {
+        
+        const result = {
           hasBooking: !!completedBooking,
           bookingId: completedBooking?.id
         };
+        
+        console.log('🎁 Resultado a devolver:', JSON.stringify(result, null, 2));
+        console.log('🔑 bookingId exacto:', result.bookingId);
+        console.log('🔑 bookingId tipo:', typeof result.bookingId);
+        
+        return result;
       })
     );
   }  /**
