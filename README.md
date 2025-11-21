@@ -103,6 +103,29 @@
 
 ### Instalación
 
+#### Opción 1: Despliegue Automático (RECOMENDADO) ⭐
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/amolrod/balconazo-scalable-marketplace.git
+cd balconazo-scalable-marketplace
+
+# 2. Desplegar TODO con un solo comando
+./scripts/deploy-all.sh
+```
+
+**¡Eso es todo!** El script hace todo automáticamente:
+- ✅ Inicia PostgreSQL
+- ✅ Compila todos los servicios
+- ✅ Inicia Eureka + todos los microservicios
+- ✅ Verifica el estado del sistema
+
+**Tiempo total: 5-7 minutos** ⏱️
+
+---
+
+#### Opción 2: Despliegue Manual (Paso a Paso)
+
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/amolrod/balconazo-scalable-marketplace.git
@@ -118,7 +141,7 @@ cd balconazo-scalable-marketplace
 ./scripts/start-all-with-eureka.sh
 
 # 5. Verificar que todo esté funcionando
-./scripts/verify-system.sh
+./scripts/check-services.sh
 ```
 
 ### Verificación
@@ -208,32 +231,52 @@ Guías completas para integrar con la API REST:
 
 Todos los scripts están en la carpeta [`scripts/`](./scripts/):
 
+### 🚀 Scripts de Despliegue
+
 | Script | Descripción |
 |--------|-------------|
+| **`deploy-all.sh`** ⭐ | **Despliegue completo automático (TODO en un comando)** |
 | `start-infrastructure.sh` | Inicia contenedores PostgreSQL (Docker Compose) |
 | `start-all-with-eureka.sh` | Inicia Eureka + todos los microservicios |
 | `start-all-services.sh` | Inicia solo microservicios (sin Eureka) |
+
+### 🛠️ Scripts de Mantenimiento
+
+| Script | Descripción |
+|--------|-------------|
 | `stop-all.sh` | Detiene todos los servicios Java |
 | `recompile-all.sh` | Recompila todos los microservicios (Maven) |
-| `verify-system.sh` | Verifica salud de todos los servicios |
-| `test-roles-usuarios-completo.sh` | Ejecuta suite completa de tests E2E |
+
+### 🔍 Scripts de Verificación
+
+| Script | Descripción |
+|--------|-------------|
+| **`check-services.sh`** ⭐ | **Verificación exhaustiva (50+ checks)** |
+| `verify-system.sh` | Verificación básica de salud |
+
+### 🧪 Scripts de Testing
+
+| Script | Descripción |
+|--------|-------------|
+| `test-roles-usuarios-completo.sh` | Ejecuta suite completa de tests E2E (45 tests) |
 
 ### Uso Típico
 
 ```bash
-# Desarrollo diario
-./scripts/start-infrastructure.sh  # Una vez
-./scripts/start-all-with-eureka.sh # Al iniciar sesión
-./scripts/verify-system.sh         # Para verificar
+# 🚀 Inicio rápido (RECOMENDADO)
+./scripts/deploy-all.sh          # Despliega TODO automáticamente
 
-# Al hacer cambios
-./scripts/stop-all.sh
-./scripts/recompile-all.sh
-./scripts/start-all-with-eureka.sh
+# 🔍 Verificar sistema
+./scripts/check-services.sh      # Verificación exhaustiva
 
-# Antes de commit
+# 🧪 Ejecutar tests
 ./scripts/test-roles-usuarios-completo.sh
+
+# 🛑 Detener todo
+./scripts/stop-all.sh
 ```
+
+**Para más detalles**: Ver [`scripts/README.md`](./scripts/README.md)
 
 ---
 
@@ -421,7 +464,7 @@ Este proyecto está bajo la licencia **MIT**.
 
 ---
 
-## 👥 Autores
+## 👥 Autor
 
 - **Angel Rodriguez** - [@amolrod](https://github.com/amolrod)
 
@@ -435,14 +478,6 @@ Este proyecto está bajo la licencia **MIT**.
 - [Colección Postman](./Balconazo_API.postman_collection.json)
 - [Spring Boot Docs](https://spring.io/projects/spring-boot)
 - [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)
-
----
-
-## 🙏 Agradecimientos
-
-- Spring Boot Team por el excelente framework
-- Spring Cloud Netflix por Eureka Server
-- Comunidad Open Source
 
 ---
 
@@ -462,7 +497,6 @@ Este proyecto está bajo la licencia **MIT**.
 
 [Reportar Bug](https://github.com/amolrod/balconazo-scalable-marketplace/issues) · [Solicitar Feature](https://github.com/amolrod/balconazo-scalable-marketplace/issues) · [Documentación](./docs/INDEX.md)
 
-Made with ❤️ by the BalconazoApp Team
 
 </div>
 

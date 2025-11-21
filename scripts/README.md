@@ -6,21 +6,61 @@ Esta carpeta contiene todos los scripts operacionales para gestionar el ciclo de
 
 ## 📋 Índice de Scripts
 
+### 🚀 Scripts de Despliegue
+
 | Script | Descripción | Uso |
 |--------|-------------|-----|
-| [`start-infrastructure.sh`](#start-infrastructuresh) | Inicia contenedores PostgreSQL | Inicio del sistema |
-| [`start-all-with-eureka.sh`](#start-all-with-eurekash) | Inicia Eureka + todos los microservicios | Desarrollo completo |
-| [`start-all-services.sh`](#start-all-servicessh) | Inicia solo microservicios | Desarrollo sin Eureka |
-| [`stop-all.sh`](#stop-allsh) | Detiene todos los servicios | Finalizar trabajo |
+| [`deploy-all.sh`](#deploy-allsh) ⭐ | **Despliegue completo con un solo comando** | **Inicio rápido** |
+| [`start-infrastructure.sh`](#start-infrastructuresh) | Inicia contenedores PostgreSQL | Inicio manual |
+| [`start-all-with-eureka.sh`](#start-all-with-eurekash) | Inicia Eureka + todos los microservicios | Desarrollo |
+| [`start-all-services.sh`](#start-all-servicessh) | Inicia solo microservicios | Sin Eureka |
+
+### 🛠️ Scripts de Mantenimiento
+
+| Script | Descripción | Uso |
+|--------|-------------|-----|
+| [`stop-all.sh`](#stop-allsh) | Detiene todos los servicios | Finalizar |
 | [`recompile-all.sh`](#recompile-allsh) | Recompila todos los servicios | Después de cambios |
-| [`verify-system.sh`](#verify-systemsh) | Verifica salud del sistema | Testing/debugging |
+
+### 🔍 Scripts de Verificación
+
+| Script | Descripción | Uso |
+|--------|-------------|-----|
+| [`check-services.sh`](#check-servicessh) ⭐ | **Verificación exhaustiva del sistema** | **Diagnóstico** |
+| [`verify-system.sh`](#verify-systemsh) | Verificación básica de salud | Quick check |
+
+### 🧪 Scripts de Testing
+
+| Script | Descripción | Uso |
+|--------|-------------|-----|
 | [`test-roles-usuarios-completo.sh`](#test-roles-usuarios-completosh) | Ejecuta tests E2E (45 tests) | Validación completa |
 
 ---
 
 ## 🚀 Flujo de Trabajo Típico
 
-### Inicio de Día
+### ⚡ Inicio Rápido (RECOMENDADO)
+
+```bash
+# Un solo comando para desplegar TODO el sistema
+./scripts/deploy-all.sh
+```
+
+Este script hace TODO automáticamente:
+- ✅ Detiene servicios existentes
+- ✅ Limpia logs antiguos
+- ✅ Inicia infraestructura Docker
+- ✅ Compila todos los microservicios
+- ✅ Inicia todos los servicios
+- ✅ Verifica el estado del sistema
+
+**Tiempo total: 5-7 minutos** ⏱️
+
+---
+
+### 📋 Inicio Manual (Paso a Paso)
+
+Si prefieres control total sobre cada paso:
 
 ```bash
 # 1. Iniciar infraestructura (PostgreSQL)
@@ -30,8 +70,10 @@ Esta carpeta contiene todos los scripts operacionales para gestionar el ciclo de
 ./scripts/start-all-with-eureka.sh
 
 # 3. Verificar que todo esté funcionando
-./scripts/verify-system.sh
+./scripts/check-services.sh
 ```
+
+---
 
 ### Después de Hacer Cambios
 
@@ -45,9 +87,26 @@ Esta carpeta contiene todos los scripts operacionales para gestionar el ciclo de
 # 3. Reiniciar servicios
 ./scripts/start-all-with-eureka.sh
 
-# 4. Ejecutar tests
+# 4. Verificar
+./scripts/check-services.sh
+
+# 5. Ejecutar tests
 ./scripts/test-roles-usuarios-completo.sh
 ```
+
+---
+
+### Diagnóstico y Troubleshooting
+
+```bash
+# Verificación exhaustiva del sistema (recomendado)
+./scripts/check-services.sh
+
+# Verificación rápida básica
+./scripts/verify-system.sh
+```
+
+---
 
 ### Finalizar Día
 
@@ -62,6 +121,180 @@ docker-compose down
 ---
 
 ## 📄 Detalles de cada Script
+
+### `deploy-all.sh` ⭐ NUEVO
+
+**Propósito**: Script todo-en-uno para desplegar el sistema completo desde cero.
+
+**Qué hace**:
+1. Detiene todos los servicios Java existentes
+2. Detiene y elimina contenedores Docker
+3. Limpia logs antiguos (`/tmp/*.log`)
+4. Inicia infraestructura Docker (PostgreSQL)
+5. Compila todos los microservicios con Maven
+6. Inicia todos los servicios en orden correcto
+7. Espera 90 segundos para inicialización completa
+8. Ejecuta verificación exhaustiva del sistema
+
+**Uso**:
+```bash
+./scripts/deploy-all.sh
+```
+
+**Tiempo total**: 5-7 minutos
+
+**Salida esperada**:
+```
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║      🏢 BALCONAZO APP - DESPLIEGUE COMPLETO 🚀            ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+
+PASO 1: Deteniendo servicios existentes
+✅ Servicios Java detenidos
+✅ Contenedores Docker detenidos
+
+PASO 2: Limpiando logs antiguos
+✅ Logs limpiados
+
+PASO 3: Iniciando infraestructura Docker (PostgreSQL)
+✅ Contenedores PostgreSQL iniciados correctamente
+
+PASO 4: Compilando microservicios (Maven)
+✅ Todos los microservicios compilados exitosamente
+
+PASO 5: Iniciando microservicios
+✅ Todos los microservicios iniciados
+
+PASO 6: Esperando inicialización completa del sistema
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
+✅ Tiempo de espera completado
+
+PASO 7: Verificando estado del sistema
+✅ TODOS LOS CHECKS PASARON CORRECTAMENTE
+
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║     🎉 SISTEMA COMPLETAMENTE OPERATIVO 🎉                 ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
+**Cuándo usar**:
+- ✅ Primera vez configurando el proyecto
+- ✅ Después de cambios importantes en código
+- ✅ Cuando hay problemas con servicios y quieres empezar limpio
+- ✅ Para demos o presentaciones (garantiza que todo funcione)
+
+**Ventajas**:
+- Un solo comando hace todo
+- Verificación automática incluida
+- Output colorido y claro
+- Manejo de errores robusto
+- Pide confirmación antes de empezar
+
+---
+
+### `check-services.sh` ⭐ NUEVO
+
+**Propósito**: Verificación exhaustiva de TODOS los componentes del sistema.
+
+**Qué verifica** (50+ checks):
+
+1. **Contenedores Docker** (4 checks)
+   - pg-auth en puerto 5433
+   - pg-catalog en puerto 5432
+   - pg-booking en puerto 5434
+   - pg-search en puerto 5435
+
+2. **Procesos Java** (6 checks)
+   - Eureka Server
+   - API Gateway
+   - Auth Service
+   - Catalog Service
+   - Booking Service
+   - Search Service
+
+3. **Health Endpoints** (6 checks)
+   - Verifica `/actuator/health` de cada servicio
+   - Confirma que el status sea "UP"
+
+4. **Registro en Eureka** (5 checks)
+   - Verifica que cada servicio esté registrado
+   - Confirma que tengan status "UP" en Eureka
+
+5. **Conectividad API Gateway** (4 checks)
+   - Verifica rutas: /api/auth, /api/spaces, /api/bookings, /api/search
+   - Acepta códigos: 200 (OK), 401 (requiere auth), 404 (servicio responde)
+
+6. **Puertos en Uso** (10 checks)
+   - PostgreSQL: 5433, 5432, 5434, 5435
+   - Servicios: 8761, 8080, 8084, 8085, 8082, 8083
+
+**Uso**:
+```bash
+./scripts/check-services.sh
+```
+
+**Tiempo de ejecución**: 10-15 segundos
+
+**Salida esperada (todo OK)**:
+```
+═══════════════════════════════════════════════════════════
+  1️⃣  CONTENEDORES DOCKER (PostgreSQL)
+═══════════════════════════════════════════════════════════
+
+  ✅ pg-auth (puerto 5433)
+  ✅ pg-catalog (puerto 5432)
+  ✅ pg-booking (puerto 5434)
+  ✅ pg-search (puerto 5435)
+
+═══════════════════════════════════════════════════════════
+  2️⃣  PROCESOS JAVA (Microservicios)
+═══════════════════════════════════════════════════════════
+
+  ✅ Eureka Server (PID: 12345)
+  ✅ API Gateway (PID: 12346)
+  ✅ Auth Service (PID: 12347)
+  ✅ Catalog Service (PID: 12348)
+  ✅ Booking Service (PID: 12349)
+  ✅ Search Service (PID: 12350)
+
+[... más checks ...]
+
+═══════════════════════════════════════════════════════════
+  📊 RESUMEN DE VERIFICACIÓN
+═══════════════════════════════════════════════════════════
+
+  Tests ejecutados:  50
+  Tests exitosos:    50
+  Tests fallidos:    0
+
+✅ TODOS LOS CHECKS PASARON CORRECTAMENTE
+
+🎉 El sistema está completamente operativo
+
+📍 URLs importantes:
+   • Eureka Dashboard:  http://localhost:8761
+   • API Gateway:       http://localhost:8080
+   [...]
+```
+
+**Cuándo usar**:
+- ✅ Después de iniciar el sistema con `deploy-all.sh`
+- ✅ Para diagnosticar problemas
+- ✅ Antes de ejecutar tests E2E
+- ✅ En CI/CD para validar deployment
+
+**Ventajas**:
+- Verificación completa de 50+ componentes
+- Output colorido y organizado por secciones
+- Contador de éxitos/fallos
+- Recomendaciones automáticas si algo falla
+- Código de salida 0 (éxito) o 1 (fallo) para scripts
+
+---
 
 ### `start-infrastructure.sh`
 
