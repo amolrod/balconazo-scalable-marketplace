@@ -55,11 +55,13 @@ export class RegisterComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    const { confirmPassword, acceptsTerms, ...registerData } = this.registerForm.value;
+    const { confirmPassword, acceptsTerms, firstName, lastName, ...registerData } = this.registerForm.value;
 
+    // Concatenar firstName y lastName en name
     // Añadir role GUEST por defecto (todos empiezan como guests)
     const payload = {
       ...registerData,
+      name: `${firstName} ${lastName}`.trim(),
       role: 'GUEST'
     };
 

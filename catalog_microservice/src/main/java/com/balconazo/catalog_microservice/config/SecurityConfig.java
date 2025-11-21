@@ -62,7 +62,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
                 .requestMatchers("/actuator/**").permitAll()
-                // TODAS las rutas de catalog requieren autenticación JWT
+                // Endpoints públicos de catalog (lectura de espacios)
+                .requestMatchers("GET", "/api/catalog/spaces", "/api/catalog/spaces/**").permitAll()
+                // Resto de rutas de catalog requieren autenticación JWT
                 .requestMatchers("/api/catalog/**").authenticated()
                 .anyRequest().permitAll()
             )
@@ -89,9 +91,17 @@ public class SecurityConfig {
                 throws ServletException, IOException {
 
             String path = request.getRequestURI();
+            String method = request.getMethod();
 
             // Solo aplicar a rutas /api/catalog/**
             if (!path.startsWith("/api/catalog/")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // Permitir GET en rutas públicas sin token
+            if ("GET".equalsIgnoreCase(method) && 
+                (path.equals("/api/catalog/spaces") || path.matches("/api/catalog/spaces/[^/]+"))) {
                 filterChain.doFilter(request, response);
                 return;
             }
