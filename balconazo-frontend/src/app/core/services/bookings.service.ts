@@ -12,7 +12,7 @@ export interface Booking {
   endTs: string;
   numGuests: number;
   totalPriceCents: number;
-  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   paymentStatus: 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
   paymentIntentId?: string;
   cancellationReason?: string;
@@ -115,7 +115,7 @@ export class BookingsService {
     return this.getMyBookings().pipe(
       map(bookings => {
         const completedBooking = bookings.find(b => 
-          b.spaceId === spaceId && b.status === 'COMPLETED'
+          b.spaceId === spaceId && b.status === 'completed'
         );
         return {
           hasBooking: !!completedBooking,
@@ -123,9 +123,7 @@ export class BookingsService {
         };
       })
     );
-  }
-
-  /**
+  }  /**
    * Crear una reseña para una reserva
    */
   createReview(data: CreateReviewDTO): Observable<Review> {

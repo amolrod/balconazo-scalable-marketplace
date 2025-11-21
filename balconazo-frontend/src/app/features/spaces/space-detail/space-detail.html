@@ -162,8 +162,8 @@
               <!-- Review Form Button - Solo si el usuario tiene reserva completada -->
               @if (canWriteReview && !eligibilityLoading) {
                 <div class="review-form-container">
-                  <button 
-                    class="btn btn-outline" 
+                  <button
+                    class="btn btn-outline"
                     (click)="toggleReviewForm()"
                     [disabled]="reviewSubmitting">
                     {{ showReviewForm ? 'Cancelar' : '✍️ Escribir una reseña' }}
@@ -176,7 +176,7 @@
                       <label for="rating">Calificación *</label>
                       <div class="rating-input">
                         @for (star of [1,2,3,4,5]; track star) {
-                          <button 
+                          <button
                             type="button"
                             class="star-button"
                             [class.active]="star <= reviewForm.value.rating"
@@ -190,7 +190,7 @@
 
                     <div class="form-group">
                       <label for="comment">Comentario * (mínimo 10 caracteres)</label>
-                      <textarea 
+                      <textarea
                         id="comment"
                         formControlName="comment"
                         rows="4"
@@ -213,8 +213,8 @@
                       <div class="alert alert-error">{{ reviewError }}</div>
                     }
 
-                    <button 
-                      type="submit" 
+                    <button
+                      type="submit"
                       class="btn btn-primary"
                       [disabled]="!reviewForm.valid || reviewSubmitting">
                       {{ reviewSubmitting ? 'Enviando...' : 'Publicar reseña' }}

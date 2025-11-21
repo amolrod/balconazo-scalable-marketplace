@@ -332,7 +332,7 @@ export class SpaceDetailComponent implements OnInit {
    */
   checkReviewEligibility(spaceId: string): void {
     const token = localStorage.getItem('authToken');
-    
+
     // Si no está autenticado, no puede escribir reseñas
     if (!token) {
       this.canWriteReview = false;
@@ -415,7 +415,7 @@ export class SpaceDetailComponent implements OnInit {
         this.reviewSubmitting = false;
         this.showReviewForm = false;
         this.reviewForm.reset({ rating: 5, comment: '' });
-        
+
         // Recargar reviews
         if (this.space) {
           this.loadReviews(this.space.id);
