@@ -56,7 +56,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         return http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configure(http)) // Habilitar CORS
+            .cors(cors -> cors.disable()) // CORS manejado por el Gateway
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
@@ -70,6 +70,8 @@ public class SecurityConfig {
             .build();
     }
 
+    // CORS desactivado - el API Gateway maneja CORS
+    /*
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
@@ -83,6 +85,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    */
 
     /**
      * Filtro de autenticación JWT
@@ -155,8 +158,8 @@ public class SecurityConfig {
                 filterChain.doFilter(request, response);
 
             } catch (Exception e) {
-                log.error("JWT validation error: {}", e.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+                log.error("❌ JWT validation error for path: {} - Error: {} - Message: {}", path, e.getClass().getSimpleName(), e.getMessage(), e);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token: " + e.getMessage());
             }
         }
 
