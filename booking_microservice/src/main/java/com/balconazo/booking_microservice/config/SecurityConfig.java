@@ -104,9 +104,12 @@ public class SecurityConfig {
                 throws ServletException, IOException {
 
             String path = request.getRequestURI();
+            
+            log.info("🔍 JwtAuthenticationFilter - Path recibido: {}", path);
 
             // Solo aplicar a rutas /api/bookings/** (con o sin slash final)
             if (!path.startsWith("/api/bookings")) {
+                log.info("🔓 Path {} no requiere JWT, skipping filter", path);
                 filterChain.doFilter(request, response);
                 return;
             }
