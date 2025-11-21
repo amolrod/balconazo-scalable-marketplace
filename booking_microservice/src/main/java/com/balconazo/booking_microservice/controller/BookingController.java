@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -84,6 +85,29 @@ public class BookingController {
         log.info("📥 GET /api/booking/bookings/guest/{}", guestId);
         List<BookingDTO> bookings = bookingService.getBookingsByGuest(guestId);
         return ResponseEntity.ok(bookings);
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<BookingDTO>> getMyBookings(Authentication authentication) {
+        log.info("📥 GET /api/booking/bookings/my");
+        
+        if (authentication == null || authentication.getName() == null) {
+            log.warn("⚠️ Usuario no autenticado intentando acceder a /my");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String userId = authentication.getName(); // El JWT tiene el userId en el subject
+        log.info("✅ Usuario autenticado: {}", userId);
+        
+        try {
+            UUID guestId = UUID.fromString(userId);
+            List<BookingDTO> bookings = bookingService.getBookingsByGuest(guestId);
+            log.info("✅ Reservas encontradas: {}", bookings.size());
+            return ResponseEntity.ok(bookings);
+        } catch (IllegalArgumentException e) {
+            log.error("❌ Error parseando userId: {}", userId, e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
 

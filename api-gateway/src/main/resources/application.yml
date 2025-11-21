@@ -112,6 +112,22 @@ spring:
         # ==========================================
         # BOOKING SERVICE - Protected endpoints
         # ==========================================
+        - id: booking-service-api
+          uri: lb://booking-service
+          predicates:
+            - Path=/api/booking/**
+          filters:
+            - StripPrefix=0
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+            - name: CircuitBreaker
+              args:
+                name: bookingServiceCircuitBreaker
+                fallbackUri: forward:/fallback/booking
+
         - id: booking-service-bookings
           uri: lb://booking-service
           predicates:
