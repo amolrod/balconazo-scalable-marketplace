@@ -112,11 +112,20 @@ export class BookingsService {
    * Verificar si el usuario tiene una reserva completada para un espacio
    */
   hasCompletedBookingForSpace(spaceId: string): Observable<{ hasBooking: boolean; bookingId?: string }> {
+    console.log('📞 hasCompletedBookingForSpace llamado con spaceId:', spaceId);
     return this.getMyBookings().pipe(
       map(bookings => {
-        const completedBooking = bookings.find(b => 
-          b.spaceId === spaceId && b.status === 'completed'
-        );
+        console.log('📦 Total de reservas obtenidas:', bookings.length);
+        console.log('📋 Reservas:', bookings.map(b => ({ id: b.id, spaceId: b.spaceId, status: b.status })));
+
+        const completedBooking = bookings.find(b => {
+          const match = b.spaceId === spaceId && b.status === 'completed';
+          console.log(`🔎 Comparando: ${b.spaceId} === ${spaceId} && ${b.status} === 'completed' = ${match}`);
+          return match;
+        });
+
+        console.log('🎯 Reserva completada encontrada:', completedBooking ? completedBooking.id : 'NINGUNA');
+
         return {
           hasBooking: !!completedBooking,
           bookingId: completedBooking?.id

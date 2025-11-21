@@ -63,6 +63,7 @@ export class SpaceDetailComponent implements OnInit {
   reviewError: string | null = null;
 
   constructor() {
+    console.log('🔧 SpaceDetailComponent constructor');
     this.bookingForm = this.fb.group({
       startDate: ['', Validators.required],
       startTime: ['10:00', Validators.required],
@@ -331,22 +332,29 @@ export class SpaceDetailComponent implements OnInit {
    * Verificar si el usuario puede escribir una reseña para este espacio
    */
   checkReviewEligibility(spaceId: string): void {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('accessToken'); // CORREGIDO: era 'authToken'
+
+    console.log('🔍 Verificando elegibilidad para espacio:', spaceId);
+    console.log('🔑 Token en localStorage:', token ? 'SÍ' : 'NO');
 
     // Si no está autenticado, no puede escribir reseñas
     if (!token) {
+      console.log('❌ No hay token, canWriteReview = false');
       this.canWriteReview = false;
       return;
     }
 
     this.eligibilityLoading = true;
+    console.log('⏳ Consultando reservas...');
 
     this.bookingsService.hasCompletedBookingForSpace(spaceId).subscribe({
       next: (result) => {
+        console.log('✅ Resultado elegibilidad:', result);
         this.canWriteReview = result.hasBooking;
         this.completedBookingId = result.bookingId || null;
         this.eligibilityLoading = false;
-        console.log('✅ Elegibilidad verificada:', result);
+        console.log('🎯 canWriteReview =', this.canWriteReview);
+        console.log('🎫 completedBookingId =', this.completedBookingId);
       },
       error: (error) => {
         console.error('❌ Error verificando elegibilidad:', error);
@@ -354,9 +362,7 @@ export class SpaceDetailComponent implements OnInit {
         this.eligibilityLoading = false;
       }
     });
-  }
-
-  calculateAverageRating(): void {
+  }  calculateAverageRating(): void {
     if (this.reviews.length === 0) {
       this.averageRating = 0;
       return;
