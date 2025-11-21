@@ -39,7 +39,6 @@ export interface Review {
 
 export interface CreateReviewDTO {
   bookingId: string;
-  spaceId: string;
   rating: number;
   comment?: string;
 }
