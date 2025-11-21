@@ -349,12 +349,17 @@ export class SpaceDetailComponent implements OnInit {
 
     this.bookingsService.hasCompletedBookingForSpace(spaceId).subscribe({
       next: (result) => {
-        console.log('✅ Resultado elegibilidad:', result);
+        console.log('✅ Resultado elegibilidad COMPLETO:', JSON.stringify(result, null, 2));
         this.canWriteReview = result.hasBooking;
         this.completedBookingId = result.bookingId || null;
         this.eligibilityLoading = false;
         console.log('🎯 canWriteReview =', this.canWriteReview);
-        console.log('🎫 completedBookingId =', this.completedBookingId);
+        console.log('🎫 completedBookingId GUARDADO =', this.completedBookingId);
+        console.log('📊 Estado del componente:', {
+          canWriteReview: this.canWriteReview,
+          completedBookingId: this.completedBookingId,
+          spaceId: this.space?.id
+        });
       },
       error: (error) => {
         console.error('❌ Error verificando elegibilidad:', error);
@@ -390,19 +395,31 @@ export class SpaceDetailComponent implements OnInit {
   }
 
   submitReview(): void {
+    console.log('📝 submitReview() iniciado');
+    console.log('📋 Formulario válido:', this.reviewForm.valid);
+    console.log('🏠 Space presente:', !!this.space);
+    
     if (!this.reviewForm.valid || !this.space) {
+      console.error('❌ Formulario inválido o sin espacio');
       return;
     }
 
     const userId = localStorage.getItem('userId');
     if (!userId) {
+      console.error('❌ No hay userId en localStorage');
       this.router.navigate(['/login']);
       return;
     }
 
+    console.log('🎫 completedBookingId ANTES de validar:', this.completedBookingId);
+    
     if (!this.completedBookingId) {
       this.reviewError = 'No se encontró una reserva completada para este espacio';
-      console.error('❌ No hay bookingId disponible');
+      console.error('❌ No hay bookingId disponible - ESTADO:', {
+        completedBookingId: this.completedBookingId,
+        canWriteReview: this.canWriteReview,
+        spaceId: this.space?.id
+      });
       return;
     }
 
@@ -414,6 +431,8 @@ export class SpaceDetailComponent implements OnInit {
       rating: this.reviewForm.value.rating,
       comment: this.reviewForm.value.comment
     };
+    
+    console.log('📤 Enviando review con datos:', JSON.stringify(reviewData, null, 2));
 
     this.bookingsService.createReview(reviewData).subscribe({
       next: (review) => {

@@ -18,7 +18,7 @@ export class MyBookingsComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  selectedFilter: 'all' | 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' = 'all';
+  selectedFilter: 'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed' = 'all';
 
   showCancelModal = false;
   bookingToCancel: Booking | null = null;
@@ -64,20 +64,20 @@ export class MyBookingsComponent implements OnInit {
 
   getStatusBadgeClass(status: string): string {
     const classes: { [key: string]: string } = {
-      'PENDING': 'badge-warning',
-      'CONFIRMED': 'badge-info',
-      'CANCELLED': 'badge-error',
-      'COMPLETED': 'badge-success'
+      'pending': 'badge-warning',
+      'confirmed': 'badge-info',
+      'cancelled': 'badge-error',
+      'completed': 'badge-success'
     };
     return classes[status] || 'badge-default';
   }
 
   getStatusText(status: string): string {
     const texts: { [key: string]: string } = {
-      'PENDING': 'Pendiente',
-      'CONFIRMED': 'Confirmada',
-      'CANCELLED': 'Cancelada',
-      'COMPLETED': 'Completada'
+      'pending': 'Pendiente',
+      'confirmed': 'Confirmada',
+      'cancelled': 'Cancelada',
+      'completed': 'Completada'
     };
     return texts[status] || status;
   }
@@ -115,7 +115,7 @@ export class MyBookingsComponent implements OnInit {
   }
 
   canCancel(booking: Booking): boolean {
-    if (booking.status !== 'PENDING' && booking.status !== 'CONFIRMED') {
+    if (booking.status !== 'pending' && booking.status !== 'confirmed') {
       return false;
     }
 
@@ -127,7 +127,7 @@ export class MyBookingsComponent implements OnInit {
   }
 
   canReview(booking: Booking): boolean {
-    return booking.status === 'COMPLETED';
+    return booking.status === 'completed';
   }
 
   openCancelModal(booking: Booking): void {

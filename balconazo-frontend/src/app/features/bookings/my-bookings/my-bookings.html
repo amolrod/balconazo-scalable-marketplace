@@ -30,31 +30,31 @@
       </button>
       <button
         class="filter-btn"
-        [class.active]="selectedFilter === 'PENDING'"
-        (click)="selectedFilter = 'PENDING'"
+        [class.active]="selectedFilter === 'pending'"
+        (click)="selectedFilter = 'pending'"
       >
-        Pendientes <span class="filter-count">{{ getBookingCount('PENDING') }}</span>
+        Pendientes <span class="filter-count">{{ getBookingCount('pending') }}</span>
       </button>
       <button
         class="filter-btn"
-        [class.active]="selectedFilter === 'CONFIRMED'"
-        (click)="selectedFilter = 'CONFIRMED'"
+        [class.active]="selectedFilter === 'confirmed'"
+        (click)="selectedFilter = 'confirmed'"
       >
-        Confirmadas <span class="filter-count">{{ getBookingCount('CONFIRMED') }}</span>
+        Confirmadas <span class="filter-count">{{ getBookingCount('confirmed') }}</span>
       </button>
       <button
         class="filter-btn"
-        [class.active]="selectedFilter === 'COMPLETED'"
-        (click)="selectedFilter = 'COMPLETED'"
+        [class.active]="selectedFilter === 'completed'"
+        (click)="selectedFilter = 'completed'"
       >
-        Completadas <span class="filter-count">{{ getBookingCount('COMPLETED') }}</span>
+        Completadas <span class="filter-count">{{ getBookingCount('completed') }}</span>
       </button>
       <button
         class="filter-btn"
-        [class.active]="selectedFilter === 'CANCELLED'"
-        (click)="selectedFilter = 'CANCELLED'"
+        [class.active]="selectedFilter === 'cancelled'"
+        (click)="selectedFilter = 'cancelled'"
       >
-        Canceladas <span class="filter-count">{{ getBookingCount('CANCELLED') }}</span>
+        Canceladas <span class="filter-count">{{ getBookingCount('cancelled') }}</span>
       </button>
     </div>
 

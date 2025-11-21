@@ -5,6 +5,7 @@ import { HomeComponent } from './features/home/home';
 import { ExploreComponent } from './features/explore/explore';
 import { SpaceDetailComponent } from './features/spaces/space-detail/space-detail';
 import { MyBookingsComponent } from './features/bookings/my-bookings/my-bookings';
+import { CreateReviewComponent } from './features/bookings/create-review/create-review';
 import { HostDashboardComponent } from './features/host/host-dashboard/host-dashboard';
 
 export const routes: Routes = [
@@ -35,6 +36,10 @@ export const routes: Routes = [
   {
     path: 'my-bookings',
     component: MyBookingsComponent
+  },
+  {
+    path: 'bookings/:id/review',
+    component: CreateReviewComponent
   },
   {
     path: 'host/dashboard',
