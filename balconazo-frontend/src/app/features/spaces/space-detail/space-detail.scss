@@ -605,3 +605,123 @@
   }
 }
 
+
+// ============================================
+// REVIEWS FORM
+// ============================================
+.review-form-container {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.review-form {
+  margin-top: 1.5rem;
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-500);
+    }
+
+    &.error {
+      border-color: var(--error-color);
+    }
+  }
+
+  .error-message {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--error-color);
+    font-size: 0.85rem;
+  }
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .star-button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.3;
+    transition: opacity 0.2s, transform 0.1s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  .rating-value {
+    margin-left: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+}
+
+.reviews-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+
+  &.alert-error {
+    background: #fee;
+    border: 1px solid #fcc;
+    color: #c00;
+  }
+}

@@ -148,32 +148,111 @@
             }
 
             <!-- Reviews -->
-            @if (reviews.length > 0) {
-              <section class="content-section">
-                <div class="reviews-header">
-                  <h2>Reseñas</h2>
+            <section class="content-section">
+              <div class="reviews-header">
+                <h2>Reseñas</h2>
+                @if (reviews.length > 0) {
                   <div class="reviews-summary">
                     <app-rating-stars [rating]="averageRating" [size]="'md'"></app-rating-stars>
                     <span class="reviews-text">{{ totalReviews }} reseñas</span>
                   </div>
+                }
+              </div>
+
+              <!-- Review Form Button -->
+              <div class="review-form-container">
+                <button 
+                  class="btn btn-outline" 
+                  (click)="toggleReviewForm()"
+                  [disabled]="reviewSubmitting">
+                  {{ showReviewForm ? 'Cancelar' : '✍️ Escribir una reseña' }}
+                </button>
+
+                <!-- Review Form -->
+                @if (showReviewForm) {
+                  <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+                    <div class="form-group">
+                      <label for="rating">Calificación *</label>
+                      <div class="rating-input">
+                        @for (star of [1,2,3,4,5]; track star) {
+                          <button 
+                            type="button"
+                            class="star-button"
+                            [class.active]="star <= reviewForm.value.rating"
+                            (click)="reviewForm.patchValue({ rating: star })">
+                            ⭐
+                          </button>
+                        }
+                        <span class="rating-value">({{ reviewForm.value.rating }}/5)</span>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="comment">Comentario * (mínimo 10 caracteres)</label>
+                      <textarea 
+                        id="comment"
+                        formControlName="comment"
+                        rows="4"
+                        placeholder="Comparte tu experiencia con otros usuarios..."
+                        [class.error]="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched">
+                      </textarea>
+                      @if (reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched) {
+                        <span class="error-message">
+                          @if (reviewForm.get('comment')?.errors?.['required']) {
+                            El comentario es obligatorio
+                          }
+                          @if (reviewForm.get('comment')?.errors?.['minlength']) {
+                            El comentario debe tener al menos 10 caracteres
+                          }
+                        </span>
+                      }
+                    </div>
+
+                    @if (reviewError) {
+                      <div class="alert alert-error">{{ reviewError }}</div>
+                    }
+
+                    <button 
+                      type="submit" 
+                      class="btn btn-primary"
+                      [disabled]="!reviewForm.valid || reviewSubmitting">
+                      {{ reviewSubmitting ? 'Enviando...' : 'Publicar reseña' }}
+                    </button>
+                  </form>
+                }
+              </div>
+
+              <!-- Reviews List -->
+              @if (reviewsLoading) {
+                <div class="reviews-loading">
+                  <div class="spinner-small"></div>
+                  <p>Cargando reseñas...</p>
                 </div>
+              }
+              @else if (reviewsError) {
+                <div class="alert alert-error">{{ reviewsError }}</div>
+              }
+              @else if (reviews.length > 0) {
                 <div class="reviews-list">
                   @for (review of reviews; track review.id) {
                     <div class="review-item">
                       <div class="review-header">
-                        <div class="reviewer-avatar">{{ review.guestAvatar }}</div>
+                        <div class="reviewer-avatar">U</div>
                         <div class="reviewer-info">
-                          <strong>{{ review.guestName }}</strong>
-                          <span class="review-date">{{ formatDate(review.date) }}</span>
+                          <strong>Usuario {{ review.guestId.substring(0, 8) }}</strong>
+                          <span class="review-date">{{ review.createdAt | date: 'dd MMM yyyy' }}</span>
                         </div>
                       </div>
                       <app-rating-stars [rating]="review.rating" [size]="'sm'" [showNumber]="false"></app-rating-stars>
-                      <p class="review-comment">{{ review.comment }}</p>
+                      <p class="review-comment">{{ review.comment || 'Sin comentario' }}</p>
                     </div>
                   }
                 </div>
-              </section>
-            }
+              }
+              @else {
+                <p class="no-reviews">Aún no hay reseñas para este espacio. ¡Sé el primero en dejar una!</p>
+              }
+            </section>
 
             <!-- Location -->
             <section class="content-section">

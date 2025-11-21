@@ -61,8 +61,24 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
                 .requestMatchers("/actuator/**").permitAll()
-                // TODAS las rutas de bookings requieren autenticación JWT
+                
+                // ============================================
+                // REVIEWS - Endpoints públicos (lectura)
+                // ============================================
+                .requestMatchers("/api/bookings/reviews/space/**").permitAll()  // GET reviews por espacio
+                .requestMatchers("/api/bookings/reviews/{id}").permitAll()      // GET review por ID
+                
+                // ============================================
+                // REVIEWS - Endpoints protegidos (escritura y mi data)
+                // ============================================
+                .requestMatchers("/api/bookings/reviews/my").authenticated()    // GET mis reviews
+                .requestMatchers("/api/bookings/reviews").authenticated()       // POST crear review
+                
+                // ============================================
+                // BOOKINGS - Todos protegidos
+                // ============================================
                 .requestMatchers("/api/bookings/**").authenticated()
+                
                 .anyRequest().permitAll()
             )
             // Agregar filtro JWT ANTES del UsernamePasswordAuthenticationFilter
@@ -104,22 +120,40 @@ public class SecurityConfig {
                 throws ServletException, IOException {
 
             String path = request.getRequestURI();
+            String method = request.getMethod();
             
-            log.info("🔍 JwtAuthenticationFilter - Path recibido: {}", path);
+            log.info("🔍 JwtAuthenticationFilter - {} {}", method, path);
 
-            // Solo aplicar a rutas /api/bookings/** (con o sin slash final)
-            if (!path.startsWith("/api/bookings")) {
-                log.info("🔓 Path {} no requiere JWT, skipping filter", path);
+            // ============================================
+            // RUTAS PÚBLICAS (no requieren JWT)
+            // ============================================
+            if (path.startsWith("/api/bookings/reviews/space/")   // GET reviews por espacio
+                || path.matches("/api/bookings/reviews/[0-9a-f-]+")  // GET review por ID (UUID)
+                || path.startsWith("/actuator/")) {
+                
+                log.info("🔓 Path {} es público, skipping JWT filter", path);
                 filterChain.doFilter(request, response);
                 return;
             }
 
+            // ============================================
+            // RUTAS QUE NO SON DE BOOKINGS (skip)
+            // ============================================
+            if (!path.startsWith("/api/bookings")) {
+                log.info("🔓 Path {} no es de bookings, skipping filter", path);
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // ============================================
+            // RUTAS PROTEGIDAS (requieren JWT)
+            // ============================================
             try {
                 String token = extractToken(request);
 
                 // Si no hay token, retornar 401 UNAUTHORIZED
                 if (token == null) {
-                    log.warn("No JWT token found in request to: {} - returning 401 UNAUTHORIZED", path);
+                    log.warn("⚠️ No JWT token found in request to: {} - returning 401 UNAUTHORIZED", path);
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token is required");
                     return;
                 }

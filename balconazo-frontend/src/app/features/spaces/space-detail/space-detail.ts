@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SpacesService, Space } from '../../../core/services/spaces.service';
-import { BookingsService, CreateBookingDTO } from '../../../core/services/bookings.service';
+import { BookingsService, CreateBookingDTO, Review, CreateReviewDTO } from '../../../core/services/bookings.service';
 import { RatingStarsComponent } from '../../../shared/components/rating-stars/rating-stars';
 import { PricePipe } from '../../../shared/pipes/price.pipe';
 
@@ -44,27 +44,18 @@ export class SpaceDetailComponent implements OnInit {
   // Amenities
   showAllAmenities = false;
 
-  // Reviews (mock para este PR, se implementarán con backend)
-  reviews: any[] = [
-    {
-      id: 1,
-      guestName: 'María García',
-      rating: 5,
-      comment: 'Espacio increíble, perfecto para nuestra reunión. El anfitrión fue muy atento.',
-      date: '2025-10-15',
-      guestAvatar: 'M'
-    },
-    {
-      id: 2,
-      guestName: 'Carlos Ruiz',
-      rating: 4,
-      comment: 'Muy buen lugar, cómodo y bien ubicado. Solo faltaba un poco más de iluminación.',
-      date: '2025-10-08',
-      guestAvatar: 'C'
-    }
-  ];
-  averageRating = 4.5;
-  totalReviews = 2;
+  // Reviews (cargadas del backend)
+  reviews: Review[] = [];
+  averageRating = 0;
+  totalReviews = 0;
+  reviewsLoading = false;
+  reviewsError: string | null = null;
+
+  // Review Form
+  showReviewForm = false;
+  reviewForm: FormGroup;
+  reviewSubmitting = false;
+  reviewError: string | null = null;
 
   constructor() {
     this.bookingForm = this.fb.group({
@@ -73,6 +64,11 @@ export class SpaceDetailComponent implements OnInit {
       endDate: ['', Validators.required],
       endTime: ['18:00', Validators.required],
       numGuests: [1, [Validators.required, Validators.min(1)]]
+    });
+
+    this.reviewForm = this.fb.group({
+      rating: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
+      comment: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]]
     });
 
     this.bookingForm.valueChanges.subscribe(() => {
@@ -84,6 +80,7 @@ export class SpaceDetailComponent implements OnInit {
     const spaceId = this.route.snapshot.paramMap.get('id');
     if (spaceId) {
       this.loadSpace(spaceId);
+      this.loadReviews(spaceId);
     } else {
       this.router.navigate(['/']);
     }
@@ -298,5 +295,100 @@ export class SpaceDetailComponent implements OnInit {
 
   toggleAmenities(): void {
     this.showAllAmenities = !this.showAllAmenities;
+  }
+
+  // ============================================
+  // REVIEWS
+  // ============================================
+
+  loadReviews(spaceId: string): void {
+    this.reviewsLoading = true;
+    this.reviewsError = null;
+
+    this.bookingsService.getReviewsBySpace(spaceId).subscribe({
+      next: (reviews) => {
+        this.reviews = reviews;
+        this.totalReviews = reviews.length;
+        this.calculateAverageRating();
+        this.reviewsLoading = false;
+        console.log('✅ Reviews cargadas:', reviews.length);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando reviews:', error);
+        this.reviewsError = 'No se pudieron cargar las reseñas';
+        this.reviewsLoading = false;
+      }
+    });
+  }
+
+  calculateAverageRating(): void {
+    if (this.reviews.length === 0) {
+      this.averageRating = 0;
+      return;
+    }
+
+    const sum = this.reviews.reduce((acc, review) => acc + review.rating, 0);
+    this.averageRating = sum / this.reviews.length;
+  }
+
+  toggleReviewForm(): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      // Redirigir a login
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+      return;
+    }
+
+    this.showReviewForm = !this.showReviewForm;
+    if (!this.showReviewForm) {
+      this.reviewForm.reset({ rating: 5, comment: '' });
+      this.reviewError = null;
+    }
+  }
+
+  submitReview(): void {
+    if (!this.reviewForm.valid || !this.space) {
+      return;
+    }
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    // Nota: En producción, el bookingId debería venir de las reservas completadas del usuario
+    // Por ahora, esto es un placeholder hasta que implementemos esa lógica
+    const bookingId = 'placeholder-booking-id';  // TODO: Obtener de reservas completadas
+
+    this.reviewSubmitting = true;
+    this.reviewError = null;
+
+    const reviewData: CreateReviewDTO = {
+      bookingId: bookingId,
+      rating: this.reviewForm.value.rating,
+      comment: this.reviewForm.value.comment
+    };
+
+    this.bookingsService.createReview(reviewData).subscribe({
+      next: (review) => {
+        console.log('✅ Review creada:', review);
+        this.reviewSubmitting = false;
+        this.showReviewForm = false;
+        this.reviewForm.reset({ rating: 5, comment: '' });
+        
+        // Recargar reviews
+        if (this.space) {
+          this.loadReviews(this.space.id);
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error creando review:', error);
+        this.reviewError = error.error?.message || 'No se pudo crear la reseña. Verifica que tengas una reserva completada para este espacio.';
+        this.reviewSubmitting = false;
+      }
+    });
   }
 }
