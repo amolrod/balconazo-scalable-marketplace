@@ -398,7 +398,7 @@ GET    /api/spaces/my-spaces # Mis espacios como HOST
 
 ```http
 POST   /api/bookings                  # Crear reserva
-GET    /api/bookings/my-bookings      # Mis reservas como GUEST
+GET    /api/bookings/my               # Mis reservas como GUEST
 GET    /api/bookings/space/{spaceId}  # Reservas de mi espacio (HOST)
 POST   /api/bookings/{id}/confirm     # Confirmar reserva (HOST)
 POST   /api/bookings/{id}/cancel      # Cancelar reserva

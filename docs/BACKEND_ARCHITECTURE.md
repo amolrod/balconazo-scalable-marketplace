@@ -345,7 +345,7 @@ public SpaceDTO createSpace(CreateSpaceDTO dto, UUID ownerId) {
 **Endpoints**:
 ```
 POST   /api/bookings                     - Crear reserva
-GET    /api/bookings/my-bookings         - Listar reservas del usuario
+GET    /api/bookings/my                  - Listar reservas del usuario
 GET    /api/bookings/space/{spaceId}     - Listar reservas de un espacio
 POST   /api/bookings/{id}/confirm        - Confirmar reserva (host)
 POST   /api/bookings/{id}/cancel         - Cancelar reserva

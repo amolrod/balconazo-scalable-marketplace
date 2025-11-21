@@ -143,7 +143,7 @@ Content-Type: application/json
 ### 2. Listar Reservas del Usuario (Guest)
 
 ```
-GET /api/bookings/my-bookings
+GET /api/bookings/my
 ```
 
 **Headers**:
@@ -534,7 +534,7 @@ export async function createBooking(
 }
 
 export async function getMyBookings(token: string): Promise<Booking[]> {
-  const response = await fetch(`${API_BASE}/my-bookings`, {
+  const response = await fetch(`${API_BASE}/bookings/my`, {
     headers: getAuthHeaders(token)
   });
   

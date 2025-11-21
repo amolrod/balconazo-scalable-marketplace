@@ -201,7 +201,7 @@ Documentación técnica completa del backend.
 | Crear espacio | `/api/spaces` | POST | ✅ |
 | Buscar espacios | `/api/search` | GET | ❌ |
 | Crear reserva | `/api/bookings` | POST | ✅ |
-| Mis reservas | `/api/bookings/my-bookings` | GET | ✅ |
+| Mis reservas | `/api/bookings/my` | GET | ✅ |
 
 ### Servicios Locales
 
