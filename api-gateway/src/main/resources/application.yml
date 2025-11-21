@@ -15,26 +15,25 @@ spring:
           lower-case-service-id: true
 
       # Global CORS Configuration
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-      
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - "http://localhost:4200"
-              - "http://localhost:3000"
-              - "https://balconazo.com"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:4200"
+                  - "http://localhost:3000"
+                  - "https://balconazo.com"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - PATCH
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+                maxAge: 3600
 
       # Routes Configuration
       routes:
@@ -166,6 +165,7 @@ spring:
 
       # Default filters for all routes
       default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
         - AddRequestHeader=X-Gateway-Request, API-Gateway
         - AddResponseHeader=X-Gateway-Response, API-Gateway
 
