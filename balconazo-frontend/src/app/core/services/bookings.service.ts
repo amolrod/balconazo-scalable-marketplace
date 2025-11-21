@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Booking {
@@ -105,6 +106,23 @@ export class BookingsService {
    */
   completeBooking(bookingId: string): Observable<Booking> {
     return this.http.post<Booking>(`${this.baseUrl}/${bookingId}/complete`, {});
+  }
+
+  /**
+   * Verificar si el usuario tiene una reserva completada para un espacio
+   */
+  hasCompletedBookingForSpace(spaceId: string): Observable<{ hasBooking: boolean; bookingId?: string }> {
+    return this.getMyBookings().pipe(
+      map(bookings => {
+        const completedBooking = bookings.find(b => 
+          b.spaceId === spaceId && b.status === 'COMPLETED'
+        );
+        return {
+          hasBooking: !!completedBooking,
+          bookingId: completedBooking?.id
+        };
+      })
+    );
   }
 
   /**

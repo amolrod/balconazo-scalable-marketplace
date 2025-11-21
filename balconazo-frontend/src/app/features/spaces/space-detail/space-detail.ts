@@ -51,6 +51,11 @@ export class SpaceDetailComponent implements OnInit {
   reviewsLoading = false;
   reviewsError: string | null = null;
 
+  // Review eligibility
+  canWriteReview = false;
+  eligibilityLoading = false;
+  completedBookingId: string | null = null;
+
   // Review Form
   showReviewForm = false;
   reviewForm: FormGroup;
@@ -81,6 +86,7 @@ export class SpaceDetailComponent implements OnInit {
     if (spaceId) {
       this.loadSpace(spaceId);
       this.loadReviews(spaceId);
+      this.checkReviewEligibility(spaceId);
     } else {
       this.router.navigate(['/']);
     }
@@ -321,6 +327,35 @@ export class SpaceDetailComponent implements OnInit {
     });
   }
 
+  /**
+   * Verificar si el usuario puede escribir una reseña para este espacio
+   */
+  checkReviewEligibility(spaceId: string): void {
+    const token = localStorage.getItem('authToken');
+    
+    // Si no está autenticado, no puede escribir reseñas
+    if (!token) {
+      this.canWriteReview = false;
+      return;
+    }
+
+    this.eligibilityLoading = true;
+
+    this.bookingsService.hasCompletedBookingForSpace(spaceId).subscribe({
+      next: (result) => {
+        this.canWriteReview = result.hasBooking;
+        this.completedBookingId = result.bookingId || null;
+        this.eligibilityLoading = false;
+        console.log('✅ Elegibilidad verificada:', result);
+      },
+      error: (error) => {
+        console.error('❌ Error verificando elegibilidad:', error);
+        this.canWriteReview = false;
+        this.eligibilityLoading = false;
+      }
+    });
+  }
+
   calculateAverageRating(): void {
     if (this.reviews.length === 0) {
       this.averageRating = 0;
@@ -359,15 +394,17 @@ export class SpaceDetailComponent implements OnInit {
       return;
     }
 
-    // Nota: En producción, el bookingId debería venir de las reservas completadas del usuario
-    // Por ahora, esto es un placeholder hasta que implementemos esa lógica
-    const bookingId = 'placeholder-booking-id';  // TODO: Obtener de reservas completadas
+    if (!this.completedBookingId) {
+      this.reviewError = 'No se encontró una reserva completada para este espacio';
+      console.error('❌ No hay bookingId disponible');
+      return;
+    }
 
     this.reviewSubmitting = true;
     this.reviewError = null;
 
     const reviewData: CreateReviewDTO = {
-      bookingId: bookingId,
+      bookingId: this.completedBookingId,
       rating: this.reviewForm.value.rating,
       comment: this.reviewForm.value.comment
     };

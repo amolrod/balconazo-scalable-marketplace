@@ -159,17 +159,18 @@
                 }
               </div>
 
-              <!-- Review Form Button -->
-              <div class="review-form-container">
-                <button 
-                  class="btn btn-outline" 
-                  (click)="toggleReviewForm()"
-                  [disabled]="reviewSubmitting">
-                  {{ showReviewForm ? 'Cancelar' : '✍️ Escribir una reseña' }}
-                </button>
+              <!-- Review Form Button - Solo si el usuario tiene reserva completada -->
+              @if (canWriteReview && !eligibilityLoading) {
+                <div class="review-form-container">
+                  <button 
+                    class="btn btn-outline" 
+                    (click)="toggleReviewForm()"
+                    [disabled]="reviewSubmitting">
+                    {{ showReviewForm ? 'Cancelar' : '✍️ Escribir una reseña' }}
+                  </button>
 
-                <!-- Review Form -->
-                @if (showReviewForm) {
+                  <!-- Review Form -->
+                  @if (showReviewForm) {
                   <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
                     <div class="form-group">
                       <label for="rating">Calificación *</label>
@@ -221,6 +222,7 @@
                   </form>
                 }
               </div>
+            }
 
               <!-- Reviews List -->
               @if (reviewsLoading) {
@@ -250,7 +252,7 @@
                 </div>
               }
               @else {
-                <p class="no-reviews">Aún no hay reseñas para este espacio. ¡Sé el primero en dejar una!</p>
+                <p class="no-reviews">Este espacio aún no tiene reseñas.</p>
               }
             </section>
 
