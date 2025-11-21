@@ -49,7 +49,7 @@ export interface CreateReviewDTO {
 })
 export class BookingsService {
   private http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/booking`;
+  private readonly baseUrl = `${environment.apiUrl}/bookings`;
 
   /**
    * Crear una nueva reserva
