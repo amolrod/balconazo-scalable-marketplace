@@ -148,9 +148,42 @@ cd balconazo-scalable-marketplace
 
 Una vez iniciados todos los servicios, verifica:
 
-- **API Gateway**: http://localhost:8080
-- **Eureka Dashboard**: http://localhost:8761
-- **Health Check**: `curl http://localhost:8080/actuator/health`
+#### Verificación Rápida
+
+```bash
+./scripts/verify-system.sh
+```
+
+**Salida esperada:**
+```
+🎯 VERIFICACIÓN RÁPIDA DEL SISTEMA BALCONAZO
+
+  ✅ Eureka  Service (puerto 8761) - UP
+  ✅ Gateway Service (puerto 8080) - UP
+  ✅ Auth    Service (puerto 8084) - UP
+  ✅ Catalog Service (puerto 8085) - UP
+  ✅ Booking Service (puerto 8082) - UP
+  ✅ Search  Service (puerto 8083) - UP
+
+📊 Resultado: 6/6 servicios UP
+✅ Todos los servicios están funcionando
+```
+
+#### Verificación Exhaustiva (50+ checks)
+
+```bash
+./scripts/check-services.sh
+```
+
+Verifica:
+- ✅ Contenedores Docker (PostgreSQL)
+- ✅ Procesos Java (microservicios)
+- ✅ Health endpoints
+- ✅ Registro en Eureka
+- ✅ Conectividad API Gateway
+- ✅ Puertos en uso
+
+---
 
 ### Ejecutar Tests
 
