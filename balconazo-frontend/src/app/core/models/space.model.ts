@@ -15,6 +15,8 @@ export interface Space {
   createdAt: string;
   updatedAt?: string;
   images?: SpaceImage[]; // Añadido
+  averageRating?: number; // Rating promedio del espacio
+  reviewCount?: number; // Número de reseñas
 }
 
 export interface SpaceImage {

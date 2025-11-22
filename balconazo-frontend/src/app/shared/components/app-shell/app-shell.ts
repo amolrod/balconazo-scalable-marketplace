@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar';
@@ -14,7 +14,8 @@ import { filter, map } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, RouterModule, NavbarComponent],
   templateUrl: './app-shell.html',
-  styleUrl: './app-shell.scss'
+  styleUrl: './app-shell.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class AppShellComponent {
   private router = inject(Router);

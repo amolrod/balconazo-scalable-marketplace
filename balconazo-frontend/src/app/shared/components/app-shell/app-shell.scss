@@ -1,28 +1,27 @@
 /**
- * AppShell Styles
+ * AppShell Styles - REDISEÑADO PARA STICKY
+ * NO usar flex ni overflow que interfiera con sticky positioning
  */
 
 .app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  min-height: 100vh !important;
+  position: relative !important;
+  /* NO flex, NO overflow - para que sticky funcione */
 
   &.auth-page {
-    min-height: 100dvh;
-    height: 100dvh;
-    overflow: hidden;
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
   }
 }
 
 .app-main {
-  flex: 1;
-  position: relative;
-  z-index: 1;
+  position: relative !important;
+  /* NO flex-1, NO overflow - para que sticky del hijo funcione */
 
   &.app-main--fullscreen {
-    flex: unset;
-    height: 100dvh;
-    overflow: hidden;
+    height: 100dvh !important;
+    overflow: hidden !important;
   }
 }
 

@@ -1,9 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewEncapsulation, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SpacesService, Space } from '../../core/services/spaces.service';
-import { SpaceCardComponent } from '../../shared/components/space-card/space-card';
 import { SkeletonListComponent } from '../../shared/components/skeleton-list/skeleton-list';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 
@@ -13,12 +12,12 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
     CommonModule,
     FormsModule,
     RouterModule,
-    SpaceCardComponent,
     SkeletonListComponent,
     EmptyStateComponent
   ],
   templateUrl: './home.html',
-  styleUrl: './home.scss'
+  styleUrl: './home.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit {
   private router = inject(Router);
@@ -27,6 +26,9 @@ export class HomeComponent implements OnInit {
   loading = false;
   error: string | null = null;
   featuredSpaces: Space[] = [];
+
+  // Variable para scroll behavior de category-bar
+  hideCategoryBar = false;
 
   searchParams = {
     location: '',
@@ -38,13 +40,46 @@ export class HomeComponent implements OnInit {
     this.loadFeaturedSpaces();
   }
 
+  @HostListener('window:scroll', [])
+  onWindowScroll(): void {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Obtener la posición de la sección "¿Por qué Balconazo?"
+    const whyBalconazoSection = document.querySelector('.why-balconazo-section');
+
+    if (!whyBalconazoSection) {
+      this.hideCategoryBar = false;
+      return;
+    }
+
+    // Obtener la posición top de la sección
+    const whyBalconazoTop = whyBalconazoSection.getBoundingClientRect().top + currentScroll;
+
+    // Ocultar cuando llegamos a "¿Por qué Balconazo?" (dejando un margen de 100px)
+    if (currentScroll + window.innerHeight >= whyBalconazoTop - 100) {
+      this.hideCategoryBar = true;
+    } else {
+      this.hideCategoryBar = false;
+    }
+  }
+
   loadFeaturedSpaces(): void {
     this.loading = true;
 
     this.spacesService.getActiveSpaces().subscribe({
       next: (spaces) => {
         console.log('✅ Espacios cargados desde el backend:', spaces);
+
+        // Usar datos REALES del backend sin simulación
         this.featuredSpaces = spaces.slice(0, 8);
+
+        console.log('📊 Espacios con datos reales:', this.featuredSpaces.map(s => ({
+          id: s.id,
+          title: s.title,
+          rating: s.averageRating,
+          reviews: s.reviewCount
+        })));
+
         this.loading = false;
       },
       error: (error) => {
@@ -112,6 +147,12 @@ export class HomeComponent implements OnInit {
 
   getSpacePricePerHour(space: Space): number {
     return Math.round(space.basePriceCents / 100);
+  }
+
+  toggleFavorite(event: Event, spaceId: string): void {
+    event.stopPropagation(); // Evitar que se active el click del card
+    console.log('❤️ Toggle favorito para espacio:', spaceId);
+    // TODO: Implementar lógica de favoritos cuando esté disponible
   }
 }
 

@@ -1,25 +1,35 @@
 /**
- * Navbar Styles
- * Professional sticky navbar with dropdown menu
+ * Navbar Styles - REDISEÑO COMPLETO BASADO EN REFERENCIA HTML
+ * Sticky navbar con backdrop blur
  */
 
 .navbar {
-  position: static;
-  height: var(--navbar-height);
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
-  transition: all var(--transition-base);
-  overflow: visible;
-  z-index: 100;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  height: 80px !important;
+  width: 100% !important;
 }
 
 .navbar-container {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8);
-  overflow: visible;
+  max-width: 1920px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  height: 80px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+
+  @media (min-width: 768px) {
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+  }
 }
 
 .navbar-logo {
@@ -84,26 +94,25 @@
 .user-menu-trigger {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2);
+  gap: var(--space-3);
+  padding: 5px 5px 5px 12px; /* Asimétrico: más espacio a la izquierda */
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: var(--radius-full);
+  border-radius: 30px; /* Píldora completa */
   cursor: pointer;
   transition: all var(--transition-fast);
 
-  &:hover, &.active {
-    border-color: var(--gray-400);
-    box-shadow: var(--shadow-sm);
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12); /* Sombra suave */
   }
 
-  svg {
+  &.active {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .hamburger-icon {
     color: var(--gray-600);
-    transition: transform var(--transition-fast);
-  }
-
-  &.active svg {
-    transform: rotate(180deg);
+    flex-shrink: 0;
   }
 }
 
@@ -128,14 +137,14 @@
 /* User Dropdown */
 .user-dropdown {
   position: absolute;
-  top: calc(100% + var(--space-2));
+  top: calc(100% + 12px); /* Más separación del botón */
   right: 0;
   min-width: 280px;
   background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-2xl);
+  border-radius: 16px; /* Más redondeado */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); /* Sombra difusa y suave */
   border: 1px solid var(--gray-200);
-  overflow: visible;
+  overflow: hidden;
   z-index: 9999;
 }
 

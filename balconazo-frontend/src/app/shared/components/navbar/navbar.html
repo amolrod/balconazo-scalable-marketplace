@@ -1,5 +1,5 @@
 <nav class="navbar" role="navigation" aria-label="Navegación principal">
-  <div class="container navbar-container">
+  <div class="navbar-container">
     <!-- Logo -->
     <a routerLink="/" class="navbar-logo" (click)="closeMobileMenu()">
       Balconazo
@@ -26,23 +26,23 @@
         </a>
       }
 
-      <!-- Guest Menu (No autenticado) - Estilo Airbnb -->
+      <!-- User Menu Píldora Premium -->
       @if (!isAuthenticated) {
         <div class="user-menu-wrapper">
           <button
-            class="user-menu-trigger"
+            class="rounded-full border border-slate-200 p-1 pl-3 flex items-center gap-2 hover:shadow-md transition"
             [class.active]="showUserMenu"
             aria-haspopup="true"
             [attr.aria-expanded]="showUserMenu"
             (click)="toggleUserMenu()"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
-            <div class="user-avatar user-avatar--guest">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="w-8 h-8 bg-slate-700 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
@@ -102,12 +102,14 @@
             [attr.aria-expanded]="showUserMenu"
             (click)="toggleUserMenu()"
           >
+            <svg class="hamburger-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
             <div class="user-avatar">
               {{ userInitials }}
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hide-mobile">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
           </button>
 
           <!-- Dropdown Menu -->

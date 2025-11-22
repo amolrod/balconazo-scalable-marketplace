@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BalconazoApp | Rediseño Premium</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#f43f5e', // Tu Rojo Principal
+                            600: '#e11d48', // Rojo Hover
+                            900: '#881337',
+                        }
+                    },
+                    boxShadow: {
+                        'pill': '0 6px 20px rgba(0,0,0,0.08)', // Sombra suave barra búsqueda
+                        'pill-hover': '0 10px 40px rgba(0,0,0,0.12)', // Sombra hover
+                        'card': '0 2px 8px rgba(0,0,0,0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Ajustes finos que Tailwind a veces necesita ayuda */
+        body { -webkit-font-smoothing: antialiased; }
+        
+        /* Animación suave de entrada */
+        .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ocultar scrollbar en carruseles horizontales */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-slate-900">
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100" x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
+        <div class="max-w-[1920px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
+            
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-orange-500 rounded-lg flex items-center justify-center text-white">
+                    <i class="ph-bold ph-terrace text-xl"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-brand-600 hidden md:block">Balconazo</span>
+            </a>
+
+            <div class="hidden lg:flex items-center gap-1 p-1 bg-slate-100/50 rounded-full border border-slate-200/50">
+                <a href="#" class="px-5 py-2 rounded-full text-sm font-semibold text-slate-900 bg-white shadow-sm transition-all">Explorar</a>
+                <a href="#" class="px-5 py-2 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all">Eventos</a>
+                <a href="#" class="px-5 py-2 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all">Rodajes</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="#" class="hidden md:block text-sm font-semibold text-slate-600 hover:bg-slate-100 px-4 py-2.5 rounded-full transition-colors">
+                    Publica tu espacio
+                </a>
+
+                <button class="hidden md:block w-10 h-10 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-600 transition">
+                    <i class="ph ph-globe text-lg"></i>
+                </button>
+
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="flex items-center gap-2 pl-3 pr-1 py-1 bg-white border border-slate-200 rounded-full hover:shadow-md transition-all duration-300 group">
+                        <i class="ph ph-list text-lg text-slate-600 ml-1"></i>
+                        <div class="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm">
+                            AG
+                        </div>
+                    </button>
+
+                    <div x-show="open" @click.outside="open = false" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 overflow-hidden" style="display: none;">
+                        
+                        <div class="px-4 py-3 border-b border-slate-50 bg-slate-50/50">
+                            <p class="text-sm font-bold text-slate-900">Angel Rodriguez</p>
+                            <p class="text-xs text-slate-500">Viajero</p>
+                        </div>
+                        
+                        <div class="py-1">
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+                                <i class="ph ph-user-circle text-lg"></i> Mi Perfil
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+                                <i class="ph ph-heart text-lg"></i> Favoritos
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
+                                <i class="ph ph-ticket text-lg"></i> Mis Reservas
+                            </a>
+                        </div>
+                        
+                        <div class="h-px bg-slate-100 my-1 mx-4"></div>
+                        
+                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors">
+                            <i class="ph ph-sign-out text-lg"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-16 pb-32 px-4 md:px-8 overflow-hidden">
+        <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-50 via-white to-white opacity-70"></div>
+        
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="animate-fade-up inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-600 shadow-sm mb-6">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                Más de 1,000 espacios verificados
+            </div>
+
+            <h1 class="animate-fade-up delay-100 text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
+                Encuentra el lugar perfecto <br class="hidden md:block" /> para tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-orange-500">próximo evento</span>
+            </h1>
+            
+            <p class="animate-fade-up delay-200 text-lg md:text-xl text-slate-500 mb-12 max-w-2xl mx-auto">
+                Terrazas, jardines y salones exclusivos por horas. Reserva de forma segura y sin complicaciones.
+            </p>
+
+            <div class="animate-fade-up delay-200 relative z-20 max-w-4xl mx-auto">
+                <div class="bg-white rounded-full shadow-pill hover:shadow-pill-hover transition-all duration-300 border border-slate-200 p-2 flex flex-col md:flex-row items-center">
+                    
+                    <div class="w-full md:flex-1 relative group px-6 py-2 hover:bg-slate-100 rounded-full cursor-pointer transition-colors text-left">
+                        <label class="block text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Ubicación</label>
+                        <input type="text" placeholder="¿Dónde buscas?" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-600 focus:outline-none focus:ring-0 placeholder-slate-400">
+                    </div>
+
+                    <div class="hidden md:block w-px h-8 bg-slate-200"></div>
+
+                    <div class="w-full md:w-auto md:min-w-[180px] relative group px-6 py-2 hover:bg-slate-100 rounded-full cursor-pointer transition-colors text-left">
+                        <label class="block text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Fecha</label>
+                        <input type="text" placeholder="Añadir fechas" onfocus="(this.type='date')" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-600 focus:outline-none focus:ring-0 placeholder-slate-400">
+                    </div>
+
+                    <div class="hidden md:block w-px h-8 bg-slate-200"></div>
+
+                    <div class="w-full md:flex-[0.8] relative group pl-6 pr-2 py-2 hover:bg-slate-100 rounded-full cursor-pointer transition-colors flex items-center justify-between">
+                        <div class="text-left w-full">
+                            <label class="block text-[10px] font-bold text-slate-800 uppercase tracking-wider mb-0.5">Invitados</label>
+                            <input type="number" placeholder="¿Cuántos?" class="w-full bg-transparent border-none p-0 text-sm font-medium text-slate-600 focus:outline-none focus:ring-0 placeholder-slate-400">
+                        </div>
+                        
+                        <button class="ml-2 w-12 h-12 bg-gradient-to-br from-brand-600 to-brand-500 rounded-full text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform shrink-0">
+                            <i class="ph-bold ph-magnifying-glass text-xl"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="sticky top-20 z-40 bg-white border-b border-slate-100 pt-4 pb-0">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center gap-8 overflow-x-auto hide-scrollbar pb-4">
+                <button class="flex flex-col items-center gap-2 min-w-fit group border-b-2 border-slate-900 pb-2">
+                    <i class="ph-fill ph-plant text-2xl text-slate-900"></i>
+                    <span class="text-xs font-bold text-slate-900">Jardines</span>
+                </button>
+                
+                <button class="flex flex-col items-center gap-2 min-w-fit group border-b-2 border-transparent hover:border-slate-300 pb-2 opacity-60 hover:opacity-100 transition-all">
+                    <i class="ph-fill ph-house-line text-2xl"></i>
+                    <span class="text-xs font-medium">Terrazas</span>
+                </button>
+                <button class="flex flex-col items-center gap-2 min-w-fit group border-b-2 border-transparent hover:border-slate-300 pb-2 opacity-60 hover:opacity-100 transition-all">
+                    <i class="ph-fill ph-swimming-pool text-2xl"></i>
+                    <span class="text-xs font-medium">Piscinas</span>
+                </button>
+                <button class="flex flex-col items-center gap-2 min-w-fit group border-b-2 border-transparent hover:border-slate-300 pb-2 opacity-60 hover:opacity-100 transition-all">
+                    <i class="ph-fill ph-martini text-2xl"></i>
+                    <span class="text-xs font-medium">Eventos</span>
+                </button>
+                <button class="flex flex-col items-center gap-2 min-w-fit group border-b-2 border-transparent hover:border-slate-300 pb-2 opacity-60 hover:opacity-100 transition-all">
+                    <i class="ph-fill ph-camera text-2xl"></i>
+                    <span class="text-xs font-medium">Rodajes</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-12 bg-white">
+        <div class="max-w-[1920px] mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-x-6 gap-y-10">
+                
+                <div class="group cursor-pointer">
+                    <div class="relative aspect-[1/1.05] bg-slate-200 rounded-2xl overflow-hidden mb-3">
+                        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <button class="absolute top-3 right-3 text-white/70 hover:text-white hover:scale-110 transition">
+                            <i class="ph-fill ph-heart text-2xl drop-shadow-md"></i>
+                        </button>
+                        <div class="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded shadow-sm">
+                            Superhost
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-900">Ático con vistas 360°</h3>
+                            <p class="text-slate-500 text-sm">Madrid Centro</p>
+                            <p class="text-slate-500 text-sm">Capacidad: 20 pers.</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <i class="ph-fill ph-star text-slate-900"></i> 4.9
+                        </div>
+                    </div>
+                    <div class="mt-1 flex items-baseline gap-1">
+                        <span class="font-bold text-slate-900 text-lg">50€</span>
+                        <span class="text-slate-600 text-sm">/ hora</span>
+                    </div>
+                </div>
+
+                <div class="group cursor-pointer">
+                    <div class="relative aspect-[1/1.05] bg-slate-200 rounded-2xl overflow-hidden mb-3">
+                        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <button class="absolute top-3 right-3 text-white/70 hover:text-white hover:scale-110 transition">
+                            <i class="ph-fill ph-heart text-2xl drop-shadow-md"></i>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-900">Jardín con Piscina Privada</h3>
+                            <p class="text-slate-500 text-sm">Pozuelo de Alarcón</p>
+                            <p class="text-slate-500 text-sm">Capacidad: 15 pers.</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <i class="ph-fill ph-star text-slate-900"></i> 5.0
+                        </div>
+                    </div>
+                    <div class="mt-1 flex items-baseline gap-1">
+                        <span class="font-bold text-slate-900 text-lg">85€</span>
+                        <span class="text-slate-600 text-sm">/ hora</span>
+                    </div>
+                </div>
+
+                <div class="group cursor-pointer">
+                    <div class="relative aspect-[1/1.05] bg-slate-200 rounded-2xl overflow-hidden mb-3">
+                        <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <button class="absolute top-3 right-3 text-white/70 hover:text-white hover:scale-110 transition">
+                            <i class="ph-fill ph-heart text-2xl drop-shadow-md"></i>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-900">Terraza Chill Out</h3>
+                            <p class="text-slate-500 text-sm">Barrio de Salamanca</p>
+                            <p class="text-slate-500 text-sm">Capacidad: 30 pers.</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <i class="ph-fill ph-star text-slate-900"></i> 4.8
+                        </div>
+                    </div>
+                    <div class="mt-1 flex items-baseline gap-1">
+                        <span class="font-bold text-slate-900 text-lg">65€</span>
+                        <span class="text-slate-600 text-sm">/ hora</span>
+                    </div>
+                </div>
+
+                 <div class="group cursor-pointer">
+                    <div class="relative aspect-[1/1.05] bg-slate-200 rounded-2xl overflow-hidden mb-3">
+                        <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <button class="absolute top-3 right-3 text-white/70 hover:text-white hover:scale-110 transition">
+                            <i class="ph-fill ph-heart text-2xl drop-shadow-md"></i>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-slate-900">Villa Moderna para Eventos</h3>
+                            <p class="text-slate-500 text-sm">La Moraleja</p>
+                            <p class="text-slate-500 text-sm">Capacidad: 50 pers.</p>
+                        </div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <i class="ph-fill ph-star text-slate-900"></i> 4.95
+                        </div>
+                    </div>
+                    <div class="mt-1 flex items-baseline gap-1">
+                        <span class="font-bold text-slate-900 text-lg">120€</span>
+                        <span class="text-slate-600 text-sm">/ hora</span>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-16 text-center">
+                <button class="px-8 py-4 rounded-full border border-slate-900 text-slate-900 font-bold hover:bg-slate-50 transition">
+                    Mostrar más espacios
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-50 border-t border-slate-200 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6 md:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-4">Asistencia</h4>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li><a href="#" class="hover:underline">Centro de ayuda</a></li>
+                        <li><a href="#" class="hover:underline">AirCover</a></li>
+                        <li><a href="#" class="hover:underline">Cancelaciones</a></li>
+                        <li><a href="#" class="hover:underline">Problemas en el barrio</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-4">Ser Anfitrión</h4>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li><a href="#" class="hover:underline">Pon tu espacio en Balconazo</a></li>
+                        <li><a href="#" class="hover:underline">AirCover para anfitriones</a></li>
+                        <li><a href="#" class="hover:underline">Recursos para anfitriones</a></li>
+                        <li><a href="#" class="hover:underline">Foro de la comunidad</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-4">Balconazo</h4>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li><a href="#" class="hover:underline">Sala de prensa</a></li>
+                        <li><a href="#" class="hover:underline">Nuevas funciones</a></li>
+                        <li><a href="#" class="hover:underline">Carreras</a></li>
+                        <li><a href="#" class="hover:underline">Inversores</a></li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 class="font-bold text-slate-900 mb-4">App</h4>
+                    <div class="flex gap-2">
+                        <div class="bg-slate-200 h-10 w-32 rounded animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-sm text-slate-500">
+                    © 2025 BalconazoApp, Inc. · Privacidad · Términos · Mapa del sitio
+                </div>
+                <div class="flex gap-4 text-slate-900 text-lg">
+                    <i class="ph-fill ph-facebook-logo hover:text-brand-600 cursor-pointer"></i>
+                    <i class="ph-fill ph-twitter-logo hover:text-brand-600 cursor-pointer"></i>
+                    <i class="ph-fill ph-instagram-logo hover:text-brand-600 cursor-pointer"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 py-3 px-6 flex justify-between items-center z-50">
+        <div class="flex flex-col items-center gap-1 text-brand-600">
+            <i class="ph-fill ph-magnifying-glass text-2xl"></i>
+            <span class="text-[10px] font-medium">Explorar</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-900">
+            <i class="ph ph-heart text-2xl"></i>
+            <span class="text-[10px] font-medium">Favoritos</span>
+        </div>
+         <div class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-900">
+            <i class="ph-bold ph-plus-circle text-3xl -mt-4 bg-brand-600 text-white rounded-full p-1 shadow-lg"></i>
+            <span class="text-[10px] font-medium">Publicar</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-900">
+            <i class="ph ph-chat-circle-dots text-2xl"></i>
+            <span class="text-[10px] font-medium">Mensajes</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-900">
+            <i class="ph ph-user-circle text-2xl"></i>
+            <span class="text-[10px] font-medium">Perfil</span>
+        </div>
+    </div>
+
+</body>
+</html>
