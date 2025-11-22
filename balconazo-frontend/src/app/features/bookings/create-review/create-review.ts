@@ -66,7 +66,7 @@ export class CreateReviewComponent implements OnInit {
           next: (reviews) => {
             const userId = localStorage.getItem('userId');
             const alreadyReviewed = reviews.some(r => r.guestId === userId);
-            
+
             if (alreadyReviewed) {
               this.error = 'Ya dejaste una reseña para este espacio';
               this.loading = false;

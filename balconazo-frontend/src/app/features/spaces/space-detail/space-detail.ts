@@ -350,12 +350,12 @@ export class SpaceDetailComponent implements OnInit {
     this.bookingsService.hasCompletedBookingForSpace(spaceId).subscribe({
       next: (result) => {
         console.log('✅ Resultado elegibilidad COMPLETO:', JSON.stringify(result, null, 2));
-        
+
         // Solo puede escribir si tiene reserva completada Y no ha dejado reseña
         this.canWriteReview = result.hasBooking && !result.alreadyReviewed;
         this.completedBookingId = result.bookingId || null;
         this.eligibilityLoading = false;
-        
+
         console.log('🎯 canWriteReview =', this.canWriteReview);
         console.log('📝 Ya dejó reseña =', result.alreadyReviewed);
         console.log('🎫 completedBookingId GUARDADO =', this.completedBookingId);
