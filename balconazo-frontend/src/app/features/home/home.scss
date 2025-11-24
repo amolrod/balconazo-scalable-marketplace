@@ -203,6 +203,15 @@
   box-shadow: 0 16px 40px -10px rgba(0,0,0,0.1);
 }
 
+/* Custom shadow classes matching example */
+.shadow-pill {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.shadow-pill-hover {
+  box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+}
+
 .border {
   border-width: 1px;
 }
