@@ -1,0 +1,130 @@
+<div class="review-page">
+  <div class="container">
+    <div class="review-card">
+      <!-- Header -->
+      <div class="review-header">
+        <button class="back-button" (click)="cancel()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Volver
+        </button>
+        <h1 class="review-title">Deja tu reseña</h1>
+        <p class="review-subtitle">Comparte tu experiencia con otros usuarios</p>
+      </div>
+
+      <!-- Error State -->
+      @if (error) {
+        <div class="alert alert-error">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ error }}
+        </div>
+      }
+
+      <!-- Rating Section -->
+      <div class="form-section">
+        <label class="form-label">
+          Calificación
+          <span class="required">*</span>
+        </label>
+        <p class="form-helper">¿Cómo calificarías tu experiencia?</p>
+
+        <div class="rating-stars">
+          @for (star of [1, 2, 3, 4, 5]; track star) {
+            <button
+              type="button"
+              class="star-button"
+              [class]="getStarClass(star)"
+              (click)="setRating(star)"
+              (mouseenter)="setHoverRating(star)"
+              (mouseleave)="clearHoverRating()"
+            >
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </button>
+          }
+        </div>
+
+        @if (rating > 0) {
+          <div class="rating-text">
+            @switch (rating) {
+              @case (1) {
+                <span class="rating-description">😞 Muy insatisfecho</span>
+              }
+              @case (2) {
+                <span class="rating-description">😕 Insatisfecho</span>
+              }
+              @case (3) {
+                <span class="rating-description">😐 Neutral</span>
+              }
+              @case (4) {
+                <span class="rating-description">😊 Satisfecho</span>
+              }
+              @case (5) {
+                <span class="rating-description">😍 ¡Muy satisfecho!</span>
+              }
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Comment Section -->
+      <div class="form-section">
+        <label class="form-label" for="comment">
+          Comentario
+          <span class="required">*</span>
+        </label>
+        <p class="form-helper">Cuéntanos más sobre tu experiencia</p>
+
+        <textarea
+          id="comment"
+          class="form-textarea"
+          rows="6"
+          placeholder="¿Qué te gustó del espacio? ¿Algo que podría mejorar? Comparte los detalles de tu experiencia..."
+          [(ngModel)]="comment"
+          [disabled]="loading"
+        ></textarea>
+
+        <div class="char-count">
+          {{ comment.length }} caracteres
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary btn-lg"
+          (click)="cancel()"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          (click)="submitReview()"
+          [disabled]="loading || !rating || !comment.trim()"
+        >
+          @if (loading) {
+            <div class="spinner"></div>
+            <span>Enviando...</span>
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>Publicar reseña</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -148,19 +148,39 @@
             }
 
             <!-- Reviews -->
-            @if (reviews.length > 0) {
-              <section class="content-section">
-                <div class="reviews-header">
-                  <h2>Reseñas</h2>
+            <section class="content-section">
+              <div class="reviews-header">
+                <h2>Reseñas</h2>
+                @if (totalReviews > 0) {
                   <div class="reviews-summary">
                     <app-rating-stars [rating]="averageRating" [size]="'md'"></app-rating-stars>
                     <span class="reviews-text">{{ totalReviews }} reseñas</span>
                   </div>
+                }
+              </div>
+
+              <!-- Botón para dejar reseña si el usuario tiene una reserva completada -->
+              @if (canLeaveReview) {
+                <div class="leave-review-banner">
+                  <div class="banner-content">
+                    <div class="banner-icon">⭐</div>
+                    <div class="banner-text">
+                      <h3>¿Cómo te ha ido?</h3>
+                      <p>Has estado en este espacio. Cuéntanos tu experiencia y ayuda a otros usuarios con tu opinión.</p>
+                    </div>
+                    <button class="btn btn-primary" (click)="goToLeaveReview()">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                      Dejar reseña
+                    </button>
+                  </div>
                 </div>
+              }
+
+              <!-- Lista de reseñas -->
+              @if (reviews.length > 0) {
                 <div class="reviews-list">
-                  @if (reviews.length === 0 && !reviewsLoading) {
-                    <p class="text-slate-500 text-center py-8">Aún no hay reseñas para este espacio. ¡Sé el primero en reservar y dejar tu opinión!</p>
-                  }
                   @for (review of reviews; track review.id) {
                     <div class="review-item">
                       <div class="review-header">
@@ -175,8 +195,10 @@
                     </div>
                   }
                 </div>
-              </section>
-            }
+              } @else if (!reviewsLoading) {
+                <p class="text-slate-500 text-center py-8">Aún no hay reseñas para este espacio. ¡Sé el primero en reservar y dejar tu opinión!</p>
+              }
+            </section>
 
             <!-- Location -->
             <section class="content-section">

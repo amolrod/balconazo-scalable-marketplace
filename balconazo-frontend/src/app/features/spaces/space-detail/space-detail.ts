@@ -50,6 +50,11 @@ export class SpaceDetailComponent implements OnInit {
   averageRating = 0;
   totalReviews = 0;
 
+  // User's booking status for this space
+  userCompletedBookingId: string | null = null;
+  canLeaveReview = false;
+  checkingUserBooking = false;
+
   constructor() {
     this.bookingForm = this.fb.group({
       startDate: ['', Validators.required],
@@ -69,6 +74,7 @@ export class SpaceDetailComponent implements OnInit {
     if (spaceId) {
       this.loadSpace(spaceId);
       this.loadReviews(spaceId);
+      this.checkUserBookingStatus(spaceId);
     } else {
       this.router.navigate(['/']);
     }
@@ -117,6 +123,59 @@ export class SpaceDetailComponent implements OnInit {
         // No mostrar error al usuario, simplemente no mostrar reseñas
       }
     });
+  }
+
+  checkUserBookingStatus(spaceId: string): void {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      console.log('❌ Usuario no autenticado');
+      return; // Usuario no autenticado
+    }
+
+    console.log('🔍 Verificando elegibilidad de reseña para espacio:', spaceId);
+    this.checkingUserBooking = true;
+
+    // Obtener todas las reservas del usuario
+    this.bookingsService.getMyBookings().subscribe({
+      next: (bookings) => {
+        console.log('📋 Reservas del usuario:', bookings.length);
+        console.log('📊 Detalle de reservas:', bookings.map(b => ({
+          id: b.id,
+          spaceId: b.spaceId,
+          status: b.status,
+          hasReview: b.hasReview
+        })));
+
+        // Buscar una reserva completada o confirmada sin reseña para este espacio
+        // COMPLETED = reserva finalizada, CONFIRMED = reserva activa (también puede dejar reseña)
+        const completedBooking = bookings.find(
+          b => b.spaceId === spaceId && 
+               (b.status?.toUpperCase() === 'COMPLETED' || b.status?.toUpperCase() === 'CONFIRMED') && 
+               !b.hasReview
+        );        if (completedBooking) {
+          this.canLeaveReview = true;
+          this.userCompletedBookingId = completedBooking.id;
+          console.log('✅ Usuario puede dejar reseña para reserva:', completedBooking.id);
+        } else {
+          this.canLeaveReview = false;
+          console.log('ℹ️ Usuario no tiene reservas completadas sin reseña en este espacio');
+          console.log('🔍 Buscando spaceId:', spaceId);
+          console.log('🔍 SpaceIds en reservas:', bookings.map(b => b.spaceId));
+        }
+
+        this.checkingUserBooking = false;
+      },
+      error: (error) => {
+        console.error('❌ Error verificando reservas del usuario:', error);
+        this.checkingUserBooking = false;
+      }
+    });
+  }
+
+  goToLeaveReview(): void {
+    if (this.userCompletedBookingId) {
+      this.router.navigate(['/bookings', this.userCompletedBookingId, 'review']);
+    }
   }
 
   getImages(): string[] {

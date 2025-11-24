@@ -2,27 +2,29 @@
 
 ## 🚀 Scripts de Inicio
 
+**IMPORTANTE**: Todos los scripts deben ejecutarse desde la raíz del proyecto usando `bash scripts/[nombre-script].sh`
+
 ### Iniciar TODA la infraestructura y servicios
 ```bash
-./start-all-with-eureka.sh
+bash scripts/start-all-with-eureka.sh
 ```
 Inicia: Postgres, Redis, Kafka, Zookeeper, Eureka, Gateway, Auth, Catalog, Booking, Search y Frontend
 
 ### Iniciar solo infraestructura (sin servicios)
 ```bash
-./start-infrastructure.sh
+bash scripts/start-infrastructure.sh
 ```
-Inicia: Postgres (catalog + booking), Redis, Kafka, Zookeeper
+Inicia: Postgres (catalog + booking + search), Redis, Kafka, Zookeeper
 
 ### Iniciar todos los servicios (asume infraestructura ya corriendo)
 ```bash
-./start-all-services.sh
+bash scripts/start-all-services.sh
 ```
 Inicia: Eureka, Gateway, Auth, Catalog, Booking, Search
 
 ### Iniciar solo frontend
 ```bash
-./start-frontend.sh
+bash scripts/start-frontend.sh
 ```
 Inicia Angular frontend en `http://localhost:4200`
 

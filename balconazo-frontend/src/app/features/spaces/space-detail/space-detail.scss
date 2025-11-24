@@ -276,6 +276,73 @@
   font-weight: var(--font-medium);
 }
 
+.leave-review-banner {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+  border: 2px solid #fbcfe8;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  .banner-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+  }
+
+  .banner-text {
+    flex: 1;
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0 0 8px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(225, 29, 72, 0.4);
+    }
+
+    svg {
+      fill: currentColor;
+    }
+  }
+}
+
 .reviews-list {
   display: flex;
   flex-direction: column;
