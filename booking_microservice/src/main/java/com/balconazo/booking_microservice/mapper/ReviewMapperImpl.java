@@ -19,6 +19,7 @@ public class ReviewMapperImpl implements ReviewMapper {
         }
 
         return ReviewEntity.builder()
+            .bookingId(dto.getBookingId())
             .rating(dto.getRating())
             .comment(dto.getComment())
             .build();
