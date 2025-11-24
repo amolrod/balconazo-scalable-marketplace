@@ -17,5 +17,7 @@ public interface ReviewService {
     List<ReviewDTO> getReviewsByGuest(UUID guestId);
 
     Double getAverageRatingBySpace(UUID spaceId);
+    
+    Integer getReviewCountBySpace(UUID spaceId);
 }
 

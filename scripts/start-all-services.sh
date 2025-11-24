@@ -36,12 +36,20 @@ sleep 20
 
 # 4. Catalog Service
 echo ""
-echo "4️⃣ Iniciando Catalog Service..."
+echo "4️⃣ Compilando y iniciando Catalog Service..."
 cd /Users/angel/Desktop/BalconazoApp/catalog_microservice
-java -jar target/catalog_microservice-0.0.1-SNAPSHOT.jar > /tmp/catalog-service.log 2>&1 &
-echo $! > /tmp/catalog-service-pid.txt
-echo "✅ Catalog Service iniciado (PID: $(cat /tmp/catalog-service-pid.txt))"
-sleep 20
+echo "   🔨 Compilando con Maven (MapStruct)..."
+mvn clean package -DskipTests -q > /tmp/catalog-compile.log 2>&1
+if [ $? -eq 0 ]; then
+  echo "   ✅ Compilación exitosa"
+  java -jar target/catalog_microservice-0.0.1-SNAPSHOT.jar > /tmp/catalog-service.log 2>&1 &
+  echo $! > /tmp/catalog-service-pid.txt
+  echo "   ✅ Catalog Service iniciado (PID: $(cat /tmp/catalog-service-pid.txt))"
+else
+  echo "   ❌ Error en compilación. Ver /tmp/catalog-compile.log"
+  exit 1
+fi
+sleep 25
 
 # 5. Booking Service
 echo ""

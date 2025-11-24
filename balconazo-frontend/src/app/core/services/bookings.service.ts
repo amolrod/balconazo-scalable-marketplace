@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface Booking {
   id: string;
@@ -49,34 +50,39 @@ export interface CreateReviewDTO {
 })
 export class BookingsService {
   private http = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/booking`;
+  private authService = inject(AuthService);
+  private readonly baseUrl = `${environment.apiUrl}/bookings`;
 
   /**
    * Crear una nueva reserva
    */
   createBooking(data: CreateBookingDTO): Observable<Booking> {
-    return this.http.post<Booking>(`${this.baseUrl}/bookings`, data);
+    return this.http.post<Booking>(`${this.baseUrl}`, data);
   }
 
   /**
    * Obtener reserva por ID
    */
   getBookingById(id: string): Observable<Booking> {
-    return this.http.get<Booking>(`${this.baseUrl}/bookings/${id}`);
+    return this.http.get<Booking>(`${this.baseUrl}/${id}`);
   }
 
   /**
    * Obtener todas las reservas del usuario actual (como guest)
    */
   getMyBookings(): Observable<Booking[]> {
-    return this.http.get<Booking[]>(`${this.baseUrl}/bookings/my`);
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      return throwError(() => new Error('Usuario no autenticado'));
+    }
+    return this.http.get<Booking[]>(`${this.baseUrl}/guest/${userId}`);
   }
 
   /**
    * Obtener reservas de un espacio específico (para el host)
    */
   getBookingsBySpace(spaceId: string): Observable<Booking[]> {
-    return this.http.get<Booking[]>(`${this.baseUrl}/bookings/space/${spaceId}`);
+    return this.http.get<Booking[]>(`${this.baseUrl}/space/${spaceId}`);
   }
 
   /**
@@ -84,7 +90,7 @@ export class BookingsService {
    */
   confirmBooking(bookingId: string, paymentIntentId: string): Observable<Booking> {
     return this.http.post<Booking>(
-      `${this.baseUrl}/bookings/${bookingId}/confirm`,
+      `${this.baseUrl}/${bookingId}/confirm`,
       null,
       { params: { paymentIntentId } }
     );
@@ -95,7 +101,7 @@ export class BookingsService {
    */
   cancelBooking(bookingId: string, reason: string): Observable<Booking> {
     return this.http.post<Booking>(
-      `${this.baseUrl}/bookings/${bookingId}/cancel`,
+      `${this.baseUrl}/${bookingId}/cancel`,
       null,
       { params: { reason } }
     );
@@ -105,7 +111,7 @@ export class BookingsService {
    * Completar una reserva (marcar como realizada)
    */
   completeBooking(bookingId: string): Observable<Booking> {
-    return this.http.post<Booking>(`${this.baseUrl}/bookings/${bookingId}/complete`, {});
+    return this.http.post<Booking>(`${this.baseUrl}/${bookingId}/complete`, {});
   }
 
   /**
@@ -139,7 +145,7 @@ export class BookingsService {
       .set('endTs', endTs)
       .set('numGuests', numGuests.toString());
 
-    return this.http.get<{ totalPriceCents: number }>(`${this.baseUrl}/bookings/calculate-price`, { params });
+    return this.http.get<{ totalPriceCents: number }>(`${this.baseUrl}/calculate-price`, { params });
   }
 
   /**
@@ -151,7 +157,7 @@ export class BookingsService {
       .set('startTs', startTs)
       .set('endTs', endTs);
 
-    return this.http.get<{ available: boolean }>(`${this.baseUrl}/bookings/check-availability`, { params });
+    return this.http.get<{ available: boolean }>(`${this.baseUrl}/check-availability`, { params });
   }
 }
 

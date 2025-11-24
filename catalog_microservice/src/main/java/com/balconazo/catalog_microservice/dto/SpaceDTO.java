@@ -26,4 +26,6 @@ public class SpaceDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<SpaceImageDTO> images; // Añadido para mostrar imágenes
+    private Double averageRating; // Rating promedio del espacio
+    private Integer reviewCount; // Número de reseñas
 }

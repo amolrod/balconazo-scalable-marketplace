@@ -134,6 +134,11 @@
   }
 }
 
+.user-avatar-guest {
+  background: var(--gray-700) !important;
+  color: var(--white) !important;
+}
+
 /* User Dropdown */
 .user-dropdown {
   position: absolute;

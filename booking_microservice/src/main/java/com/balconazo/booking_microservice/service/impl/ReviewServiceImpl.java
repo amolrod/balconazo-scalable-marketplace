@@ -107,6 +107,14 @@ public class ReviewServiceImpl implements ReviewService {
         Double avgRating = reviewRepository.findAverageRatingBySpaceId(spaceId);
         return avgRating != null ? avgRating : 0.0;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Integer getReviewCountBySpace(UUID spaceId) {
+        log.info("🔍 Contando reviews del espacio: {}", spaceId);
+        
+        return reviewRepository.countBySpaceId(spaceId).intValue();
+    }
 
     // ============================================
     // EVENTOS

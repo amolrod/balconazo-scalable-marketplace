@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/booking/reviews")
+@RequestMapping("/api/bookings/reviews")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {
@@ -43,11 +43,17 @@ public class ReviewController {
     }
 
     @GetMapping("/space/{spaceId}/rating")
-    public ResponseEntity<Double> getAverageRating(@PathVariable UUID spaceId) {
+    public ResponseEntity<SpaceRatingDTO> getSpaceRating(@PathVariable UUID spaceId) {
         log.info("📥 GET /api/booking/reviews/space/{}/rating", spaceId);
         Double avgRating = reviewService.getAverageRatingBySpace(spaceId);
-        return ResponseEntity.ok(avgRating);
+        Integer reviewCount = reviewService.getReviewCountBySpace(spaceId);
+        
+        SpaceRatingDTO rating = new SpaceRatingDTO(avgRating, reviewCount);
+        return ResponseEntity.ok(rating);
     }
+    
+    // DTO interno para respuesta de rating
+    public record SpaceRatingDTO(Double averageRating, Integer reviewCount) {}
 
     @GetMapping
     public ResponseEntity<List<ReviewDTO>> getReviewsByGuest(@RequestParam UUID guestId) {

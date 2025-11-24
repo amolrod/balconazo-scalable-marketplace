@@ -12,6 +12,7 @@ import com.balconazo.catalog_microservice.mapper.SpaceMapper;
 import com.balconazo.catalog_microservice.repository.SpaceRepository;
 import com.balconazo.catalog_microservice.repository.UserRepository;
 import com.balconazo.catalog_microservice.client.AuthServiceClient;
+import com.balconazo.catalog_microservice.client.BookingServiceClient;
 import com.balconazo.catalog_microservice.service.CacheService;
 import com.balconazo.catalog_microservice.service.SpaceService;
 import com.balconazo.catalog_microservice.service.SpaceImageService;
@@ -38,6 +39,7 @@ public class SpaceServiceImpl implements SpaceService {
     private final EventPublisher eventPublisher;
     private final SpaceImageService imageService;
     private final AuthServiceClient authServiceClient;
+    private final BookingServiceClient bookingServiceClient;
 
     private static final String CACHE_KEY_SPACE = "space:";
     private static final long CACHE_TTL_SECONDS = 300; // 5 minutos
@@ -93,6 +95,17 @@ public class SpaceServiceImpl implements SpaceService {
 
         // Cargar imágenes del espacio
         space.setImages(imageService.getSpaceImages(id));
+        
+        // Cargar rating del espacio desde booking-service
+        try {
+            BookingServiceClient.SpaceRatingDTO rating = bookingServiceClient.getSpaceRating(id);
+            space.setAverageRating(rating.getAverageRating());
+            space.setReviewCount(rating.getReviewCount());
+        } catch (Exception e) {
+            log.warn("⚠️ No se pudo cargar rating para espacio {}: {}", id, e.getMessage());
+            space.setAverageRating(null);
+            space.setReviewCount(0);
+        }
 
         // Guardar en caché
         cacheService.put(cacheKey, space, CACHE_TTL_SECONDS);
@@ -117,6 +130,18 @@ public class SpaceServiceImpl implements SpaceService {
             .map(entity -> {
                 SpaceDTO dto = mapper.toDTO(entity);
                 dto.setImages(imageService.getSpaceImages(entity.getId()));
+                
+                // Cargar rating del espacio
+                try {
+                    BookingServiceClient.SpaceRatingDTO rating = bookingServiceClient.getSpaceRating(entity.getId());
+                    dto.setAverageRating(rating.getAverageRating());
+                    dto.setReviewCount(rating.getReviewCount());
+                } catch (Exception e) {
+                    log.debug("No se pudo cargar rating para espacio {}", entity.getId());
+                    dto.setAverageRating(null);
+                    dto.setReviewCount(0);
+                }
+                
                 return dto;
             })
             .collect(Collectors.toList());

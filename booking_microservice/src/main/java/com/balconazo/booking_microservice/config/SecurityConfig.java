@@ -60,7 +60,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Permitir actuator para health checks
                 .requestMatchers("/actuator/**").permitAll()
-                // TODAS las rutas de bookings requieren autenticación JWT
+                // Permitir consultar reviews y ratings (público para catalog-service)
+                .requestMatchers("/api/bookings/reviews/**").permitAll()
+                // TODAS las otras rutas de bookings requieren autenticación JWT
                 .requestMatchers("/api/bookings/**").authenticated()
                 .anyRequest().permitAll()
             )
@@ -87,8 +89,8 @@ public class SecurityConfig {
 
             String path = request.getRequestURI();
 
-            // Solo aplicar a rutas /api/bookings/** (con o sin slash final)
-            if (!path.startsWith("/api/bookings")) {
+            // Solo aplicar a rutas /api/bookings/** EXCEPTO /api/bookings/reviews/** (público)
+            if (!path.startsWith("/api/bookings") || path.startsWith("/api/bookings/reviews")) {
                 filterChain.doFilter(request, response);
                 return;
             }

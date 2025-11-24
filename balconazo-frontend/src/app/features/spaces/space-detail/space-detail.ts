@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SpacesService, Space } from '../../../core/services/spaces.service';
-import { BookingsService, CreateBookingDTO } from '../../../core/services/bookings.service';
+import { BookingsService, CreateBookingDTO, Review } from '../../../core/services/bookings.service';
 import { RatingStarsComponent } from '../../../shared/components/rating-stars/rating-stars';
 import { PricePipe } from '../../../shared/pipes/price.pipe';
 
@@ -44,27 +44,11 @@ export class SpaceDetailComponent implements OnInit {
   // Amenities
   showAllAmenities = false;
 
-  // Reviews (mock para este PR, se implementarán con backend)
-  reviews: any[] = [
-    {
-      id: 1,
-      guestName: 'María García',
-      rating: 5,
-      comment: 'Espacio increíble, perfecto para nuestra reunión. El anfitrión fue muy atento.',
-      date: '2025-10-15',
-      guestAvatar: 'M'
-    },
-    {
-      id: 2,
-      guestName: 'Carlos Ruiz',
-      rating: 4,
-      comment: 'Muy buen lugar, cómodo y bien ubicado. Solo faltaba un poco más de iluminación.',
-      date: '2025-10-08',
-      guestAvatar: 'C'
-    }
-  ];
-  averageRating = 4.5;
-  totalReviews = 2;
+  // Reviews - Cargadas desde el backend
+  reviews: Review[] = [];
+  reviewsLoading = false;
+  averageRating = 0;
+  totalReviews = 0;
 
   constructor() {
     this.bookingForm = this.fb.group({
@@ -84,6 +68,7 @@ export class SpaceDetailComponent implements OnInit {
     const spaceId = this.route.snapshot.paramMap.get('id');
     if (spaceId) {
       this.loadSpace(spaceId);
+      this.loadReviews(spaceId);
     } else {
       this.router.navigate(['/']);
     }
@@ -103,6 +88,33 @@ export class SpaceDetailComponent implements OnInit {
         console.error('❌ Error cargando espacio:', error);
         this.error = 'No se pudo cargar el espacio. Verifica que exista y el backend esté corriendo.';
         this.loading = false;
+      }
+    });
+  }
+
+  loadReviews(spaceId: string): void {
+    this.reviewsLoading = true;
+
+    this.bookingsService.getReviewsBySpace(spaceId).subscribe({
+      next: (reviews) => {
+        this.reviews = reviews;
+        this.totalReviews = reviews.length;
+
+        // Calcular rating promedio
+        if (reviews.length > 0) {
+          const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+          this.averageRating = sum / reviews.length;
+        } else {
+          this.averageRating = 0;
+        }
+
+        this.reviewsLoading = false;
+        console.log(`✅ ${reviews.length} reseñas cargadas para el espacio`);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando reseñas:', error);
+        this.reviewsLoading = false;
+        // No mostrar error al usuario, simplemente no mostrar reseñas
       }
     });
   }
@@ -240,6 +252,11 @@ export class SpaceDetailComponent implements OnInit {
       month: 'long',
       day: 'numeric'
     }).format(date);
+  }
+
+  getInitials(userId: string): string {
+    // Generar iniciales desde el UUID (primeras 2 letras)
+    return userId.substring(0, 2).toUpperCase();
   }
 
   goBack(): void {

@@ -12,7 +12,7 @@
     </div>
 
     <h1 class="hero-title animate-fade-up delay-100">
-      Encuentra el lugar perfecto <br /> para tu <span class="hero-title-gradient">próximo evento</span>
+      Descubre rincones únicos <br /> con <span class="hero-title-gradient">vistas increíbles</span>
     </h1>
 
     <p class="hero-subtitle animate-fade-up delay-200">
@@ -167,8 +167,8 @@
                 <p class="text-slate-500 text-sm">Capacidad: {{ space.capacity }} pers.</p>
               </div>
 
-              <!-- Rating: Mostrar SOLO si existe -->
-              @if (space.averageRating && space.averageRating > 0) {
+              <!-- Rating: Mostrar SOLO si existe y es mayor a 0 -->
+              @if (space.averageRating != null && space.averageRating > 0) {
                 <div class="flex items-center gap-1 text-sm">
                   <i class="ph-fill ph-star text-slate-900"></i>
                   <span class="font-semibold">{{ space.averageRating | number:'1.1-1' }}</span>
