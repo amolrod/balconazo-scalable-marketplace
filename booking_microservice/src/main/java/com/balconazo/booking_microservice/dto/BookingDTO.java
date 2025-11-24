@@ -25,5 +25,8 @@ public class BookingDTO {
     private String cancellationReason;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // Campo adicional: indica si esta reserva ya tiene una reseña
+    private Boolean hasReview;
 }
 

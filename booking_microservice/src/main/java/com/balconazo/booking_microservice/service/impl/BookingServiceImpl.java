@@ -12,6 +12,7 @@ import com.balconazo.booking_microservice.kafka.event.BookingCreatedEvent;
 import com.balconazo.booking_microservice.kafka.producer.OutboxService;
 import com.balconazo.booking_microservice.mapper.BookingMapper;
 import com.balconazo.booking_microservice.repository.BookingRepository;
+import com.balconazo.booking_microservice.repository.ReviewRepository;
 import com.balconazo.booking_microservice.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final BookingMapper bookingMapper;
     private final OutboxService outboxService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     @Transactional
@@ -176,7 +178,13 @@ public class BookingServiceImpl implements BookingService {
         List<BookingEntity> bookings = bookingRepository.findByGuestIdOrderByCreatedAtDesc(guestId);
 
         return bookings.stream()
-                .map(bookingMapper::toDTO)
+                .map(booking -> {
+                    BookingDTO dto = bookingMapper.toDTO(booking);
+                    // Verificar si esta reserva tiene una reseña asociada
+                    boolean hasReview = reviewRepository.existsByBookingId(booking.getId());
+                    dto.setHasReview(hasReview);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

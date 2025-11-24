@@ -18,6 +18,7 @@ export interface Booking {
   cancellationReason?: string;
   createdAt?: string;
   updatedAt?: string;
+  hasReview?: boolean;  // Indica si la reserva ya tiene una reseña
 }
 
 export interface CreateBookingDTO {

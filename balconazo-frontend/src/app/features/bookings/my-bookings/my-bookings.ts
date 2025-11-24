@@ -127,7 +127,10 @@ export class MyBookingsComponent implements OnInit {
   }
 
   canReview(booking: Booking): boolean {
-    return booking.status === 'COMPLETED';
+    // Solo se puede dejar reseña si:
+    // 1. La reserva está completada
+    // 2. No tiene reseña aún
+    return booking.status === 'COMPLETED' && !booking.hasReview;
   }
 
   openCancelModal(booking: Booking): void {
