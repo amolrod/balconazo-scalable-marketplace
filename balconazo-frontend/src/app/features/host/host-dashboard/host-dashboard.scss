@@ -537,3 +537,131 @@
   }
 }
 
+/* ========== BOOKINGS SECTION ========== */
+.bookings-section {
+  h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    margin-bottom: var(--space-6);
+  }
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.booking-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  &.pending {
+    border-left: 4px solid #f59e0b;
+  }
+
+  &.confirmed {
+    border-left: 4px solid #3b82f6;
+  }
+
+  &.completed {
+    border-left: 4px solid #10b981;
+  }
+
+  &.cancelled {
+    border-left: 4px solid #ef4444;
+    opacity: 0.7;
+  }
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.booking-status {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.booking-date {
+  font-size: var(--text-sm);
+  color: var(--gray-500);
+}
+
+.booking-body {
+  padding: var(--space-4);
+}
+
+.booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.info-row {
+  display: flex;
+  gap: var(--space-3);
+
+  .label {
+    color: var(--gray-500);
+    min-width: 100px;
+  }
+
+  .value {
+    font-weight: var(--font-medium);
+    color: var(--gray-900);
+
+    &.price {
+      color: var(--primary);
+      font-weight: var(--font-bold);
+    }
+  }
+}
+
+.booking-actions {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-top: 1px solid var(--gray-100);
+  background: var(--gray-50);
+}
+
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+

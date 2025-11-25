@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { BookingsService } from '../../../core/services/bookings.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-review',
@@ -15,12 +16,14 @@ export class ReviewComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private bookingsService = inject(BookingsService);
+  private toastService = inject(ToastService);
 
   bookingId: string = '';
   spaceId: string = '';
   loading = false;
   loadingBooking = true;
   error: string | null = null;
+  hasExistingReview = false;
 
   // Form data
   rating = 0;
@@ -30,7 +33,7 @@ export class ReviewComponent implements OnInit {
   ngOnInit(): void {
     // Scroll to top al cargar la página
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     this.bookingId = this.route.snapshot.paramMap.get('id') || '';
     if (!this.bookingId) {
       this.router.navigate(['/my-bookings']);
@@ -46,8 +49,10 @@ export class ReviewComponent implements OnInit {
         // Verificar que la reserva esté completada y no tenga reseña
         if (booking.status?.toUpperCase() !== 'COMPLETED' && booking.status?.toUpperCase() !== 'CONFIRMED') {
           this.error = 'Solo puedes dejar reseñas para reservas completadas o confirmadas';
+          this.hasExistingReview = true; // Bloquear formulario
         } else if (booking.hasReview) {
           this.error = 'Ya has dejado una reseña para esta reserva';
+          this.hasExistingReview = true; // Bloquear formulario
         }
 
         console.log('📋 Booking cargado:', {
@@ -83,23 +88,24 @@ export class ReviewComponent implements OnInit {
   }
 
   submitReview(): void {
+    // Verificar si ya existe reseña
+    if (this.hasExistingReview) {
+      this.toastService.error('Ya has dejado una reseña para esta reserva');
+      return;
+    }
+
     if (!this.rating || this.rating < 1 || this.rating > 5) {
-      alert('Por favor, selecciona una calificación entre 1 y 5 estrellas');
+      this.toastService.warning('Por favor, selecciona una calificación entre 1 y 5 estrellas');
       return;
     }
 
     if (!this.comment.trim()) {
-      alert('Por favor, escribe un comentario sobre tu experiencia');
+      this.toastService.warning('Por favor, escribe un comentario sobre tu experiencia');
       return;
     }
 
     if (!this.bookingId) {
-      alert('No se encontró el ID de la reserva');
-      return;
-    }
-
-    if (!this.spaceId) {
-      alert('No se pudo obtener la información del espacio');
+      this.toastService.error('No se encontró el ID de la reserva');
       return;
     }
 
@@ -119,12 +125,20 @@ export class ReviewComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         console.log('✅ Reseña creada:', response);
-        alert('¡Gracias por tu reseña!');
+        this.hasExistingReview = true; // Marcar como ya reseñada
+        this.toastService.success('¡Gracias por tu reseña!');
         this.router.navigate(['/my-bookings']);
       },
       error: (error) => {
         console.error('❌ Error creando reseña:', error);
-        this.error = error.error?.message || 'No se pudo enviar la reseña. Inténtalo de nuevo.';
+        // Verificar si el error es por reseña duplicada
+        if (error.error?.message?.includes('Ya existe') || error.status === 409) {
+          this.hasExistingReview = true;
+          this.toastService.error('Ya has dejado una reseña para esta reserva');
+        } else {
+          this.error = error.error?.message || 'No se pudo enviar la reseña. Inténtalo de nuevo.';
+          this.toastService.error(this.error || 'Error desconocido');
+        }
         this.loading = false;
       }
     });

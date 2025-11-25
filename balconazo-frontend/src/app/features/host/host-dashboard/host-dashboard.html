@@ -289,11 +289,53 @@
         @if (currentView === 'bookings') {
           <div class="bookings-section">
             <h2>Reservas Recibidas</h2>
-            <app-empty-state
-              icon="inbox"
-              title="No hay reservas"
-              message="Cuando recibas reservas aparecerán aquí">
-            </app-empty-state>
+
+            @if (receivedBookings.length === 0) {
+              <app-empty-state
+                icon="inbox"
+                title="No hay reservas"
+                message="Cuando recibas reservas aparecerán aquí">
+              </app-empty-state>
+            } @else {
+              <div class="bookings-list">
+                @for (booking of receivedBookings; track booking.id) {
+                  <div class="booking-card" [class.pending]="booking.status.toUpperCase() === 'PENDING'" 
+                       [class.confirmed]="booking.status.toUpperCase() === 'CONFIRMED'"
+                       [class.completed]="booking.status.toUpperCase() === 'COMPLETED'"
+                       [class.cancelled]="booking.status.toUpperCase() === 'CANCELLED'">
+                    <div class="booking-header">
+                      <span class="booking-status" [class]="booking.status.toLowerCase()">
+                        {{ getStatusLabel(booking.status) }}
+                      </span>
+                      <span class="booking-date">{{ booking.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="booking-body">
+                      <div class="booking-info">
+                        <div class="info-row">
+                          <span class="label">📅 Fecha:</span>
+                          <span class="value">{{ booking.startTs | date:'dd/MM/yyyy' }} - {{ booking.endTs | date:'dd/MM/yyyy' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="label">👥 Invitados:</span>
+                          <span class="value">{{ booking.numGuests }} persona(s)</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="label">💰 Total:</span>
+                          <span class="value price">{{ booking.totalPriceCents | price }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="booking-actions">
+                      @if (booking.status.toUpperCase() === 'PENDING') {
+                        <button class="btn btn-sm btn-primary" (click)="confirmBooking(booking)">Confirmar</button>
+                        <button class="btn btn-sm btn-ghost" (click)="rejectBooking(booking)">Rechazar</button>
+                      }
+                      <button class="btn btn-sm btn-ghost" (click)="viewBookingSpace(booking)">Ver espacio</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
 

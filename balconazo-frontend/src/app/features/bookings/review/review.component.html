@@ -102,7 +102,7 @@
           type="button"
           class="btn btn-secondary btn-lg"
           (click)="cancel()"
-          [disabled]="loading"
+          [disabled]="loading || hasExistingReview"
         >
           Cancelar
         </button>
@@ -111,11 +111,18 @@
           type="button"
           class="btn btn-primary btn-lg"
           (click)="submitReview()"
-          [disabled]="loading || !rating || !comment.trim()"
+          [disabled]="loading || !rating || !comment.trim() || hasExistingReview"
         >
           @if (loading) {
             <div class="spinner"></div>
             <span>Enviando...</span>
+          } @else if (hasExistingReview) {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <span>Ya has dejado reseña</span>
           } @else {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="9 11 12 14 22 4"></polyline>

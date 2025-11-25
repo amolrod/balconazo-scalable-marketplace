@@ -490,12 +490,17 @@ export class HostDashboardComponent implements OnInit {
     return '/assets/images/placeholder-space.svg';
   }
 
-  getStatusLabel(status: string): string {
+  getStatusLabel(status: string | undefined): string {
+    if (!status) return 'Desconocido';
     const labels: { [key: string]: string } = {
       'ACTIVE': 'Activo',
       'SNOOZED': 'Pausado',
       'DELETED': 'Eliminado',
-      'DRAFT': 'Borrador'
+      'DRAFT': 'Borrador',
+      'PENDING': 'Pendiente',
+      'CONFIRMED': 'Confirmada',
+      'COMPLETED': 'Completada',
+      'CANCELLED': 'Cancelada'
     };
     return labels[status.toUpperCase()] || status;
   }
@@ -526,6 +531,29 @@ export class HostDashboardComponent implements OnInit {
 
   viewSpace(spaceId: string): void {
     this.router.navigate(['/spaces', spaceId]);
+  }
+
+  // Métodos para gestionar reservas
+  confirmBooking(booking: Booking): void {
+    // TODO: Implementar confirmación de reserva cuando el backend lo soporte
+    this.toastService.info('Funcionalidad de confirmar reserva próximamente');
+  }
+
+  rejectBooking(booking: Booking): void {
+    this.bookingsService.cancelBooking(booking.id, 'Rechazada por el host').subscribe({
+      next: () => {
+        const index = this.receivedBookings.findIndex(b => b.id === booking.id);
+        if (index !== -1) {
+          this.receivedBookings[index].status = 'CANCELLED';
+        }
+        this.toastService.success('Reserva rechazada');
+      },
+      error: () => this.toastService.error('Error al rechazar la reserva')
+    });
+  }
+
+  viewBookingSpace(booking: Booking): void {
+    this.router.navigate(['/spaces', booking.spaceId]);
   }
 
   onImagesChanged(images: SpaceImage[]): void {
