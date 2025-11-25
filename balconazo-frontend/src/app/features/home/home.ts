@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SpacesService, Space } from '../../core/services/spaces.service';
+import { FavoritesService } from '../../core/services/favorites.service';
+import { ToastService } from '../../core/services/toast.service';
 import { SkeletonListComponent } from '../../shared/components/skeleton-list/skeleton-list';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state';
 
@@ -22,13 +24,27 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
 export class HomeComponent implements OnInit {
   private router = inject(Router);
   private spacesService = inject(SpacesService);
+  private favoritesService = inject(FavoritesService);
+  private toastService = inject(ToastService);
 
   loading = false;
   error: string | null = null;
+  allSpaces: Space[] = [];
   featuredSpaces: Space[] = [];
 
   // Variable para scroll behavior de category-bar
   hideCategoryBar = false;
+
+  // Categorías para filtrar
+  categories = [
+    { id: 'all', name: 'Todos', icon: 'ph-squares-four', spaceTypes: [] as string[] },
+    { id: 'jardin', name: 'Jardines', icon: 'ph-plant', spaceTypes: ['jardin', 'garden'] },
+    { id: 'terraza', name: 'Terrazas', icon: 'ph-house', spaceTypes: ['terraza', 'terrace', 'rooftop', 'atico'] },
+    { id: 'piscina', name: 'Piscinas', icon: 'ph-swimming-pool', spaceTypes: ['piscina', 'pool'] },
+    { id: 'eventos', name: 'Eventos', icon: 'ph-calendar', spaceTypes: ['salon', 'loft', 'estudio'] },
+    { id: 'rodajes', name: 'Rodajes', icon: 'ph-camera', spaceTypes: ['loft', 'estudio', 'rooftop'] }
+  ];
+  selectedCategory = 'all';
 
   searchParams = {
     location: '',
@@ -70,8 +86,11 @@ export class HomeComponent implements OnInit {
       next: (spaces) => {
         console.log('✅ Espacios cargados desde el backend:', spaces);
 
-        // Usar datos REALES del backend sin simulación
-        this.featuredSpaces = spaces.slice(0, 8);
+        // Guardar todos los espacios
+        this.allSpaces = spaces;
+
+        // Aplicar filtro de categoría
+        this.applyFilter();
 
         console.log('📊 Espacios con datos reales:', this.featuredSpaces.map(s => ({
           id: s.id,
@@ -89,6 +108,36 @@ export class HomeComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  selectCategory(categoryId: string): void {
+    this.selectedCategory = categoryId;
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const category = this.categories.find(c => c.id === this.selectedCategory);
+
+    if (!category || category.spaceTypes.length === 0) {
+      // "Todos" o categoría sin tipos específicos - mostrar todos
+      this.featuredSpaces = this.allSpaces.slice(0, 8);
+    } else {
+      // Filtrar por tipo de espacio
+      const filtered = this.allSpaces.filter(space => {
+        // Buscar en el título o descripción del espacio
+        const titleLower = space.title.toLowerCase();
+        const descLower = (space.description || '').toLowerCase();
+        const spaceTypeLower = ((space as any).spaceType || '').toLowerCase();
+
+        return category.spaceTypes.some(type =>
+          titleLower.includes(type) ||
+          descLower.includes(type) ||
+          spaceTypeLower.includes(type)
+        );
+      });
+
+      this.featuredSpaces = filtered.slice(0, 8);
+    }
   }
 
   onSearch(): void {
@@ -149,10 +198,18 @@ export class HomeComponent implements OnInit {
     return Math.round(space.basePriceCents / 100);
   }
 
-  toggleFavorite(event: Event, spaceId: string): void {
-    event.stopPropagation(); // Evitar que se active el click del card
-    console.log('❤️ Toggle favorito para espacio:', spaceId);
-    // TODO: Implementar lógica de favoritos cuando esté disponible
+  isFavorite(spaceId: string): boolean {
+    return this.favoritesService.isFavorite(spaceId);
+  }
+
+  toggleFavorite(event: Event, space: Space): void {
+    event.stopPropagation();
+    const isNowFavorite = this.favoritesService.toggleFavorite(space.id);
+    
+    if (isNowFavorite) {
+      this.toastService.success(`"${space.title}" añadido a favoritos`);
+    } else {
+      this.toastService.info(`"${space.title}" quitado de favoritos`);
+    }
   }
 }
-

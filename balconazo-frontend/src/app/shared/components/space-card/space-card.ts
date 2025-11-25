@@ -1,9 +1,11 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Space } from '../../../core/models/space.model';
 import { PricePipe } from '../../pipes/price.pipe';
 import { DistancePipe } from '../../pipes/distance.pipe';
+import { FavoritesService } from '../../../core/services/favorites.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 /**
  * SpaceCard Component
@@ -18,6 +20,7 @@ import { DistancePipe } from '../../pipes/distance.pipe';
  * - Amenities principales
  * - Hover effect con elevación
  * - Click para navegar a detalle
+ * - Botón de favoritos
  *
  * @example
  * <app-space-card
@@ -34,10 +37,22 @@ import { DistancePipe } from '../../pipes/distance.pipe';
   styleUrl: './space-card.scss'
 })
 export class SpaceCardComponent {
+  private favoritesService = inject(FavoritesService);
+  private toastService = inject(ToastService);
+
   @Input({ required: true }) space!: Space;
   @Input() showDistance: boolean = false;
   @Input() distance?: number; // En metros
+  @Input() showFavoriteButton: boolean = true;
   @Output() clicked = new EventEmitter<Space>();
+  @Output() favoriteToggled = new EventEmitter<{ spaceId: string; isFavorite: boolean }>();
+
+  /**
+   * Verifica si el espacio es favorito
+   */
+  get isFavorite(): boolean {
+    return this.favoritesService.isFavorite(this.space.id);
+  }
 
   /**
    * Obtiene la imagen principal del espacio
@@ -72,6 +87,22 @@ export class SpaceCardComponent {
    */
   onCardClick(): void {
     this.clicked.emit(this.space);
+  }
+
+  /**
+   * Toggle favorito
+   */
+  onFavoriteClick(event: Event): void {
+    event.stopPropagation();
+    const isNowFavorite = this.favoritesService.toggleFavorite(this.space.id);
+    
+    if (isNowFavorite) {
+      this.toastService.success(`"${this.space.title}" añadido a favoritos`);
+    } else {
+      this.toastService.info(`"${this.space.title}" quitado de favoritos`);
+    }
+    
+    this.favoriteToggled.emit({ spaceId: this.space.id, isFavorite: isNowFavorite });
   }
 
   /**

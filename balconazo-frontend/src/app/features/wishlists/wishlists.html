@@ -1,0 +1,326 @@
+<!-- Wishlists Page -->
+<div class="wishlists-page">
+
+  <!-- Header Section -->
+  <header class="wishlists-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1 class="page-title">Tus Colecciones</h1>
+        <p class="page-subtitle">
+          Organiza tus espacios favoritos, comparte ideas con amigos y planifica tu próximo evento inolvidable.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <!-- View Toggle -->
+        <div class="view-toggle">
+          <button 
+            class="toggle-btn" 
+            [class.active]="view() === 'boards'"
+            (click)="view.set('boards')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </button>
+          <button 
+            class="toggle-btn" 
+            [class.active]="view() === 'list'"
+            (click)="view.set('list')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Create Button -->
+        <button class="btn-create" (click)="openCreateModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nueva Colección
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="wishlists-content">
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-grid">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text short"></div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @else if (collections().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </div>
+        <h3>Aún no tienes favoritos</h3>
+        <p>Guarda espacios que te gusten para encontrarlos fácilmente después</p>
+        <button class="btn-explore" routerLink="/spaces">
+          Explorar espacios
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    }
+
+    @else {
+      <!-- Collections Section -->
+      <section class="collections-section">
+        <div class="section-header">
+          <h2>Tableros</h2>
+          <span class="count-badge">{{ collections().length }}</span>
+        </div>
+
+        <!-- Board View -->
+        @if (view() === 'boards') {
+          <div class="collections-grid">
+            @for (collection of collections(); track trackByCollectionId($index, collection)) {
+              <div class="collection-card group" (click)="viewCollection(collection)">
+                <!-- Stack Effect -->
+                <div class="card-stack">
+                  <div class="stack-layer stack-1"></div>
+                  <div class="stack-layer stack-2"></div>
+                  <div class="stack-main">
+                    <img [src]="getCollectionCover(collection)" [alt]="collection.name">
+                    
+                    <!-- Overlay Info -->
+                    <div class="card-overlay">
+                      <span class="space-count">
+                        {{ collection.spaceIds.length }} {{ collection.spaceIds.length === 1 ? 'espacio' : 'espacios' }}
+                      </span>
+                    </div>
+
+                    <!-- Delete Button (not for default collection) -->
+                    @if (!isDefaultCollection(collection)) {
+                      <button 
+                        class="delete-btn"
+                        (click)="confirmDeleteCollection(collection, $event)"
+                        title="Eliminar colección">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M3 6h18"></path>
+                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Card Info -->
+                <div class="card-info">
+                  <h3>{{ collection.name }}</h3>
+                  <p>
+                    @if (collection.isPrivate) {
+                      <span class="privacy-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Privado
+                      </span>
+                    } @else {
+                      Actualizado {{ formatTimeAgo(collection.updatedAt) }}
+                    }
+                  </p>
+                </div>
+              </div>
+            }
+
+            <!-- Create New Card -->
+            <button class="create-card" (click)="openCreateModal()">
+              <div class="create-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <span>Nueva Colección</span>
+            </button>
+          </div>
+        }
+
+        <!-- List View -->
+        @if (view() === 'list') {
+          <div class="collections-list">
+            @for (collection of collections(); track trackByCollectionId($index, collection)) {
+              <div class="collection-row" (click)="viewCollection(collection)">
+                <div class="row-image">
+                  <img [src]="getCollectionCover(collection)" [alt]="collection.name">
+                </div>
+                <div class="row-info">
+                  <h3>{{ collection.name }}</h3>
+                  <p>{{ collection.spaceIds.length }} espacios • {{ formatTimeAgo(collection.updatedAt) }}</p>
+                </div>
+                <div class="row-actions">
+                  @if (!isDefaultCollection(collection)) {
+                    <button 
+                      class="action-btn danger"
+                      (click)="confirmDeleteCollection(collection, $event)">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      </svg>
+                    </button>
+                  }
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Recent Favorites Section -->
+      @if (recentFavorites().length > 0) {
+        <section class="recent-section">
+          <div class="section-header">
+            <h2>Guardados recientemente</h2>
+          </div>
+
+          <div class="spaces-grid">
+            @for (space of recentFavorites(); track trackBySpaceId($index, space)) {
+              <div class="space-card group" (click)="viewSpace(space.id)">
+                <div class="space-image">
+                  <img [src]="getSpaceImage(space)" [alt]="space.title">
+                  
+                  <!-- Remove Button -->
+                  <button 
+                    class="favorite-btn active"
+                    (click)="removeFavorite(space.id, $event)"
+                    title="Quitar de favoritos">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="space-info">
+                  <div class="space-header">
+                    <h3>{{ space.title }}</h3>
+                    @if (space.averageRating && space.averageRating > 0) {
+                      <div class="rating">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        {{ space.averageRating | number:'1.1-1' }}
+                      </div>
+                    }
+                  </div>
+                  <p class="location">{{ space.address }}</p>
+                  <p class="price">
+                    <strong>{{ getSpacePrice(space) }}€</strong>
+                    <span>/hora</span>
+                  </p>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    }
+  </main>
+</div>
+
+<!-- Create Collection Modal -->
+@if (showCreateModal()) {
+  <div class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeCreateModal()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <h2>Nueva Colección</h2>
+      <p class="modal-subtitle">Agrupa tus espacios favoritos por tema o evento.</p>
+
+      <form (ngSubmit)="createCollection()">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input 
+            type="text" 
+            [(ngModel)]="newCollectionName"
+            name="collectionName"
+            placeholder="Ej: Boda de Laura"
+            maxlength="50"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción <span class="optional">(opcional)</span></label>
+          <textarea 
+            [(ngModel)]="newCollectionDescription"
+            name="collectionDescription"
+            placeholder="Añade una descripción..."
+            maxlength="200"
+            rows="3"></textarea>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-submit"
+          [disabled]="!newCollectionName.trim() || isCreatingCollection">
+          @if (isCreatingCollection) {
+            <span class="spinner"></span>
+            Creando...
+          } @else {
+            Crear Colección
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal()) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+      <div class="modal-icon danger">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+        </svg>
+      </div>
+
+      <h2>¿Eliminar colección?</h2>
+      <p class="modal-subtitle">
+        "{{ collectionToDelete()?.name }}" se eliminará. Los espacios se moverán a "Guardados".
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn-danger" (click)="deleteCollection()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

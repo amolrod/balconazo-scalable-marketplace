@@ -8,6 +8,7 @@ import { MyBookingsComponent } from './features/bookings/my-bookings/my-bookings
 import { ReviewComponent } from './features/bookings/review/review.component';
 import { HostDashboardComponent } from './features/host/host-dashboard/host-dashboard';
 import { HostEarningsComponent } from './features/host/host-earnings/host-earnings';
+import { WishlistsComponent } from './features/wishlists/wishlists';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,10 @@ export const routes: Routes = [
   {
     path: 'bookings/:id/review',
     component: ReviewComponent
+  },
+  {
+    path: 'wishlists',
+    component: WishlistsComponent
   },
   {
     path: 'host/dashboard',

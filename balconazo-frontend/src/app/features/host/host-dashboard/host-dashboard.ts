@@ -49,6 +49,7 @@ export class HostDashboardComponent implements OnInit {
   loading = true;
   currentView: 'overview' | 'spaces' | 'bookings' | 'create-space' | 'edit-space' = 'overview';
   spacesFilter: 'all' | 'active' | 'snoozed' | 'deleted' = 'active';
+  bookingsFilter: 'all' | 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' = 'PENDING';
 
   // Datos
   mySpaces: Space[] = [];
@@ -670,6 +671,46 @@ export class HostDashboardComponent implements OnInit {
 
   viewBookingSpace(booking: Booking): void {
     this.router.navigate(['/spaces', booking.spaceId]);
+  }
+
+  // === MÉTODOS PARA RESERVAS ===
+
+  getFilteredBookings(): Booking[] {
+    if (this.bookingsFilter === 'all') {
+      return this.receivedBookings;
+    }
+    return this.receivedBookings.filter(b => b.status?.toUpperCase() === this.bookingsFilter);
+  }
+
+  getPendingCount(): number {
+    return this.receivedBookings.filter(b => b.status?.toUpperCase() === 'PENDING').length;
+  }
+
+  getTimeAgo(dateString: string | undefined): string {
+    if (!dateString) return 'hace un momento';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `hace ${diffMins}m`;
+    if (diffHours < 24) return `hace ${diffHours}h`;
+    return `hace ${diffDays}d`;
+  }
+
+  getBookingSpaceImage(booking: Booking): string {
+    const space = this.mySpaces.find(s => s.id === booking.spaceId);
+    if (space) {
+      return this.getSpaceImage(space);
+    }
+    return '/assets/images/placeholder-space.svg';
+  }
+
+  getBookingSpaceTitle(booking: Booking): string {
+    const space = this.mySpaces.find(s => s.id === booking.spaceId);
+    return space?.title || 'Espacio';
   }
 
   onImagesChanged(images: SpaceImage[]): void {

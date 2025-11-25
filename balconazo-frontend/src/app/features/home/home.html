@@ -80,30 +80,15 @@
   <div class="category-bar-container">
     <div class="category-list hide-scrollbar">
 
-      <button class="category-item category-item-active">
-        <i class="ph-fill ph-plant category-icon"></i>
-        <span>Jardines</span>
-      </button>
-
-      <button class="category-item">
-        <i class="ph-fill ph-house category-icon"></i>
-        <span>Terrazas</span>
-      </button>
-
-      <button class="category-item">
-        <i class="ph-fill ph-swimming-pool category-icon"></i>
-        <span>Piscinas</span>
-      </button>
-
-      <button class="category-item">
-        <i class="ph-fill ph-calendar category-icon"></i>
-        <span>Eventos</span>
-      </button>
-
-      <button class="category-item">
-        <i class="ph-fill ph-camera category-icon"></i>
-        <span>Rodajes</span>
-      </button>
+      @for (category of categories; track category.id) {
+        <button
+          class="category-item"
+          [class.category-item-active]="selectedCategory === category.id"
+          (click)="selectCategory(category.id)">
+          <i class="ph-fill {{ category.icon }} category-icon"></i>
+          <span>{{ category.name }}</span>
+        </button>
+      }
 
     </div>
   </div>
@@ -132,6 +117,19 @@
     }
 
     <!-- Empty State -->
+    @else if (featuredSpaces.length === 0 && selectedCategory !== 'all') {
+      <div class="empty-category-state">
+        <div class="empty-category-icon">
+          <i class="ph-fill ph-magnifying-glass"></i>
+        </div>
+        <h3>No hay espacios en esta categoría</h3>
+        <p>Prueba seleccionando otra categoría o explora todos los espacios</p>
+        <button class="btn-view-all" (click)="selectCategory('all')">
+          Ver todos los espacios
+        </button>
+      </div>
+    }
+
     @else if (featuredSpaces.length === 0) {
       <app-empty-state
         icon="home"
@@ -154,8 +152,19 @@
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
 
               <!-- Favorite Button -->
-              <button class="absolute top-3 right-3 text-white/70 hover:text-white hover:scale-110 transition" (click)="toggleFavorite($event, space.id)">
-                <i class="ph-fill ph-heart text-2xl drop-shadow-md"></i>
+              <button 
+                class="favorite-btn-home" 
+                [class.is-favorite]="isFavorite(space.id)"
+                (click)="toggleFavorite($event, space)">
+                @if (isFavorite(space.id)) {
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                } @else {
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                }
               </button>
             </div>
 

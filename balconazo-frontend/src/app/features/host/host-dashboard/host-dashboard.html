@@ -337,11 +337,43 @@
         <!-- ========== RESERVAS ========== -->
         @if (currentView === 'bookings') {
           <div class="view-content animate-slide-up">
-            <div class="view-header-row">
-              <h2 class="section-title">Reservas Recibidas</h2>
+            <!-- Header con filtros -->
+            <div class="bookings-header">
+              <div class="bookings-header-left">
+                <h2 class="bookings-title">Gestión de Reservas</h2>
+                <p class="bookings-subtitle">
+                  Tienes <span class="highlight">{{ getPendingCount() }} solicitudes pendientes</span>.
+                </p>
+              </div>
+              <div class="bookings-filter-pills">
+                <button
+                  class="filter-pill-booking"
+                  [class.active]="bookingsFilter === 'PENDING'"
+                  (click)="bookingsFilter = 'PENDING'">
+                  Pendientes
+                </button>
+                <button
+                  class="filter-pill-booking"
+                  [class.active]="bookingsFilter === 'CONFIRMED'"
+                  (click)="bookingsFilter = 'CONFIRMED'">
+                  Confirmadas
+                </button>
+                <button
+                  class="filter-pill-booking"
+                  [class.active]="bookingsFilter === 'COMPLETED'"
+                  (click)="bookingsFilter = 'COMPLETED'">
+                  Finalizadas
+                </button>
+                <button
+                  class="filter-pill-booking"
+                  [class.active]="bookingsFilter === 'all'"
+                  (click)="bookingsFilter = 'all'">
+                  Todas
+                </button>
+              </div>
             </div>
 
-            @if (receivedBookings.length === 0) {
+            @if (getFilteredBookings().length === 0) {
               <div class="empty-state-modern">
                 <div class="empty-icon">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -355,65 +387,106 @@
                 <p>Cuando recibas reservas aparecerán aquí</p>
               </div>
             } @else {
-              <div class="bookings-grid">
-                @for (booking of receivedBookings; track booking.id) {
-                  <div class="booking-card-modern" [class]="'status-' + booking.status.toLowerCase()">
-                    <div class="booking-card-header">
-                      <span class="booking-badge" [class]="booking.status.toLowerCase()">
+              <div class="bookings-grid-new">
+                @for (booking of getFilteredBookings(); track booking.id) {
+                  <div class="booking-card-new" [class]="'status-' + booking.status.toLowerCase()">
+                    <!-- Status indicator bar -->
+                    <div class="status-bar"></div>
+
+                    <!-- Status badge -->
+                    <div class="booking-status-badge">
+                      <span class="status-badge-inner" [class]="booking.status.toLowerCase()">
+                        <span class="status-dot"></span>
                         {{ getStatusLabel(booking.status) }}
                       </span>
-                      <span class="booking-date-sm">{{ booking.createdAt | date:'dd MMM yyyy' }}</span>
                     </div>
-                    <div class="booking-card-body">
-                      <div class="booking-detail">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                          <line x1="16" y1="2" x2="16" y2="6"></line>
-                          <line x1="8" y1="2" x2="8" y2="6"></line>
-                          <line x1="3" y1="10" x2="21" y2="10"></line>
+
+                    <!-- Guest info -->
+                    <div class="booking-guest-section">
+                      <div class="guest-avatar">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        <span>{{ booking.startTs | date:'dd/MM' }} - {{ booking.endTs | date:'dd/MM/yyyy' }}</span>
                       </div>
-                      <div class="booking-detail">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                          <circle cx="9" cy="7" r="4"></circle>
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        <span>{{ booking.numGuests }} persona(s)</span>
-                      </div>
-                      <div class="booking-detail booking-price">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <line x1="12" y1="1" x2="12" y2="23"></line>
-                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                        <span class="price-value">{{ booking.totalPriceCents | price }}</span>
+                      <div class="guest-info">
+                        <h3 class="guest-name">Huésped #{{ booking.id.slice(-4) }}</h3>
+                        <p class="guest-meta">Solicitó {{ getTimeAgo(booking.createdAt) }}</p>
                       </div>
                     </div>
-                    <div class="booking-card-actions">
+
+                    <!-- Space & Details -->
+                    <div class="booking-details-section">
+                      <div class="space-preview-row">
+                        <div class="space-thumb">
+                          <img [src]="getBookingSpaceImage(booking)" alt="Espacio">
+                        </div>
+                        <div class="space-info-mini">
+                          <span class="label-mini">ESPACIO</span>
+                          <span class="value-mini">{{ getBookingSpaceTitle(booking) }}</span>
+                        </div>
+                      </div>
+
+                      <div class="details-grid">
+                        <div class="detail-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                          </svg>
+                          <div>
+                            <span class="detail-label">Fecha</span>
+                            <span class="detail-value">{{ booking.startTs | date:'dd MMM' }}</span>
+                          </div>
+                        </div>
+                        <div class="detail-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                          </svg>
+                          <div>
+                            <span class="detail-label">Personas</span>
+                            <span class="detail-value">{{ booking.numGuests }} Guests</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Footer with price and actions -->
+                    <div class="booking-footer-section">
+                      <div class="price-row">
+                        <span class="price-label">Total estimado</span>
+                        <span class="price-amount">{{ booking.totalPriceCents | price }}</span>
+                      </div>
+
                       @if (booking.status.toUpperCase() === 'PENDING') {
-                        <button class="btn-confirm" (click)="confirmBooking(booking)">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
+                        <div class="action-buttons">
+                          <button class="btn-reject-new" (click)="rejectBooking(booking)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                              <line x1="18" y1="6" x2="6" y2="18"></line>
+                              <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Rechazar
+                          </button>
+                          <button class="btn-confirm-new" (click)="confirmBooking(booking)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            Confirmar
+                          </button>
+                        </div>
+                      } @else {
+                        <button class="btn-view-space" (click)="viewBookingSpace(booking)">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
                           </svg>
-                          Confirmar
-                        </button>
-                        <button class="btn-reject" (click)="rejectBooking(booking)">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
-                          Rechazar
+                          Ver espacio
                         </button>
                       }
-                      <button class="btn-view" (click)="viewBookingSpace(booking)">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        Ver espacio
-                      </button>
                     </div>
                   </div>
                 }
