@@ -9,8 +9,6 @@ import { ToastService } from '../../../core/services/toast.service';
 import { SpaceImagesService } from '../../../core/services/space-images.service';
 import { SpaceImage } from '../../../core/models/space.model';
 import { ImageGalleryManagerComponent } from '../../../shared/image-gallery-manager/image-gallery-manager';
-import { SpaceCardComponent } from '../../../shared/components/space-card/space-card';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state';
 import { PricePipe } from '../../../shared/pipes/price.pipe';
 
 interface DashboardStats {
@@ -22,6 +20,9 @@ interface DashboardStats {
   monthlyEarnings: number;
 }
 
+// Cache for random heights to avoid re-calculation on each render
+const chartHeights: number[] = Array.from({ length: 20 }, () => Math.floor(Math.random() * 80) + 20);
+
 @Component({
   selector: 'app-host-dashboard',
   standalone: true,
@@ -31,8 +32,6 @@ interface DashboardStats {
     ReactiveFormsModule,
     RouterModule,
     ImageGalleryManagerComponent,
-    SpaceCardComponent,
-    EmptyStateComponent,
     PricePipe
   ],
   templateUrl: './host-dashboard.html',
@@ -578,5 +577,21 @@ export class HostDashboardComponent implements OnInit {
         console.log('✅ Espacio actualizado en lista con nuevas imágenes');
       }
     }
+  }
+
+  // === NUEVOS MÉTODOS PARA EL DISEÑO PREMIUM ===
+
+  getUserName(): string {
+    return localStorage.getItem('userName') || 'Host';
+  }
+
+  formatEarnings(cents: number): string {
+    return (cents / 100).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  getRandomHeight(): number {
+    // Use cached heights to avoid re-calculation
+    const index = Math.floor(Math.random() * chartHeights.length);
+    return chartHeights[index];
   }
 }
