@@ -78,6 +78,37 @@ export class HostDashboardComponent implements OnInit {
   showDeleteModal = false;
   spaceToDelete: Space | null = null;
 
+  // Tipos de espacio disponibles
+  spaceTypes = [
+    { value: 'terraza', label: 'Terraza', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>' },
+    { value: 'jardin', label: 'Jardín', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a6 6 0 0 0 6-6c-3.31 0-6 2.69-6 6"/><path d="M12 10a6 6 0 0 1-6-6c3.31 0 6 2.69 6 6"/><path d="M12 10v11"/><path d="M9 21h6"/></svg>' },
+    { value: 'atico', label: 'Ático', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M9 21v-4h6v4"/><path d="M3 7l9-4 9 4"/></svg>' },
+    { value: 'piscina', label: 'Piscina', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M2 12c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/><path d="M2 18c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/></svg>' },
+    { value: 'salon', label: 'Salón', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 3h4v4"/><path d="M3 3h4v4"/></svg>' },
+    { value: 'rooftop', label: 'Rooftop', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22h20"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M2 11h4"/><path d="M18 11h4"/><circle cx="12" cy="9" r="2"/></svg>' },
+    { value: 'loft', label: 'Loft', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>' },
+    { value: 'estudio', label: 'Estudio', icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>' }
+  ];
+
+  // Amenities disponibles con iconos SVG
+  amenitiesList = [
+    { value: 'wifi', label: 'WiFi', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>' },
+    { value: 'parking', label: 'Parking', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>' },
+    { value: 'aire_acondicionado', label: 'Aire Acond.', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 16a4 4 0 1 0 8 0"/><path d="M12 4v8"/><path d="m6 12 6-4 6 4"/></svg>' },
+    { value: 'calefaccion', label: 'Calefacción', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/></svg>' },
+    { value: 'cocina', label: 'Cocina', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v13H3V7z"/><path d="M8 5V3"/><path d="M16 5V3"/><path d="M12 5V3"/><path d="M3 11h18"/></svg>' },
+    { value: 'barbacoa', label: 'Barbacoa', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12c-2-2.67 0-6-1-8 0 3-2 4-3 6-.57.66-1 1.85-1 3a5 5 0 0 0 10 0c0-.86-.29-2.17-1-3-2 3-2.87 3-4 2z"/><path d="M5 18h14"/><path d="M7 22l3-4"/><path d="M14 22l3-4"/></svg>' },
+    { value: 'terraza', label: 'Terraza', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>' },
+    { value: 'vistas', label: 'Vistas', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' },
+    { value: 'musica', label: 'Música', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' },
+    { value: 'proyector', label: 'Proyector', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 12h4"/><path d="M6 17v2"/><path d="M18 17v2"/></svg>' },
+    { value: 'jardin', label: 'Jardín', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 10a6 6 0 0 0 6-6c-3.31 0-6 2.69-6 6"/><path d="M12 10a6 6 0 0 1-6-6c3.31 0 6 2.69 6 6"/><path d="M12 10v11"/><path d="M9 21h6"/></svg>' },
+    { value: 'piscina', label: 'Piscina', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M2 12c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/><path d="M2 18c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/></svg>' },
+    { value: 'mascotas', label: 'Mascotas', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="4" cy="8" r="2"/><path d="M12 12c-2-1-4-2-4-4s2-3 4-3 4 1 4 3-2 3-4 4z"/><path d="M12 12v5c0 2 2 3 4 3"/><path d="M12 17c0 2-2 3-4 3"/></svg>' },
+    { value: 'accesible', label: 'Accesible', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="4" r="2"/><path d="M12 14v7"/><path d="M9 12h6"/><circle cx="12" cy="19" r="2"/><path d="M6 19h0"/><path d="M18 19h0"/></svg>' },
+    { value: 'fumadores', label: 'Fumadores', icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 12h.01"/><rect x="2" y="12" width="16" height="4" rx="1"/><path d="M20 12v4"/><path d="M22 12v4"/><path d="M15 6c0-1.1.9-2 2-2h0a2 2 0 0 1 2 2v2"/></svg>' }
+  ];
+
   constructor() {
     this.spaceForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
@@ -88,7 +119,8 @@ export class HostDashboardComponent implements OnInit {
       capacity: [1, [Validators.required, Validators.min(1)]],
       basePriceCents: [25.00, [Validators.required, Validators.min(1)]], // Mostrar en euros
       areaSqm: [null, [Validators.min(1)]],
-      amenities: [[]]
+      amenities: [[]],
+      spaceType: ['terraza']
     });
   }
 
@@ -528,6 +560,15 @@ export class HostDashboardComponent implements OnInit {
     }
 
     this.spaceForm.patchValue({ amenities });
+  }
+
+  isAmenitySelected(amenity: string): boolean {
+    const amenities = this.spaceForm.value.amenities || [];
+    return amenities.includes(amenity);
+  }
+
+  selectSpaceType(type: string): void {
+    this.spaceForm.patchValue({ spaceType: type });
   }
 
   getAmenityLabel(amenity: string): string {

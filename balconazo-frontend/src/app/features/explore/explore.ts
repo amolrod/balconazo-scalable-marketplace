@@ -60,16 +60,16 @@ export class ExploreComponent implements OnInit {
   pageSize = 20;
   hasMore = true;
 
-  // Amenities options
+  // Amenities options with SVG icons
   amenitiesOptions = [
-    { value: 'wifi', label: 'WiFi', icon: '📶' },
-    { value: 'parking', label: 'Parking', icon: '🅿️' },
-    { value: 'terraza', label: 'Terraza', icon: '🏞️' },
-    { value: 'cocina', label: 'Cocina', icon: '🍳' },
-    { value: 'barbacoa', label: 'Barbacoa', icon: '🔥' },
-    { value: 'piscina', label: 'Piscina', icon: '🏊' },
-    { value: 'aire_acondicionado', label: 'Aire Acondicionado', icon: '❄️' },
-    { value: 'musica', label: 'Sistema de Música', icon: '🎵' }
+    { value: 'wifi', label: 'WiFi', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>' },
+    { value: 'parking', label: 'Parking', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>' },
+    { value: 'terraza', label: 'Terraza', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>' },
+    { value: 'cocina', label: 'Cocina', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v13H3V7z"/><path d="M8 5V3"/><path d="M16 5V3"/><path d="M12 5V3"/><path d="M3 11h18"/></svg>' },
+    { value: 'barbacoa', label: 'Barbacoa', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12c-2-2.67 0-6-1-8 0 3-2 4-3 6-.57.66-1 1.85-1 3a5 5 0 0 0 10 0c0-.86-.29-2.17-1-3-2 3-2.87 3-4 2z"/><path d="M5 18h14"/><path d="M7 22l3-4"/><path d="M14 22l3-4"/></svg>' },
+    { value: 'piscina', label: 'Piscina', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M2 12c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/><path d="M2 18c1-2 3-3 5-3s4 2 5 4 3 4 5 4 4-1 5-3"/></svg>' },
+    { value: 'aire_acondicionado', label: 'Aire Acond.', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 16a4 4 0 1 0 8 0"/><path d="M12 4v8"/><path d="m6 12 6-4 6 4"/></svg>' },
+    { value: 'musica', label: 'Música', icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' }
   ];
 
   ngOnInit(): void {
@@ -214,6 +214,11 @@ export class ExploreComponent implements OnInit {
 
   toggleViewMode(): void {
     this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
+  }
+
+  toggleSortOrder(): void {
+    this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+    this.applyFilters();
   }
 
   toggleFilters(): void {

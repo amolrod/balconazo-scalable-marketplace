@@ -99,7 +99,7 @@
                   class="amenity-chip"
                   [class.selected]="isAmenitySelected(amenity.value)"
                   (click)="toggleAmenity(amenity.value)">
-                  <span class="amenity-icon">{{ amenity.icon }}</span>
+                  <span class="amenity-icon-svg" [innerHTML]="amenity.icon"></span>
                   <span class="amenity-label">{{ amenity.label }}</span>
                 </button>
               }
@@ -119,12 +119,31 @@
 
             <div class="toolbar-actions">
               <!-- Sort -->
-              <div class="sort-dropdown">
+              <div class="sort-controls">
                 <select class="form-select" [(ngModel)]="sortBy" (change)="applyFilters()">
                   <option value="distance">Distancia</option>
                   <option value="price">Precio</option>
                   <option value="rating">Valoración</option>
                 </select>
+                <button class="sort-order-btn" (click)="toggleSortOrder()" [title]="sortOrder === 'asc' ? 'Ascendente' : 'Descendente'">
+                  @if (sortOrder === 'asc') {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m3 16 4 4 4-4"/>
+                      <path d="M7 20V4"/>
+                      <path d="M11 4h10"/>
+                      <path d="M11 8h7"/>
+                      <path d="M11 12h4"/>
+                    </svg>
+                  } @else {
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="m3 8 4-4 4 4"/>
+                      <path d="M7 4v16"/>
+                      <path d="M11 12h10"/>
+                      <path d="M11 16h7"/>
+                      <path d="M11 20h4"/>
+                    </svg>
+                  }
+                </button>
               </div>
 
               <!-- View Mode -->
@@ -195,15 +214,6 @@
                 </app-space-card>
               }
             </div>
-
-            <!-- Load More -->
-            @if (hasMore && spaces.length >= pageSize) {
-              <div class="load-more">
-                <button class="btn btn-secondary btn-lg" (click)="loadMore()">
-                  Cargar más espacios
-                </button>
-              </div>
-            }
           }
         </main>
       </div>
