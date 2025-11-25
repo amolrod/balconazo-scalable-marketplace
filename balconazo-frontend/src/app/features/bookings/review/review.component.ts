@@ -28,6 +28,9 @@ export class ReviewComponent implements OnInit {
   hoverRating = 0;
 
   ngOnInit(): void {
+    // Scroll to top al cargar la página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     this.bookingId = this.route.snapshot.paramMap.get('id') || '';
     if (!this.bookingId) {
       this.router.navigate(['/my-bookings']);
@@ -46,7 +49,7 @@ export class ReviewComponent implements OnInit {
         } else if (booking.hasReview) {
           this.error = 'Ya has dejado una reseña para esta reserva';
         }
-        
+
         console.log('📋 Booking cargado:', {
           id: this.bookingId,
           spaceId: this.spaceId,

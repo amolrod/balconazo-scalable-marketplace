@@ -196,7 +196,13 @@ public class BookingServiceImpl implements BookingService {
         List<BookingEntity> bookings = bookingRepository.findBySpaceIdOrderByStartTsAsc(spaceId);
 
         return bookings.stream()
-                .map(bookingMapper::toDTO)
+                .map(booking -> {
+                    BookingDTO dto = bookingMapper.toDTO(booking);
+                    // Verificar si esta reserva tiene una reseña asociada
+                    boolean hasReview = reviewRepository.existsByBookingId(booking.getId());
+                    dto.setHasReview(hasReview);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 

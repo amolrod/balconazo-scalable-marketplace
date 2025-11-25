@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { SpacesService, Space } from '../../../core/services/spaces.service';
 import { BookingsService, Booking } from '../../../core/services/bookings.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -109,6 +110,9 @@ export class HostDashboardComponent implements OnInit {
         this.calculateStats();
         this.loading = false;
         console.log('✅ Espacios del host cargados:', spaces);
+        
+        // Cargar reservas de todos los espacios del host
+        this.loadHostBookings(spaces);
       },
       error: (error) => {
         console.error('❌ Error cargando espacios:', error);
@@ -116,9 +120,43 @@ export class HostDashboardComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
 
-    // TODO: Cargar bookings recibidos cuando el backend lo implemente
-    // Por ahora, stats basados solo en espacios
+  loadHostBookings(spaces: Space[]): void {
+    if (spaces.length === 0) {
+      this.receivedBookings = [];
+      return;
+    }
+
+    // Cargar reservas de cada espacio y combinarlas
+    const bookingRequests = spaces.map(space => 
+      this.bookingsService.getBookingsBySpace(space.id)
+    );
+
+    // Usar forkJoin para esperar todas las requests
+    forkJoin(bookingRequests).subscribe({
+      next: (bookingsArrays) => {
+        // Combinar todas las reservas y ordenar por fecha
+        this.receivedBookings = bookingsArrays
+          .flat()
+          .sort((a, b) => new Date(b.startTs).getTime() - new Date(a.startTs).getTime());
+        
+        // Actualizar stats
+        this.stats.totalBookings = this.receivedBookings.length;
+        this.stats.pendingBookings = this.receivedBookings.filter(
+          b => b.status?.toUpperCase() === 'PENDING' || b.status?.toUpperCase() === 'CONFIRMED'
+        ).length;
+        this.stats.totalEarnings = this.receivedBookings
+          .filter(b => b.status?.toUpperCase() === 'COMPLETED')
+          .reduce((sum, b) => sum + (b.totalPriceCents || 0), 0);
+        
+        console.log('✅ Reservas del host cargadas:', this.receivedBookings.length);
+      },
+      error: (error) => {
+        console.error('❌ Error cargando reservas:', error);
+        this.receivedBookings = [];
+      }
+    });
   }
 
   calculateStats(): void {

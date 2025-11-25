@@ -149,8 +149,8 @@ export class SpaceDetailComponent implements OnInit {
         // Buscar una reserva completada o confirmada sin reseña para este espacio
         // COMPLETED = reserva finalizada, CONFIRMED = reserva activa (también puede dejar reseña)
         const completedBooking = bookings.find(
-          b => b.spaceId === spaceId && 
-               (b.status?.toUpperCase() === 'COMPLETED' || b.status?.toUpperCase() === 'CONFIRMED') && 
+          b => b.spaceId === spaceId &&
+               (b.status?.toUpperCase() === 'COMPLETED' || b.status?.toUpperCase() === 'CONFIRMED') &&
                !b.hasReview
         );        if (completedBooking) {
           this.canLeaveReview = true;
