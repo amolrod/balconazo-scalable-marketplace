@@ -42,6 +42,18 @@ $slate-900: #0f172a;
   50% { opacity: 0.5; }
 }
 
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(20deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+.wave {
+  display: inline-block;
+  animation: wave 1.5s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
 .animate-slide-up {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -909,6 +921,18 @@ $slate-900: #0f172a;
 
   &:hover {
     background: $brand-600;
+    color: white;
+  }
+
+  // Botón de pausar (naranja)
+  &.pause:hover {
+    background: #f59e0b;
+    color: white;
+  }
+
+  // Botón de activar (verde)
+  &.play:hover {
+    background: #10b981;
     color: white;
   }
 

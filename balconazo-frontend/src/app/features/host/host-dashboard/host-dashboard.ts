@@ -589,9 +589,8 @@ export class HostDashboardComponent implements OnInit {
     return (cents / 100).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
 
-  getRandomHeight(): number {
-    // Use cached heights to avoid re-calculation
-    const index = Math.floor(Math.random() * chartHeights.length);
-    return chartHeights[index];
+  getRandomHeight(index: number): number {
+    // Use cached heights with fixed index to avoid NG0100 error
+    return chartHeights[index % chartHeights.length];
   }
 }

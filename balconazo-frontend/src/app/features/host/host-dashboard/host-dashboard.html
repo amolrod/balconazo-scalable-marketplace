@@ -60,7 +60,9 @@
             <!-- Header con saludo -->
             <div class="view-header">
               <div class="header-left">
-                <h1 class="greeting">Buenos días, {{ getUserName() }} ☀️</h1>
+                <h1 class="greeting">
+                  <span class="wave">👋</span> ¡Hola, {{ getUserName() }}!
+                </h1>
                 <p class="subtitle">Aquí tienes lo que está pasando hoy en tus espacios.</p>
               </div>
               <div class="header-actions">
@@ -93,20 +95,14 @@
                   </svg>
                 </div>
                 <div class="stat-featured-content">
-                  <p class="stat-label-sm">GANANCIAS ESTE MES</p>
+                  <p class="stat-label-sm">GANANCIAS TOTALES</p>
                   <div class="stat-value-row">
-                    <h2 class="stat-value-xl">{{ formatEarnings(stats.monthlyEarnings) }}€</h2>
-                    <span class="stat-trend positive">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                      </svg>
-                      +12%
-                    </span>
+                    <h2 class="stat-value-xl">{{ formatEarnings(stats.totalEarnings) }}€</h2>
                   </div>
-                  <!-- Mini chart placeholder -->
+                  <!-- Mini chart decorativo -->
                   <div class="mini-chart">
-                    @for (i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]; track i) {
-                      <div class="chart-bar" [style.height.%]="getRandomHeight()"></div>
+                    @for (i of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]; track i) {
+                      <div class="chart-bar" [style.height.%]="getRandomHeight(i)"></div>
                     }
                   </div>
                 </div>
@@ -278,6 +274,23 @@
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                           <circle cx="12" cy="12" r="3"></circle>
                         </svg>
+                      </button>
+                      <button 
+                        class="overlay-btn" 
+                        [class.pause]="space.status.toUpperCase() === 'ACTIVE'"
+                        [class.play]="space.status.toUpperCase() === 'SNOOZED'"
+                        (click)="toggleSpaceStatus(space); $event.stopPropagation()" 
+                        [title]="space.status.toUpperCase() === 'ACTIVE' ? 'Pausar' : 'Activar'">
+                        @if (space.status.toUpperCase() === 'ACTIVE') {
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                          </svg>
+                        } @else {
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                          </svg>
+                        }
                       </button>
                     </div>
                   </div>
