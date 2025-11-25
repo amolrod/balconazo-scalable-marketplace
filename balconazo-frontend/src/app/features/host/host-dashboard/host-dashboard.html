@@ -3,7 +3,7 @@
   <div class="dashboard-subnav">
     <div class="subnav-container">
       <div class="subnav-tabs">
-        <button 
+        <button
           class="subnav-tab"
           [class.active]="currentView === 'overview'"
           (click)="changeView('overview')">
@@ -15,7 +15,7 @@
           </svg>
           Resumen
         </button>
-        <button 
+        <button
           class="subnav-tab"
           [class.active]="currentView === 'spaces'"
           (click)="changeView('spaces')">
@@ -25,7 +25,7 @@
           Mis Espacios
           <span class="tab-badge">{{ stats.totalSpaces }}</span>
         </button>
-        <button 
+        <button
           class="subnav-tab"
           [class.active]="currentView === 'bookings'"
           (click)="changeView('bookings')">
@@ -60,19 +60,17 @@
             <!-- Header con saludo -->
             <div class="view-header">
               <div class="header-left">
-                <h1 class="greeting">
-                  <span class="wave">👋</span> ¡Hola, {{ getUserName() }}!
-                </h1>
+                <h1 class="greeting">{{ getGreeting() }}, {{ getUserName() }}</h1>
                 <p class="subtitle">Aquí tienes lo que está pasando hoy en tus espacios.</p>
               </div>
               <div class="header-actions">
-                <button class="btn-outline">
+                <button class="btn-outline" (click)="downloadReport()">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
-                  Reporte
+                  Descargar CSV
                 </button>
                 <button class="btn-primary" (click)="changeView('create-space')">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -87,7 +85,7 @@
             <!-- Stats Grid -->
             <div class="stats-grid">
               <!-- Earnings Card (destacado) -->
-              <div class="stat-card stat-card-featured">
+              <div class="stat-card stat-card-featured stat-card-clickable" (click)="goToEarnings()">
                 <div class="stat-bg-icon">
                   <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor" opacity="0.05">
                     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
@@ -109,10 +107,15 @@
               </div>
 
               <!-- Active Spaces -->
-              <div class="stat-card">
+              <div class="stat-card stat-card-clickable" (click)="changeView('spaces')">
                 <div class="stat-icon stat-icon-blue">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <div class="stat-card-right">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
                 </div>
                 <h3 class="stat-value">{{ stats.activeSpaces }}</h3>
@@ -219,19 +222,19 @@
             <div class="view-header-row">
               <h2 class="section-title">Catálogo de Espacios</h2>
               <div class="filter-pills">
-                <button 
+                <button
                   class="filter-pill"
                   [class.active]="spacesFilter === 'all'"
                   (click)="spacesFilter = 'all'">
                   Todos
                 </button>
-                <button 
+                <button
                   class="filter-pill"
                   [class.active]="spacesFilter === 'active'"
                   (click)="spacesFilter = 'active'">
                   Activos
                 </button>
-                <button 
+                <button
                   class="filter-pill"
                   [class.active]="spacesFilter === 'snoozed'"
                   (click)="spacesFilter = 'snoozed'">
@@ -275,11 +278,11 @@
                           <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                       </button>
-                      <button 
-                        class="overlay-btn" 
+                      <button
+                        class="overlay-btn"
                         [class.pause]="space.status.toUpperCase() === 'ACTIVE'"
                         [class.play]="space.status.toUpperCase() === 'SNOOZED'"
-                        (click)="toggleSpaceStatus(space); $event.stopPropagation()" 
+                        (click)="toggleSpaceStatus(space); $event.stopPropagation()"
                         [title]="space.status.toUpperCase() === 'ACTIVE' ? 'Pausar' : 'Activar'">
                         @if (space.status.toUpperCase() === 'ACTIVE') {
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -312,13 +315,7 @@
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                           </svg>
-                          {{ space.capacity }}
-                        </span>
-                        <span>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                          </svg>
-                          4.9
+                          {{ space.capacity }} pers.
                         </span>
                       </div>
                       <div class="space-card-price">{{ space.basePriceCents | price }}</div>
@@ -454,10 +451,10 @@
                   <form [formGroup]="spaceForm" (ngSubmit)="editingSpaceId ? updateSpace() : createSpace()" class="premium-form">
                     <div class="form-group">
                       <label class="form-label">TÍTULO DEL ANUNCIO</label>
-                      <input 
-                        type="text" 
-                        class="form-input" 
-                        formControlName="title" 
+                      <input
+                        type="text"
+                        class="form-input"
+                        formControlName="title"
                         placeholder="Ej: Terraza Chill-out con Vistas">
                       @if (spaceForm.get('title')?.invalid && spaceForm.get('title')?.touched) {
                         <span class="form-error">El título es obligatorio (mínimo 5 caracteres)</span>
@@ -469,18 +466,18 @@
                         <label class="form-label">PRECIO / HORA (€)</label>
                         <div class="input-with-prefix">
                           <span class="input-prefix">€</span>
-                          <input 
-                            type="number" 
-                            class="form-input" 
+                          <input
+                            type="number"
+                            class="form-input"
                             formControlName="basePriceCents"
                             step="0.01">
                         </div>
                       </div>
                       <div class="form-group">
                         <label class="form-label">CAPACIDAD (PERS)</label>
-                        <input 
-                          type="number" 
-                          class="form-input" 
+                        <input
+                          type="number"
+                          class="form-input"
                           formControlName="capacity"
                           min="1">
                       </div>
@@ -488,10 +485,10 @@
 
                     <div class="form-group">
                       <label class="form-label">DESCRIPCIÓN</label>
-                      <textarea 
-                        class="form-textarea" 
-                        formControlName="description" 
-                        rows="4" 
+                      <textarea
+                        class="form-textarea"
+                        formControlName="description"
+                        rows="4"
                         placeholder="Describe lo increíble que es tu espacio..."></textarea>
                       @if (spaceForm.get('description')?.invalid && spaceForm.get('description')?.touched) {
                         <span class="form-error">La descripción es obligatoria (mínimo 20 caracteres)</span>
@@ -505,10 +502,10 @@
                           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                           <circle cx="12" cy="10" r="3" fill="white"></circle>
                         </svg>
-                        <input 
-                          type="text" 
-                          class="form-input" 
-                          formControlName="address" 
+                        <input
+                          type="text"
+                          class="form-input"
+                          formControlName="address"
                           placeholder="Buscar dirección...">
                       </div>
                       @if (spaceForm.get('address')?.invalid && spaceForm.get('address')?.touched) {
@@ -535,25 +532,55 @@
                     </div>
 
                     <!-- Galería de Imágenes -->
-                    @if (editingSpaceId) {
-                      <div class="images-section">
-                        <h3>Imágenes del espacio</h3>
+                    <div class="images-section">
+                      <h3>Imágenes del espacio</h3>
+                      @if (editingSpaceId) {
                         <app-image-gallery-manager
                           [spaceId]="editingSpaceId"
                           [images]="spaceImages"
                           (imagesChange)="onImagesChanged($event)">
                         </app-image-gallery-manager>
-                      </div>
-                    } @else {
-                      <div class="form-tip">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <line x1="12" y1="16" x2="12" y2="12" stroke="white" stroke-width="2"></line>
-                          <line x1="12" y1="8" x2="12.01" y2="8" stroke="white" stroke-width="2"></line>
-                        </svg>
-                        <p>Después de crear el espacio, podrás añadir fotos en la página de edición.</p>
-                      </div>
-                    }
+                      } @else {
+                        <!-- Subida de imágenes para nuevo espacio -->
+                        <div class="images-upload-new">
+                          <input
+                            type="file"
+                            id="newSpaceImages"
+                            accept="image/*"
+                            multiple
+                            (change)="onNewSpaceImagesSelected($event)"
+                            style="display: none">
+                          <label for="newSpaceImages" class="upload-area">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span>Arrastra fotos o haz clic para seleccionar</span>
+                            <small>Formatos: JPG, PNG, WebP (máx 5MB cada una)</small>
+                          </label>
+
+                          @if (pendingImages.length > 0) {
+                            <div class="pending-images-grid">
+                              @for (img of pendingImages; track img.name; let i = $index) {
+                                <div class="pending-image-item">
+                                  <img [src]="img.preview" [alt]="img.name">
+                                  <button class="remove-pending-btn" (click)="removePendingImage(i)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                  </button>
+                                  @if (i === 0) {
+                                    <span class="primary-badge">Principal</span>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
 
                     @if (formError) {
                       <div class="form-error-box">{{ formError }}</div>
@@ -563,9 +590,9 @@
 
                 <div class="form-actions-row">
                   <button type="button" class="btn-cancel" (click)="changeView('overview')">Cancelar</button>
-                  <button 
-                    type="button" 
-                    class="btn-submit" 
+                  <button
+                    type="button"
+                    class="btn-submit"
                     [disabled]="spaceForm.invalid || formLoading"
                     (click)="editingSpaceId ? updateSpace() : createSpace()">
                     {{ formLoading ? 'Guardando...' : 'Continuar' }}

@@ -7,6 +7,7 @@ import { SpaceDetailComponent } from './features/spaces/space-detail/space-detai
 import { MyBookingsComponent } from './features/bookings/my-bookings/my-bookings';
 import { ReviewComponent } from './features/bookings/review/review.component';
 import { HostDashboardComponent } from './features/host/host-dashboard/host-dashboard';
+import { HostEarningsComponent } from './features/host/host-earnings/host-earnings';
 
 export const routes: Routes = [
   {
@@ -44,6 +45,10 @@ export const routes: Routes = [
   {
     path: 'host/dashboard',
     component: HostDashboardComponent
+  },
+  {
+    path: 'host/earnings',
+    component: HostEarningsComponent
   },
   {
     path: '**',

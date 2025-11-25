@@ -71,6 +71,9 @@ export class HostDashboardComponent implements OnInit {
   // Imágenes del espacio en edición
   spaceImages: SpaceImage[] = [];
 
+  // Imágenes pendientes para nuevo espacio
+  pendingImages: { file: File; preview: string; name: string }[] = [];
+
   // Modal de confirmación
   showDeleteModal = false;
   spaceToDelete: Space | null = null;
@@ -206,12 +209,33 @@ export class HostDashboardComponent implements OnInit {
     this.spacesService.createSpace(spaceData).subscribe({
       next: (space) => {
         console.log('✅ Espacio creado:', space);
-        this.mySpaces.unshift(space);
-        this.calculateStats();
-        this.toastService.success('✓ Espacio creado exitosamente');
-        this.changeView('spaces');
-        this.resetForm();
-        this.formLoading = false;
+
+        // Si hay imágenes pendientes, subirlas
+        if (this.pendingImages.length > 0) {
+          this.uploadPendingImages(space.id).then(() => {
+            this.mySpaces.unshift(space);
+            this.calculateStats();
+            this.toastService.success('✓ Espacio creado con imágenes');
+            this.changeView('spaces');
+            this.resetForm();
+            this.formLoading = false;
+          }).catch(() => {
+            // Espacio creado pero error en imágenes
+            this.mySpaces.unshift(space);
+            this.calculateStats();
+            this.toastService.warning('Espacio creado, pero hubo errores con algunas imágenes');
+            this.changeView('spaces');
+            this.resetForm();
+            this.formLoading = false;
+          });
+        } else {
+          this.mySpaces.unshift(space);
+          this.calculateStats();
+          this.toastService.success('✓ Espacio creado exitosamente');
+          this.changeView('spaces');
+          this.resetForm();
+          this.formLoading = false;
+        }
       },
       error: (error) => {
         console.error('❌ Error creando espacio:', error);
@@ -220,6 +244,57 @@ export class HostDashboardComponent implements OnInit {
         this.formLoading = false;
       }
     });
+  }
+
+  private async uploadPendingImages(spaceId: string): Promise<void> {
+    for (let i = 0; i < this.pendingImages.length; i++) {
+      const img = this.pendingImages[i];
+      try {
+        await this.imagesService.uploadImage(spaceId, img.file, i === 0).toPromise();
+        console.log(`✅ Imagen ${i + 1} subida`);
+      } catch (error) {
+        console.error(`❌ Error subiendo imagen ${i + 1}:`, error);
+      }
+    }
+  }
+
+  onNewSpaceImagesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const files = Array.from(input.files);
+
+    for (const file of files) {
+      // Validar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.toastService.error(`${file.name} es demasiado grande (máx 5MB)`);
+        continue;
+      }
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        this.toastService.error(`${file.name} no es una imagen válida`);
+        continue;
+      }
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.pendingImages.push({
+          file,
+          preview: e.target?.result as string,
+          name: file.name
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Reset input para permitir seleccionar el mismo archivo de nuevo
+    input.value = '';
+  }
+
+  removePendingImage(index: number): void {
+    this.pendingImages.splice(index, 1);
   }
 
   editSpace(space: Space): void {
@@ -400,6 +475,7 @@ export class HostDashboardComponent implements OnInit {
     });
     this.editingSpaceId = null;
     this.formError = null;
+    this.pendingImages = []; // Limpiar imágenes pendientes
   }
 
   // === UTILIDADES ===
@@ -585,6 +661,13 @@ export class HostDashboardComponent implements OnInit {
     return localStorage.getItem('userName') || 'Host';
   }
 
+  getGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
   formatEarnings(cents: number): string {
     return (cents / 100).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
@@ -592,5 +675,39 @@ export class HostDashboardComponent implements OnInit {
   getRandomHeight(index: number): number {
     // Use cached heights with fixed index to avoid NG0100 error
     return chartHeights[index % chartHeights.length];
+  }
+
+  goToEarnings(): void {
+    this.router.navigate(['/host/earnings']);
+  }
+
+  downloadReport(): void {
+    // Generar CSV con datos de espacios y reservas
+    const headers = ['Espacio', 'Estado', 'Precio/hora', 'Capacidad', 'Dirección'];
+    const rows = this.mySpaces.map(space => [
+      space.title,
+      this.getStatusLabel(space.status),
+      (space.basePriceCents / 100).toFixed(2) + '€',
+      space.capacity.toString(),
+      space.address
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    // Descargar archivo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `balconazo-espacios-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    this.toastService.success('Reporte CSV descargado');
   }
 }
