@@ -109,7 +109,7 @@ export class HostDashboardComponent implements OnInit {
         this.calculateStats();
         this.loading = false;
         console.log('✅ Espacios del host cargados:', spaces);
-        
+
         // Cargar reservas de todos los espacios del host
         this.loadHostBookings(spaces);
       },
@@ -128,7 +128,7 @@ export class HostDashboardComponent implements OnInit {
     }
 
     // Cargar reservas de cada espacio y combinarlas
-    const bookingRequests = spaces.map(space => 
+    const bookingRequests = spaces.map(space =>
       this.bookingsService.getBookingsBySpace(space.id)
     );
 
@@ -139,7 +139,7 @@ export class HostDashboardComponent implements OnInit {
         this.receivedBookings = bookingsArrays
           .flat()
           .sort((a, b) => new Date(b.startTs).getTime() - new Date(a.startTs).getTime());
-        
+
         // Actualizar stats
         this.stats.totalBookings = this.receivedBookings.length;
         this.stats.pendingBookings = this.receivedBookings.filter(
@@ -148,7 +148,7 @@ export class HostDashboardComponent implements OnInit {
         this.stats.totalEarnings = this.receivedBookings
           .filter(b => b.status?.toUpperCase() === 'COMPLETED')
           .reduce((sum, b) => sum + (b.totalPriceCents || 0), 0);
-        
+
         console.log('✅ Reservas del host cargadas:', this.receivedBookings.length);
       },
       error: (error) => {
